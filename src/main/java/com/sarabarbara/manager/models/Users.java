@@ -84,6 +84,7 @@ public class Users implements Serializable {
      * The genre
      */
 
+    @NonNull
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
@@ -99,7 +100,7 @@ public class Users implements Serializable {
      */
 
     @NonNull
-    @Column(name = "premium", columnDefinition = "TINYINT(1)")
+    @Column(name = "premium")
     private Boolean premium;
 
     /**

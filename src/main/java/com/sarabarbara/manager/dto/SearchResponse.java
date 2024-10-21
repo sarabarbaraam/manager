@@ -1,9 +1,6 @@
 package com.sarabarbara.manager.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,31 +17,32 @@ import java.util.Objects;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class SearchResponse<T> {
 
     /**
      * The results
      */
 
-    List<T> results;
+    private List<T> results;
 
     /**
      * The totalResults
      */
 
-    int totalResults;
+    private int totalResults;
 
     /**
      * The currentPage
      */
 
-    int currentPage;
+    private int currentPage;
 
     /**
      * The totalPage
      */
 
-    int totalPage;
+    private int totalPage;
 
     /**
      * The equals

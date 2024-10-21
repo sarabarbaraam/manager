@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.dto;
 
+import com.sarabarbara.manager.dto.users.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

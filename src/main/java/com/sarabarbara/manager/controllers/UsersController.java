@@ -2,7 +2,8 @@ package com.sarabarbara.manager.controllers;
 
 import com.sarabarbara.manager.dto.SearchResponse;
 import com.sarabarbara.manager.dto.UpdateUserResponse;
-import com.sarabarbara.manager.dto.UserDTO;
+import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.services.UsersService;
 import lombok.AllArgsConstructor;
@@ -38,10 +39,16 @@ public class UsersController {
 
             Users createdUser = usersService.createUser(user);
 
-            UserDTO userDTO =
-                    UserDTO.builder().id(createdUser.getId()).name(createdUser.getName()).username(createdUser.getUsername())
-                            .email(createdUser.getEmail()).genre(createdUser.getGenre())
-                            .profilePictureURL(createdUser.getProfilePictureURL()).premium(createdUser.getPremium()).build();
+            UserDTO userDTO = UserDTO.builder()
+                    .id(createdUser.getId())
+                    .name(createdUser.getName())
+                    .username(createdUser.getUsername())
+                    .email(createdUser.getEmail())
+                    .genre(createdUser.getGenre())
+                    .profilePictureURL(createdUser.getProfilePictureURL())
+                    .premium(createdUser.getPremium())
+                    .build();
+
 
             return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
 
@@ -49,25 +56,27 @@ public class UsersController {
 
             logger.error("Error creating user", e);
 
-               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-}
 
     /**
      * The Search User Controller
      */
 
-    @GetMapping("/search/{identifier}")
-    public ResponseEntity<SearchResponse<UserDTO>> searchUser(@PathVariable String identifier) {
+    @PostMapping("/search/users")
+    public ResponseEntity<SearchResponse<UserSearchDTO>> searchUser(@RequestBody String identifier,
+                                                                    @RequestParam(defaultValue = "0") int page,
+                                                                    @RequestParam(defaultValue = "10") int size) {
 
         try {
-            SearchResponse<UserDTO> response = usersService.searchUser(identifier);
+            SearchResponse<UserSearchDTO> response = usersService.searchUser(identifier, page, size);
 
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (Exception e) {
 
-            logger.error("Error finding user", e);
+            logger.error("User not found", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -78,14 +87,14 @@ public class UsersController {
      */
 
     @PatchMapping("/{identifier}/update")
-    public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String identifier, @RequestBody Users user) {
+    public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String identifier, @RequestBody UserDTO user) {
 
         try {
 
             Users updatedUser = usersService.updateUser(identifier, user);
             UserDTO userDTO =
                     UserDTO.builder().id(updatedUser.getId()).name(updatedUser.getName()).username(updatedUser.getUsername())
-                            .email(updatedUser.getEmail()).genre(updatedUser.getGenre())
+                            .password(updatedUser.getPassword()).email(updatedUser.getEmail()).genre(updatedUser.getGenre())
                             .profilePictureURL(updatedUser.getProfilePictureURL()).premium(updatedUser.getPremium()).build();
 
             UpdateUserResponse response = UpdateUserResponse.builder()
@@ -93,6 +102,7 @@ public class UsersController {
                     .user(userDTO)
                     .build();
 
+            logger.info("User updated successfully");
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (Exception e) {
@@ -108,7 +118,7 @@ public class UsersController {
      * The Delete Controller
      */
 
-    @DeleteMapping("/delete/{identifier}")
+    @DeleteMapping("/settings/{identifier}")
     public ResponseEntity<String> deleteUser(@PathVariable String identifier) {
 
         try {

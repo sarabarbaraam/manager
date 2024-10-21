@@ -76,11 +76,74 @@
             <version>3.3.4</version>
         </dependency>
 
+        <!-- spring-boot-starter-test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>3.3.4</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.xmlunit</groupId>
+                    <artifactId>xmlunit-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- mockito-junit-jupiter (Junit5) -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.14.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- junit-jupiter-params -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.11.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- junit-jupiter-api -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.11.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- junit-jupiter-engine -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.11.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- h2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.2.0</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
+
+            <!-- maven-compiler-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -93,6 +156,8 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
+
+            <!-- spring-boot-maven-plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
