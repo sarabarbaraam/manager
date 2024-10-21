@@ -68,6 +68,14 @@ public class UserDTO {
      */
     private Boolean premium;
 
+    /**
+     * The equals
+     *
+     * @param o the o
+     *
+     * @return the equals
+     */
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -77,6 +85,12 @@ public class UserDTO {
                 userDTO.getEmail()) && getGenre() == userDTO.getGenre() && Objects.equals(getProfilePictureURL(),
                 userDTO.getProfilePictureURL());
     }
+
+    /**
+     * The hashcode
+     *
+     * @return the hash
+     */
 
     @Override
     public int hashCode() {

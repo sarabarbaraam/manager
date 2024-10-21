@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.utils;
 
 import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.exceptions.UserValidateException;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
@@ -93,7 +94,8 @@ public class UsersUtils {
 
         if (!pattern.matcher(password).matches()) {
 
-            throw new UserValidateException("Can't validate the password: ");
+            throw new UserValidateException("The password does not meet the security requirements. " +
+                    "Special characters allowed: !?/@#$%^&*()_+=-");
         }
 
         return pattern.matcher(password).matches();
@@ -130,6 +132,15 @@ public class UsersUtils {
         }
 
         logger.info("The email {} is available", email);
+    }
+
+    public boolean userExist(UserLoginDTO user) {
+
+        Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(user.getUsername());
+        Optional<Users> optionalEmail = userRepository.findByEmail(user.getEmail());
+
+        logger.info("The user exists");
+        return optionalUsername.isPresent() || optionalEmail.isPresent();
     }
 
 }

@@ -1,8 +1,10 @@
 package com.sarabarbara.manager.controllers;
 
+import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
 import com.sarabarbara.manager.dto.UpdateUserResponse;
 import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.services.UsersService;
@@ -69,18 +71,17 @@ public class UsersController {
                                                                     @RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size) {
 
-        try {
-            SearchResponse<UserSearchDTO> response = usersService.searchUser(identifier, page, size);
+        SearchResponse<UserSearchDTO> response = usersService.searchUser(identifier, page, size);
 
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+        if (response.getResults().isEmpty()) {
 
-        } catch (Exception e) {
-
-            logger.error("User not found", e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            logger.info("No users found for identifier: {}", identifier);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-    }
 
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
 
     /**
      * The Update Controller
@@ -132,6 +133,18 @@ public class UsersController {
             logger.error("Error deleting user", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't delete user: " + e.getMessage());
         }
+    }
+
+    /**
+     * The Login Controller
+     */
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody UserLoginDTO user) {
+        LoginResponse response = usersService.loginUser(user);
+
+        return ResponseEntity.status(response.isSuccess() ? HttpStatus.OK : HttpStatus.UNAUTHORIZED)
+                .body(response);
     }
 
 }

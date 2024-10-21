@@ -115,6 +115,10 @@ public class Users implements Serializable {
 
     /**
      * The equals
+     *
+     * @param o the o
+     *
+     * @return the equals
      */
     @Override
     public boolean equals(Object o) {
@@ -129,7 +133,9 @@ public class Users implements Serializable {
     }
 
     /**
-     * The hashCode
+     * The hashcode
+     *
+     * @return the hash
      */
 
     @Override

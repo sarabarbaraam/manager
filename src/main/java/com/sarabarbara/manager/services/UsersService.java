@@ -1,7 +1,9 @@
 package com.sarabarbara.manager.services;
 
+import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
 import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.exceptions.UserRegistrationException;
@@ -89,18 +91,14 @@ public class UsersService {
 
     public SearchResponse<UserSearchDTO> searchUser(String identifier, int page, int size) {
 
+        // page number (default = 0) and the number of elements in the page
         PageRequest pageRequest = PageRequest.of(page, size);
 
         logger.info("Searching user: {}, Page: {}, Size: {}", identifier, page, size);
 
         Page<Users> userPage = userRepository.findAllByUsernameContaining(identifier, pageRequest);
 
-        if (userPage.isEmpty()) {
-
-            throw new UserNotFoundException("User not found");
-        }
-
-        List<UserSearchDTO> userDTOs = userPage.stream()
+        List<UserSearchDTO> userDTO = userPage.stream()
                 .map(user -> UserSearchDTO.builder()
                         .username(user.getUsername())
                         .profilePictureURL(user.getProfilePictureURL())
@@ -109,9 +107,14 @@ public class UsersService {
 
         int totalPages = userPage.getTotalPages();
 
-        logger.info("Users found: {}, Page number: {}, Total pages: {}", userDTOs.size(), page, totalPages);
+        if (userPage.isEmpty()) {
 
-        return new SearchResponse<>(userDTOs, (int) userPage.getTotalElements(), page, totalPages);
+            return new SearchResponse<>(userDTO, (int) userPage.getTotalElements(), page, totalPages);
+        }
+
+        logger.info("Users found: {}, Page number: {}, Total pages: {}", userDTO.size(), page, totalPages);
+
+        return new SearchResponse<>(userDTO, (int) userPage.getTotalElements(), page, totalPages);
     }
 
 
@@ -181,6 +184,37 @@ public class UsersService {
             logger.error("User with username {} not found", identifier);
             throw new UserNotFoundException("User with username" + identifier + " not found");
         }
+    }
+
+    /**
+     * Login a user
+     *
+     * @param user the user
+     *
+     * @return the LoginResponse
+     */
+
+    public LoginResponse loginUser(UserLoginDTO user) {
+
+        logger.info("Logging user (identifier: {})", user);
+        logger.info("Checking if the user exist...");
+        if (usersUtils.userExist(user)) {
+
+            Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(user.getUsername());
+            Optional<Users> optionalEmail = userRepository.findByEmail(user.getEmail());
+
+            logger.info("Checking user information...");
+            if (optionalEmail.isPresent() && passwordEncoder.matches(user.getPassword(),
+                    optionalEmail.get().getPassword()) || optionalUsername.isPresent() && passwordEncoder.matches(user.getPassword(),
+                    optionalUsername.get().getPassword())) {
+
+                logger.info("Logged successfully");
+                return new LoginResponse(true, "Logged successfully");
+            }
+        }
+
+        logger.info("Username/email or password are incorrect");
+        return new LoginResponse(false, "Can't logged the user. Ensure the email/username and password are correct");
     }
 
 }
