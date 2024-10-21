@@ -145,7 +145,7 @@ public class UsersService {
             modelMapper.getConfiguration().setSkipNullEnabled(true);
 
             /* copies the values of the Users object (newInfo, any non-null field)
-            to the updatedUser object (the existing user in the database). */
+            to the existingUser object. */
             modelMapper.map(newInfo, existingUser);
 
             logger.info("Updating user {}...", existingUser.getUsername());
