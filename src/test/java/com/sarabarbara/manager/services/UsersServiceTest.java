@@ -1,11 +1,11 @@
 package com.sarabarbara.manager.services;
 
+import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
 import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserRegistrationException;
-import com.sarabarbara.manager.exceptions.UserUpdateException;
 import com.sarabarbara.manager.exceptions.UserValidateException;
 import com.sarabarbara.manager.models.Genre;
 import com.sarabarbara.manager.models.Users;
@@ -31,7 +31,6 @@ class UsersServiceTest {
 
     private Users user;
 
-
     @BeforeEach
     void init() {
 
@@ -46,11 +45,15 @@ class UsersServiceTest {
     @Test
     void createUserTest() {
 
-        assertThat(userRepository.findByUsernameIgnoreCase(user.getUsername())).isPresent();
+        Users createdUser = Users.builder().name("Pruebas").username("pruebasS123").password("Testpassword#12")
+                .email("test123@gmail.com").genre(Genre.F).profilePictureURL(null).premium(false).build();
+
+        usersService.createUser(createdUser);
+        assertThat(userRepository.findByUsernameIgnoreCase(createdUser.getUsername())).isPresent();
     }
 
     @Test
-    void createUserErrorTest() throws UserRegistrationException {
+    void createUserErrorTest() {
 
         Users badUser = Users.builder().name("Pruebas").username("pruebasS").password("Testpassword12")
                 .email("test23@gmail.com").genre(Genre.F).profilePictureURL(null).premium(false).build();
@@ -130,11 +133,12 @@ class UsersServiceTest {
 
         String identifier = user.getUsername();
 
-        assertThrows(UserUpdateException.class, () -> usersService.updateUser(identifier, updateUser));
+        assertThrows(UserValidateException.class, () -> usersService.updateUser(identifier, updateUser));
     }
 
     @Test
     void deleteUserTest() {
+
 
         usersService.deleteUser(user.getUsername());
 
@@ -151,6 +155,43 @@ class UsersServiceTest {
 
         String username = userToDelete.getUsername();
         assertThrows(UserNotFoundException.class, () -> usersService.deleteUser(username));
+    }
+
+    @Test
+    void loginUserUsernameTest() {
+
+        UserLoginDTO loginUser =
+                UserLoginDTO.builder().username(user.getUsername()).password("Testpassword1#").build();
+
+        LoginResponse loginResponse = usersService.loginUser(loginUser);
+
+        assertThat(loginResponse.isSuccess()).isTrue();
+        assertThat(loginResponse.getMessage()).isEqualTo("Logged successfully");
+    }
+
+    @Test
+    void loginUserEmailTest() {
+
+        UserLoginDTO loginUser =
+                UserLoginDTO.builder().email(user.getEmail()).password("Testpassword1#").build();
+
+        LoginResponse loginResponse = usersService.loginUser(loginUser);
+
+        assertThat(loginResponse.isSuccess()).isTrue();
+        assertThat(loginResponse.getMessage()).isEqualTo("Logged successfully");
+    }
+
+    @Test
+    void loginUserErrorTest() {
+
+        UserLoginDTO loginUser =
+                UserLoginDTO.builder().email(user.getEmail()).password("Testpassword1").build();
+
+        LoginResponse loginResponse = usersService.loginUser(loginUser);
+
+        assertThat(loginResponse.isSuccess()).isFalse();
+        assertThat(loginResponse.getMessage()).isEqualTo("Can't logged the user. Ensure the email/username and " +
+                "password are correct");
     }
 
 }
