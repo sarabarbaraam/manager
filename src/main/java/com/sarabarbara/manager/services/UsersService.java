@@ -1,11 +1,11 @@
 package com.sarabarbara.manager.services;
 
+import com.sarabarbara.manager.dto.CreateResponse;
+import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
-import com.sarabarbara.manager.dto.users.UserDTO;
-import com.sarabarbara.manager.dto.users.UserSearchDTO;
+import com.sarabarbara.manager.dto.UpdateUserResponse;
+import com.sarabarbara.manager.dto.users.*;
 import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserRegistrationException;
-import com.sarabarbara.manager.exceptions.UserUpdateException;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
 import com.sarabarbara.manager.utils.UsersUtils;
@@ -49,7 +49,7 @@ public class UsersService {
      * @param user the user
      */
 
-    public Users createUser(Users user) {
+    public CreateResponse createUser(Users user) {
 
         logger.info("Creating user: {}", user);
 
@@ -62,6 +62,8 @@ public class UsersService {
         logger.info("Validating password...");
         isValidPassword(user.getPassword());
 
+        UserCreateDTO userCreateDTO = null;
+
         if (isValidPassword(user.getPassword())) {
 
             logger.info("Encoding password...");
@@ -69,12 +71,15 @@ public class UsersService {
             Users savedUser = userRepository.save(user);
 
             logger.info("User created successfully: {}", savedUser);
-            return savedUser;
-        } else {
 
-            throw new UserRegistrationException(" - Can't register the user");
+            userCreateDTO =
+                    UserCreateDTO.builder().name(user.getName()).username(user.getUsername()).email(user.getEmail())
+                            .genre(user.getGenre()).profilePictureURL(user.getProfilePictureURL()).premium(user.getPremium()).build();
+
+            return new CreateResponse(true, userCreateDTO, "User created successfully");
         }
 
+        return new CreateResponse(false, userCreateDTO, "Can't create user: ");
     }
 
     /**
@@ -89,18 +94,14 @@ public class UsersService {
 
     public SearchResponse<UserSearchDTO> searchUser(String identifier, int page, int size) {
 
+        // page number (default = 0) and the number of elements in the page
         PageRequest pageRequest = PageRequest.of(page, size);
 
         logger.info("Searching user: {}, Page: {}, Size: {}", identifier, page, size);
 
         Page<Users> userPage = userRepository.findAllByUsernameContaining(identifier, pageRequest);
 
-        if (userPage.isEmpty()) {
-
-            throw new UserNotFoundException("User not found");
-        }
-
-        List<UserSearchDTO> userDTOs = userPage.stream()
+        List<UserSearchDTO> userDTO = userPage.stream()
                 .map(user -> UserSearchDTO.builder()
                         .username(user.getUsername())
                         .profilePictureURL(user.getProfilePictureURL())
@@ -109,9 +110,14 @@ public class UsersService {
 
         int totalPages = userPage.getTotalPages();
 
-        logger.info("Users found: {}, Page number: {}, Total pages: {}", userDTOs.size(), page, totalPages);
+        if (userPage.isEmpty()) {
 
-        return new SearchResponse<>(userDTOs, (int) userPage.getTotalElements(), page, totalPages);
+            return new SearchResponse<>(userDTO, (int) userPage.getTotalElements(), page, totalPages);
+        }
+
+        logger.info("Users found: {}, Page number: {}, Total pages: {}", userDTO.size(), page, totalPages);
+
+        return new SearchResponse<>(userDTO, (int) userPage.getTotalElements(), page, totalPages);
     }
 
 
@@ -122,9 +128,10 @@ public class UsersService {
      * @param newInfo    the newInfo
      */
 
-    public Users updateUser(String identifier, UserDTO newInfo) {
+    public UpdateUserResponse updateUser(String identifier, UserDTO newInfo) {
 
         Optional<Users> optionalUser = userRepository.findByUsernameIgnoreCase(identifier);
+        UserUpdateDTO userUpdateDTO = null;
 
         logger.info("Updating user: {}", optionalUser);
 
@@ -149,12 +156,18 @@ public class UsersService {
             modelMapper.map(newInfo, existingUser);
 
             logger.info("Updating user {}...", existingUser.getUsername());
-            return userRepository.save(existingUser);
+            userRepository.save(existingUser);
+
+            userUpdateDTO =
+                    UserUpdateDTO.builder().name(existingUser.getName()).username(existingUser.getUsername()).email(existingUser.getEmail())
+                    .genre(existingUser.getGenre()).profilePictureURL(existingUser.getProfilePictureURL()).premium(existingUser.getPremium()).build();
+            logger.info("User {} updated successfully", existingUser);
+            return new UpdateUserResponse("User updated successfully", userUpdateDTO);
 
         }
 
         logger.error("User with identifier {} can't be updated", identifier);
-        throw new UserUpdateException("Can't update the user");
+        return new UpdateUserResponse("Can't update user: ", userUpdateDTO);
     }
 
     /**
@@ -179,8 +192,41 @@ public class UsersService {
         } else {
 
             logger.error("User with username {} not found", identifier);
-            throw new UserNotFoundException("User with username" + identifier + " not found");
+            throw new UserNotFoundException("User with username " + identifier + " not found");
         }
+    }
+
+    /**
+     * Login a user
+     *
+     * @param user the user
+     *
+     * @return the LoginResponse
+     */
+
+    public LoginResponse loginUser(UserLoginDTO user) {
+
+        logger.info("Logging user (identifier: {})", user);
+        logger.info("Checking if the user exist...");
+
+        List<Optional<Users>> userExistence = usersUtils.userExist(user);
+        Optional<Users> optionalUsername = userExistence.get(0);
+        Optional<Users> optionalEmail = userExistence.get(1);
+
+        if (optionalUsername.isPresent() || optionalEmail.isPresent()) {
+
+            logger.info("Checking user information...");
+            if ((optionalEmail.isPresent() && passwordEncoder.matches(user.getPassword(),
+                    optionalEmail.get().getPassword())) || (optionalUsername.isPresent() && passwordEncoder.matches(user.getPassword(),
+                    optionalUsername.get().getPassword()))) {
+
+                logger.info("Logged successfully");
+                return new LoginResponse(true, "Logged successfully");
+            }
+        }
+
+        logger.info("Username/email or password are incorrect");
+        return new LoginResponse(false, "Can't logged the user. Ensure the email/username and password are correct");
     }
 
 }

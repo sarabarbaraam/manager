@@ -5,11 +5,11 @@ import lombok.*;
 import java.util.Objects;
 
 /**
- * SearchUserDTO class
+ * UserDTO class
  *
  * @author sarabarbaraam
  * @version 1.0
- * @since 18/10/2024
+ * @since 21/10/2024
  */
 
 @Getter
@@ -17,19 +17,21 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSearchDTO {
-
-    /**
-     * The username
-     */
+public class UserLoginDTO {
 
     private String username;
 
     /**
-     * The profilePictureURL
+     * The password
      */
 
-    private String profilePictureURL;
+    private String password;
+
+    /**
+     * The email
+     */
+
+    private String email;
 
     /**
      * The equals
@@ -42,8 +44,8 @@ public class UserSearchDTO {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserSearchDTO that)) return false;
-        return Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getProfilePictureURL(), that.getProfilePictureURL());
+        if (!(o instanceof UserLoginDTO that)) return false;
+        return Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(), that.getPassword()) && Objects.equals(getEmail(), that.getEmail());
     }
 
     /**
@@ -54,7 +56,7 @@ public class UserSearchDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getProfilePictureURL());
+        return Objects.hash(getUsername(), getPassword(), getEmail());
     }
 
 }

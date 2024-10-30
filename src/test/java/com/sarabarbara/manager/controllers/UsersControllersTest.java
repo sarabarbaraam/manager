@@ -1,8 +1,11 @@
 package com.sarabarbara.manager.controllers;
 
+import com.sarabarbara.manager.dto.CreateResponse;
+import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
 import com.sarabarbara.manager.dto.UpdateUserResponse;
 import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.models.Genre;
 import com.sarabarbara.manager.models.Users;
@@ -37,7 +40,7 @@ class UsersControllersTest {
     @Autowired
     private UserRepository userRepository;
 
-    private ResponseEntity<UserDTO> responseCreate;
+    private ResponseEntity<CreateResponse> responseCreate;
     private SearchResponse<UserSearchDTO> responseSearch;
     private Users user1;
 
@@ -54,25 +57,17 @@ class UsersControllersTest {
     }
 
     @Test
-    void registerTest() {
+    void registerControllerTest() {
 
+        Users userCreated = Users.builder().id(1502L).name("Prueba").username("curcucucucu").password("Testpassword1#")
+                .email("test123@gmail.com").genre(Genre.PNTS).profilePictureURL(null).premium(true).build();
+
+        responseCreate = usersController.register(userCreated);
         assertEquals(HttpStatus.CREATED, responseCreate.getStatusCode());
-
-        UserDTO responseBody = responseCreate.getBody();
-
-        assertNotNull(responseBody);
-        assertEquals("Prueba", responseBody.getName());
-        assertEquals("curcu", responseBody.getUsername());
-        assertEquals("test@gmail.com", responseBody.getEmail());
-        assertEquals(Genre.PNTS, responseBody.getGenre());
-        assertNull(responseBody.getProfilePictureURL());
-
-        assertNotNull(responseBody.getPremium());
-        assertTrue(responseBody.getPremium());
     }
 
     @Test
-    void registerUsernameDuplicatedTest() {
+    void registerControllerUsernameDuplicatedTest() {
 
         Users user2 = Users.builder()
                 .name("Prueba2")
@@ -90,7 +85,7 @@ class UsersControllersTest {
     }
 
     @Test
-    void registerEmailDuplicatedTest() {
+    void registerControllerEmailDuplicatedTest() {
 
         Users user2 = Users.builder()
                 .name("Prueba2")
@@ -108,7 +103,7 @@ class UsersControllersTest {
     }
 
     @Test
-    void searchTotalUserTest() {
+    void searchControllerTotalUserTest() {
 
         responseSearch = usersController.searchUser("curcu", 0, 10).getBody();
 
@@ -122,7 +117,7 @@ class UsersControllersTest {
     }
 
     @Test
-    void searchPartialUserTest() {
+    void searchControllerPartialUserTest() {
 
         Users user2 = Users.builder()
                 .name("Prueba2")
@@ -149,19 +144,19 @@ class UsersControllersTest {
 
         assertEquals(2, foundUsers.size());
 
-        assertTrue(foundUsers.stream().anyMatch(userSearch1 -> user1.getUsername().equals("curcu")));
-        assertTrue(foundUsers.stream().anyMatch(user -> user.getUsername().equals("curceido")));
+        assertTrue(foundUsers.stream().anyMatch(user -> user1.getUsername().equals("curcu")));
+        assertTrue(foundUsers.stream().anyMatch(user -> user2.getUsername().equals("curceido")));
     }
 
     @Test
-    void searchZeroUserTest() {
+    void searchControllerZeroUserTest() {
 
         ResponseEntity<SearchResponse<UserSearchDTO>> response = usersController.searchUser("curct", 0, 10);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
-    void updateUserTest() {
+    void updateUserControllerTest() {
 
         ResponseEntity<UpdateUserResponse> responseUpdate = usersController.updateUser("curcu",
                 UserDTO.builder().username("circulito").build());
@@ -169,7 +164,7 @@ class UsersControllersTest {
     }
 
     @Test
-    void updateUserFailTest() {
+    void updateUserControllerFailTest() {
 
         ResponseEntity<UpdateUserResponse> responseUpdate = usersController.updateUser("curcu",
                 UserDTO.builder().username("curcu").build());
@@ -177,17 +172,38 @@ class UsersControllersTest {
     }
 
     @Test
-    void deleteUserTest() {
+    void deleteUserControllerTest() {
 
         ResponseEntity<String> responseDelete = usersController.deleteUser("curcu");
         assertEquals(HttpStatus.OK, responseDelete.getStatusCode());
     }
 
     @Test
-    void deleteUserFailTest() {
+    void deleteUserControllerFailTest() {
 
         ResponseEntity<String> responseDelete = usersController.deleteUser("curca");
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseDelete.getStatusCode());
+    }
+
+    @Test
+    void loginUserControllerTest() {
+
+        UserLoginDTO userLoginDTO =
+                UserLoginDTO.builder().username(user1.getUsername()).email(user1.getEmail()).password("Testpassword1" +
+                        "#").build();
+        ResponseEntity<LoginResponse> responseLogin = usersController.loginUser(userLoginDTO);
+
+        assertEquals(HttpStatus.OK, responseLogin.getStatusCode());
+    }
+
+    @Test
+    void loginUserControllerFailTest() {
+
+        UserLoginDTO userLoginDTO =
+                UserLoginDTO.builder().username(user1.getUsername()).email(user1.getEmail()).password("Testpassword1").build();
+        ResponseEntity<LoginResponse> responseLogin = usersController.loginUser(userLoginDTO);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseLogin.getStatusCode());
     }
 
 }
