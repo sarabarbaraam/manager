@@ -3,12 +3,9 @@ package com.sarabarbara.manager.services;
 import com.sarabarbara.manager.dto.CreateResponse;
 import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
-import com.sarabarbara.manager.dto.users.UserCreateDTO;
-import com.sarabarbara.manager.dto.users.UserDTO;
-import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.dto.users.UserSearchDTO;
+import com.sarabarbara.manager.dto.UpdateUserResponse;
+import com.sarabarbara.manager.dto.users.*;
 import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserUpdateException;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
 import com.sarabarbara.manager.utils.UsersUtils;
@@ -131,9 +128,10 @@ public class UsersService {
      * @param newInfo    the newInfo
      */
 
-    public Users updateUser(String identifier, UserDTO newInfo) {
+    public UpdateUserResponse updateUser(String identifier, UserDTO newInfo) {
 
         Optional<Users> optionalUser = userRepository.findByUsernameIgnoreCase(identifier);
+        UserUpdateDTO userUpdateDTO = null;
 
         logger.info("Updating user: {}", optionalUser);
 
@@ -158,12 +156,18 @@ public class UsersService {
             modelMapper.map(newInfo, existingUser);
 
             logger.info("Updating user {}...", existingUser.getUsername());
-            return userRepository.save(existingUser);
+            userRepository.save(existingUser);
+
+            userUpdateDTO =
+                    UserUpdateDTO.builder().name(existingUser.getName()).username(existingUser.getUsername()).email(existingUser.getEmail())
+                    .genre(existingUser.getGenre()).profilePictureURL(existingUser.getProfilePictureURL()).premium(existingUser.getPremium()).build();
+            logger.info("User {} updated successfully", existingUser);
+            return new UpdateUserResponse("User updated successfully", userUpdateDTO);
 
         }
 
         logger.error("User with identifier {} can't be updated", identifier);
-        throw new UserUpdateException("Can't update the user");
+        return new UpdateUserResponse("Can't update user: ", userUpdateDTO);
     }
 
     /**

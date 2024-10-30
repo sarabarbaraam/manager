@@ -4,7 +4,10 @@ import com.sarabarbara.manager.dto.CreateResponse;
 import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
 import com.sarabarbara.manager.dto.UpdateUserResponse;
-import com.sarabarbara.manager.dto.users.*;
+import com.sarabarbara.manager.dto.users.UserCreateDTO;
+import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserLoginDTO;
+import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.services.UsersService;
 import lombok.AllArgsConstructor;
@@ -41,7 +44,7 @@ public class UsersController {
 
         try {
 
-            userCreateDTO = usersService.createUser(user).getUserCreateDTO();
+            userCreateDTO = usersService.createUser(user).getUser();
 
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(true, userCreateDTO,
                     "User successfully"));
@@ -85,17 +88,7 @@ public class UsersController {
 
         try {
 
-            Users updatedUser = usersService.updateUser(identifier, user);
-            UserDTO userDTO =
-                    UserDTO.builder().id(updatedUser.getId()).name(updatedUser.getName()).username(updatedUser.getUsername())
-                            .email(updatedUser.getEmail()).genre(updatedUser.getGenre())
-                            .profilePictureURL(updatedUser.getProfilePictureURL()).premium(updatedUser.getPremium()).build();
-
-            UpdateUserResponse response = UpdateUserResponse.builder()
-                    .message("User updated successfully: ")
-                    .user(UserUpdateDTO.builder().name(userDTO.getName()).username(userDTO.getUsername()).email(userDTO.getEmail())
-                            .genre(userDTO.getGenre()).profilePictureURL(userDTO.getProfilePictureURL()).premium(userDTO.getPremium()).build())
-                    .build();
+            UpdateUserResponse response = usersService.updateUser(identifier, user);
 
             logger.info("User updated successfully");
             return ResponseEntity.status(HttpStatus.OK).body(response);

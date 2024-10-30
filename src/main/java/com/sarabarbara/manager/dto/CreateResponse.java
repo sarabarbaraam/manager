@@ -31,7 +31,7 @@ public class CreateResponse {
      * The userDTO
      */
 
-    private UserCreateDTO userCreateDTO;
+    private UserCreateDTO user;
 
     /**
      * The message
@@ -47,7 +47,7 @@ public class CreateResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CreateResponse that)) return false;
-        return isSuccess() == that.isSuccess() && Objects.equals(getUserCreateDTO(), that.getUserCreateDTO()) && Objects.equals(getMessage(), that.getMessage());
+        return isSuccess() == that.isSuccess() && Objects.equals(getUser(), that.getUser()) && Objects.equals(getMessage(), that.getMessage());
     }
 
     /**
@@ -56,7 +56,7 @@ public class CreateResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(isSuccess(), getUserCreateDTO(), getMessage());
+        return Objects.hash(isSuccess(), getUser(), getMessage());
     }
 
 }
