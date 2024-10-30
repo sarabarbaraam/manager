@@ -1,12 +1,13 @@
 package com.sarabarbara.manager.services;
 
+import com.sarabarbara.manager.dto.CreateResponse;
 import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
+import com.sarabarbara.manager.dto.users.UserCreateDTO;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserRegistrationException;
 import com.sarabarbara.manager.exceptions.UserUpdateException;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
@@ -51,7 +52,7 @@ public class UsersService {
      * @param user the user
      */
 
-    public Users createUser(Users user) {
+    public CreateResponse createUser(Users user) {
 
         logger.info("Creating user: {}", user);
 
@@ -64,6 +65,8 @@ public class UsersService {
         logger.info("Validating password...");
         isValidPassword(user.getPassword());
 
+        UserCreateDTO userCreateDTO = null;
+
         if (isValidPassword(user.getPassword())) {
 
             logger.info("Encoding password...");
@@ -71,12 +74,15 @@ public class UsersService {
             Users savedUser = userRepository.save(user);
 
             logger.info("User created successfully: {}", savedUser);
-            return savedUser;
-        } else {
 
-            throw new UserRegistrationException(" - Can't register the user");
+            userCreateDTO =
+                    UserCreateDTO.builder().name(user.getName()).username(user.getUsername()).email(user.getEmail())
+                            .genre(user.getGenre()).profilePictureURL(user.getProfilePictureURL()).premium(user.getPremium()).build();
+
+            return new CreateResponse(true, userCreateDTO, "User created successfully");
         }
 
+        return new CreateResponse(false, userCreateDTO, "Can't create user: ");
     }
 
     /**
@@ -182,7 +188,7 @@ public class UsersService {
         } else {
 
             logger.error("User with username {} not found", identifier);
-            throw new UserNotFoundException("User with username" + identifier + " not found");
+            throw new UserNotFoundException("User with username " + identifier + " not found");
         }
     }
 
@@ -198,15 +204,17 @@ public class UsersService {
 
         logger.info("Logging user (identifier: {})", user);
         logger.info("Checking if the user exist...");
-        if (usersUtils.userExist(user)) {
 
-            Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(user.getUsername());
-            Optional<Users> optionalEmail = userRepository.findByEmail(user.getEmail());
+        List<Optional<Users>> userExistence = usersUtils.userExist(user);
+        Optional<Users> optionalUsername = userExistence.get(0);
+        Optional<Users> optionalEmail = userExistence.get(1);
+
+        if (optionalUsername.isPresent() || optionalEmail.isPresent()) {
 
             logger.info("Checking user information...");
-            if (optionalEmail.isPresent() && passwordEncoder.matches(user.getPassword(),
-                    optionalEmail.get().getPassword()) || optionalUsername.isPresent() && passwordEncoder.matches(user.getPassword(),
-                    optionalUsername.get().getPassword())) {
+            if ((optionalEmail.isPresent() && passwordEncoder.matches(user.getPassword(),
+                    optionalEmail.get().getPassword())) || (optionalUsername.isPresent() && passwordEncoder.matches(user.getPassword(),
+                    optionalUsername.get().getPassword()))) {
 
                 logger.info("Logged successfully");
                 return new LoginResponse(true, "Logged successfully");

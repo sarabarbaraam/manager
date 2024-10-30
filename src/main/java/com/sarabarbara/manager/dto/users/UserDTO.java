@@ -66,6 +66,7 @@ public class UserDTO {
     /**
      * The premium
      */
+
     private Boolean premium;
 
     /**

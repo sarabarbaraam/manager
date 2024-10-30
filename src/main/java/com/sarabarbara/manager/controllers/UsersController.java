@@ -1,11 +1,10 @@
 package com.sarabarbara.manager.controllers;
 
+import com.sarabarbara.manager.dto.CreateResponse;
 import com.sarabarbara.manager.dto.LoginResponse;
 import com.sarabarbara.manager.dto.SearchResponse;
 import com.sarabarbara.manager.dto.UpdateUserResponse;
-import com.sarabarbara.manager.dto.users.UserDTO;
-import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.dto.users.UserSearchDTO;
+import com.sarabarbara.manager.dto.users.*;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.services.UsersService;
 import lombok.AllArgsConstructor;
@@ -36,29 +35,23 @@ public class UsersController {
      */
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@Validated @RequestBody Users user) {
+    public ResponseEntity<CreateResponse> register(@Validated @RequestBody Users user) {
+
+        UserCreateDTO userCreateDTO = null;
+
         try {
 
-            Users createdUser = usersService.createUser(user);
+            userCreateDTO = usersService.createUser(user).getUserCreateDTO();
 
-            UserDTO userDTO = UserDTO.builder()
-                    .id(createdUser.getId())
-                    .name(createdUser.getName())
-                    .username(createdUser.getUsername())
-                    .email(createdUser.getEmail())
-                    .genre(createdUser.getGenre())
-                    .profilePictureURL(createdUser.getProfilePictureURL())
-                    .premium(createdUser.getPremium())
-                    .build();
-
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(true, userCreateDTO,
+                    "User successfully"));
 
         } catch (Exception e) {
 
             logger.error("Error creating user", e);
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CreateResponse(false, userCreateDTO,
+                    "Can't create the user: " + e.getMessage()));
         }
     }
 
@@ -95,12 +88,13 @@ public class UsersController {
             Users updatedUser = usersService.updateUser(identifier, user);
             UserDTO userDTO =
                     UserDTO.builder().id(updatedUser.getId()).name(updatedUser.getName()).username(updatedUser.getUsername())
-                            .password(updatedUser.getPassword()).email(updatedUser.getEmail()).genre(updatedUser.getGenre())
+                            .email(updatedUser.getEmail()).genre(updatedUser.getGenre())
                             .profilePictureURL(updatedUser.getProfilePictureURL()).premium(updatedUser.getPremium()).build();
 
             UpdateUserResponse response = UpdateUserResponse.builder()
                     .message("User updated successfully: ")
-                    .user(userDTO)
+                    .user(UserUpdateDTO.builder().name(userDTO.getName()).username(userDTO.getUsername()).email(userDTO.getEmail())
+                            .genre(userDTO.getGenre()).profilePictureURL(userDTO.getProfilePictureURL()).premium(userDTO.getPremium()).build())
                     .build();
 
             logger.info("User updated successfully");

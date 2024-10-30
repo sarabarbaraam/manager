@@ -6,11 +6,14 @@ import com.sarabarbara.manager.exceptions.UserValidateException;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -36,7 +39,8 @@ public class UsersUtils {
      * @param newInfo      the newInfo
      * @param existingUser the existingUser
      */
-    public void checks(UserDTO newInfo, Users existingUser) {
+
+    public void checks(@NonNull UserDTO newInfo, Users existingUser) {
 
         if (newInfo.getPassword() != null && !newInfo.getPassword().isBlank()) {
 
@@ -60,7 +64,8 @@ public class UsersUtils {
      * @param newInfo      the newInfo
      * @param existingUser the updatedUser
      */
-    public void passwordValidator(UserDTO newInfo, Users existingUser) {
+
+    public void passwordValidator(@NonNull UserDTO newInfo, Users existingUser) {
 
         if (newInfo.getPassword() != null && !newInfo.getPassword().isBlank()) {
 
@@ -85,6 +90,7 @@ public class UsersUtils {
      *
      * @return the pattern
      */
+
     public static boolean isValidPassword(String password) {
 
         final Pattern pattern = Pattern.compile(
@@ -107,6 +113,7 @@ public class UsersUtils {
      *
      * @param username username
      */
+
     public void usernameValidator(String username) {
 
         Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(username);
@@ -123,6 +130,7 @@ public class UsersUtils {
      *
      * @param email email
      */
+
     public void emailValidator(String email) {
 
         Optional<Users> optionalEmail = userRepository.findByEmail(email);
@@ -134,13 +142,21 @@ public class UsersUtils {
         logger.info("The email {} is available", email);
     }
 
-    public boolean userExist(UserLoginDTO user) {
+    /**
+     * Checks if the user exist
+     *
+     * @param user the user
+     *
+     * @return the username and email of the user
+     */
+
+    public List<Optional<Users>> userExist(@NonNull UserLoginDTO user) {
 
         Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(user.getUsername());
         Optional<Users> optionalEmail = userRepository.findByEmail(user.getEmail());
 
-        logger.info("The user exists");
-        return optionalUsername.isPresent() || optionalEmail.isPresent();
+        logger.info("User existence check completed.");
+        return Arrays.asList(optionalUsername, optionalEmail);
     }
 
 }

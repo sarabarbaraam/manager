@@ -1,15 +1,16 @@
 package com.sarabarbara.manager.dto;
 
+import com.sarabarbara.manager.dto.users.UserCreateDTO;
 import lombok.*;
 
 import java.util.Objects;
 
 /**
- * LoginResponse class
+ * CreateResponse class
  *
  * @author sarabarbaraam
  * @version 1.0
- * @since 21/10/2024
+ * @since 30/10/2024
  */
 
 @AllArgsConstructor
@@ -18,13 +19,19 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-public class LoginResponse {
+public class CreateResponse {
 
     /**
      * The success
      */
 
     private boolean success;
+
+    /**
+     * The userDTO
+     */
+
+    private UserCreateDTO userCreateDTO;
 
     /**
      * The message
@@ -34,28 +41,22 @@ public class LoginResponse {
 
     /**
      * The equals
-     *
-     * @param o the o
-     *
-     * @return the equals
      */
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LoginResponse that)) return false;
-        return isSuccess() == that.isSuccess() && Objects.equals(getMessage(), that.getMessage());
+        if (!(o instanceof CreateResponse that)) return false;
+        return isSuccess() == that.isSuccess() && Objects.equals(getUserCreateDTO(), that.getUserCreateDTO()) && Objects.equals(getMessage(), that.getMessage());
     }
 
     /**
-     * The hashcode
-     *
-     * @return the hash
+     * The hashCode
      */
 
     @Override
     public int hashCode() {
-        return Objects.hash(isSuccess(), getMessage());
+        return Objects.hash(isSuccess(), getUserCreateDTO(), getMessage());
     }
 
 }
