@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.utils;
 
+import com.sarabarbara.manager.apis.ZeroBounceAPI;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.exceptions.UserValidateException;
@@ -30,8 +31,10 @@ import java.util.regex.Pattern;
 public class UsersUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersUtils.class);
+
     private final UserRepository userRepository;
     private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final ZeroBounceAPI zeroBounceAPI;
 
     /**
      * Checks if the password, username and email are correct
@@ -42,11 +45,6 @@ public class UsersUtils {
 
     public void checks(@NonNull UserDTO newInfo, Users existingUser) {
 
-        if (newInfo.getPassword() != null && !newInfo.getPassword().isBlank()) {
-
-            passwordValidator(newInfo, existingUser);
-        }
-
         if (newInfo.getUsername() != null && !newInfo.getUsername().isBlank()) {
 
             usernameValidator(newInfo.getUsername());
@@ -56,6 +54,12 @@ public class UsersUtils {
 
             emailValidator(newInfo.getEmail());
         }
+
+        if (newInfo.getPassword() != null && !newInfo.getPassword().isBlank()) {
+
+            passwordValidator(newInfo, existingUser);
+        }
+
     }
 
     /**
@@ -65,7 +69,7 @@ public class UsersUtils {
      * @param existingUser the updatedUser
      */
 
-    public void passwordValidator(@NonNull UserDTO newInfo, Users existingUser) {
+    private void passwordValidator(@NonNull UserDTO newInfo, Users existingUser) {
 
         if (newInfo.getPassword() != null && !newInfo.getPassword().isBlank()) {
 
@@ -119,6 +123,7 @@ public class UsersUtils {
         Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(username);
 
         if (optionalUsername.isPresent()) {
+
             throw new UserValidateException("The username " + username + " is already taken.");
         }
 
@@ -140,6 +145,8 @@ public class UsersUtils {
         }
 
         logger.info("The email {} is available", email);
+
+        zeroBounceAPI.emailIsReal(email);
     }
 
     /**

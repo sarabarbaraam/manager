@@ -18,7 +18,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,8 +75,14 @@ public class UsersService {
             logger.info("User created successfully: {}", savedUser);
 
             userCreateDTO =
-                    UserCreateDTO.builder().name(user.getName()).username(user.getUsername()).email(user.getEmail())
-                            .genre(user.getGenre()).profilePictureURL(user.getProfilePictureURL()).premium(user.getPremium()).build();
+                    UserCreateDTO.builder()
+                            .name(user.getName())
+                            .username(user.getUsername())
+                            .email(user.getEmail())
+                            .genre(user.getGenre())
+                            .profilePictureURL(user.getProfilePictureURL())
+                            .premium(user.getPremium())
+                            .build();
 
             return new CreateResponse(true, userCreateDTO, "User created successfully");
         }
@@ -101,12 +109,12 @@ public class UsersService {
 
         Page<Users> userPage = userRepository.findAllByUsernameContaining(identifier, pageRequest);
 
-        List<UserSearchDTO> userDTO = userPage.stream()
+        List<UserSearchDTO> userDTO = new ArrayList<>(userPage.stream()
                 .map(user -> UserSearchDTO.builder()
                         .username(user.getUsername())
                         .profilePictureURL(user.getProfilePictureURL())
                         .build())
-                .toList();  // immutable list
+                .toList()); // mutable list
 
         int totalPages = userPage.getTotalPages();
 
@@ -159,15 +167,22 @@ public class UsersService {
             userRepository.save(existingUser);
 
             userUpdateDTO =
-                    UserUpdateDTO.builder().name(existingUser.getName()).username(existingUser.getUsername()).email(existingUser.getEmail())
-                    .genre(existingUser.getGenre()).profilePictureURL(existingUser.getProfilePictureURL()).premium(existingUser.getPremium()).build();
+                    UserUpdateDTO.builder()
+                            .name(existingUser.getName())
+                            .username(existingUser.getUsername())
+                            .email(existingUser.getEmail())
+                            .genre(existingUser.getGenre())
+                            .profilePictureURL(existingUser.getProfilePictureURL())
+                            .premium(existingUser.getPremium())
+                            .build();
+
             logger.info("User {} updated successfully", existingUser);
-            return new UpdateUserResponse("User updated successfully", userUpdateDTO);
+            return new UpdateUserResponse(true, userUpdateDTO, "User updated successfully");
 
         }
 
         logger.error("User with identifier {} can't be updated", identifier);
-        return new UpdateUserResponse("Can't update user: ", userUpdateDTO);
+        return new UpdateUserResponse(false, userUpdateDTO, "Can't update user: ");
     }
 
     /**
@@ -204,7 +219,7 @@ public class UsersService {
      * @return the LoginResponse
      */
 
-    public LoginResponse loginUser(UserLoginDTO user) {
+    public LoginResponse loginUser(@RequestBody UserLoginDTO user) {
 
         logger.info("Logging user (identifier: {})", user);
         logger.info("Checking if the user exist...");

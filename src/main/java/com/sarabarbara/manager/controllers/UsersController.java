@@ -40,21 +40,35 @@ public class UsersController {
     @PostMapping("/register")
     public ResponseEntity<CreateResponse> register(@Validated @RequestBody Users user) {
 
-        UserCreateDTO userCreateDTO = null;
+        UserCreateDTO userCreateDTO;
 
         try {
 
-            userCreateDTO = usersService.createUser(user).getUser();
+            logger.info("Creating user started");
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(true, userCreateDTO,
-                    "User successfully"));
+            CreateResponse response = usersService.createUser(user);
+
+            if (response.isSuccess()) {
+
+                userCreateDTO = response.getUser();
+
+                logger.info("User {} created successfully", user.getUsername());
+                logger.info("Creating user finished");
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(true, userCreateDTO,
+                        "User created successfully"));
+            }
+
+            logger.error("User creation failed: {} ", response.getMessage());
+            logger.info("Creating user finished");
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 
         } catch (Exception e) {
 
-            logger.error("Error creating user", e);
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CreateResponse(false, userCreateDTO,
-                    "Can't create the user: " + e.getMessage()));
+            logger.error("Can't create user: Some internal error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CreateResponse(false, null, "Can't create user: Some internal error occurred."));
         }
     }
 
@@ -67,15 +81,36 @@ public class UsersController {
                                                                     @RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size) {
 
-        SearchResponse<UserSearchDTO> response = usersService.searchUser(identifier, page, size);
+        try {
 
-        if (response.getResults().isEmpty()) {
+            logger.info("Searching user started");
 
-            logger.info("No users found for identifier: {}", identifier);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            SearchResponse<UserSearchDTO> response = usersService.searchUser(identifier, page, size);
+
+            if (response.getResults().isEmpty()) {
+
+                logger.info("No users found for identifier: {}", identifier);
+                logger.info("Searching user finished");
+
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+
+            logger.info("Total users found with identifier {} : {}", identifier, response.getTotalResults());
+
+            for (UserSearchDTO user : response.getResults()) {
+
+                logger.info("Users found: - {} ", user.getUsername());
+            }
+
+            logger.info("Searching user finished");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        } catch (Exception e) {
+
+            logger.error("Can't search user: Some internal error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new SearchResponse<>(null, 0, 0, 0));
         }
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 
@@ -88,16 +123,29 @@ public class UsersController {
 
         try {
 
+            logger.info("Updating user started");
+
             UpdateUserResponse response = usersService.updateUser(identifier, user);
 
-            logger.info("User updated successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            if (response.isSuccess()) {
+
+                logger.info("User updated successfully");
+                logger.info("Updating user finished");
+
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+
+            }
+
+            logger.error("User update failed: {} ", response.getMessage());
+            logger.info("updating user finished");
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 
         } catch (Exception e) {
 
-            logger.error("Error updating user", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UpdateUserResponse("Can't update the user: "
-                    + e.getMessage(), null));
+            logger.error("Can't update user: Some internal error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new UpdateUserResponse(false, null, "Can't update user: Some internal error occurred."));
         }
 
     }
@@ -111,14 +159,18 @@ public class UsersController {
 
         try {
 
+            logger.info("Deleting user started");
+
             usersService.deleteUser(identifier);
 
+            logger.info("Deleting user finished");
             return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
 
         } catch (Exception e) {
 
-            logger.error("Error deleting user", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't delete user: " + e.getMessage());
+            logger.error("Can't delete user: Some internal error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Can't delete user: Some internal error occurred.");
         }
     }
 
@@ -128,10 +180,24 @@ public class UsersController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(@RequestBody UserLoginDTO user) {
-        LoginResponse response = usersService.loginUser(user);
 
-        return ResponseEntity.status(response.isSuccess() ? HttpStatus.OK : HttpStatus.UNAUTHORIZED)
-                .body(response);
+        try {
+
+            logger.info("Logging user started");
+
+            LoginResponse response = usersService.loginUser(user);
+
+            logger.info("Logging user finished");
+            return ResponseEntity.status(response.isSuccess() ? HttpStatus.OK : HttpStatus.UNAUTHORIZED)
+                    .body(response);
+
+        } catch (Exception e) {
+
+            logger.error("Can't logging user: Some internal error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new LoginResponse(false, "Can't logged the user: Some internal error occurred."));
+        }
+
     }
 
 }
