@@ -12,11 +12,12 @@ import java.util.Objects;
  * @since 18/10/2024
  */
 
-@Getter
-@Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@Builder
 public class UserSearchDTO {
 
     /**

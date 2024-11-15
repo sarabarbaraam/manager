@@ -1,26 +1,31 @@
 package com.sarabarbara.manager.controllers;
 
-import com.sarabarbara.manager.dto.CreateResponse;
-import com.sarabarbara.manager.dto.LoginResponse;
-import com.sarabarbara.manager.dto.SearchResponse;
-import com.sarabarbara.manager.dto.UpdateUserResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.dto.users.UserSearchDTO;
+import com.sarabarbara.manager.exceptions.UserValidateException;
 import com.sarabarbara.manager.models.Genre;
 import com.sarabarbara.manager.models.Users;
-import com.sarabarbara.manager.repositories.UserRepository;
+import com.sarabarbara.manager.services.UsersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * UsersControllersTest class
@@ -30,180 +35,453 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 18/10/2024
  */
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 class UsersControllersTest {
 
-    @Autowired
+    @InjectMocks
     private UsersController usersController;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Mock
+    private UsersService usersService;
 
-    private ResponseEntity<CreateResponse> responseCreate;
-    private SearchResponse<UserSearchDTO> responseSearch;
-    private Users user1;
+    private MockMvc mockMvc;
+
+    private Users user;
 
     @BeforeEach
     void setUp() {
 
-        userRepository.deleteAll();
+        mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
 
-        user1 = Users.builder().id(1502L).name("Prueba").username("curcu").password("Testpassword1#")
-                .email("test@gmail.com").genre(Genre.PNTS).profilePictureURL(null).premium(true).build();
-
-        responseCreate = usersController.register(user1);
-        assertEquals(HttpStatus.CREATED, responseCreate.getStatusCode());
-    }
-
-    @Test
-    void registerControllerTest() {
-
-        Users userCreated = Users.builder().id(1502L).name("Prueba").username("curcucucucu").password("Testpassword1#")
-                .email("test123@gmail.com").genre(Genre.PNTS).profilePictureURL(null).premium(true).build();
-
-        responseCreate = usersController.register(userCreated);
-        assertEquals(HttpStatus.CREATED, responseCreate.getStatusCode());
-    }
-
-    @Test
-    void registerControllerUsernameDuplicatedTest() {
-
-        Users user2 = Users.builder()
-                .name("Prueba2")
+        user = Users.builder()
+                .id(1L)
+                .name("Prueba")
                 .username("curcu")
-                .password("Testpassword2#")
-                .email("test@gmail.com")
-                .genre(Genre.PNTS)
-                .profilePictureURL(null)
-                .premium(false)
-                .build();
-
-        responseCreate = usersController.register(user2);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseCreate.getStatusCode());
-    }
-
-    @Test
-    void registerControllerEmailDuplicatedTest() {
-
-        Users user2 = Users.builder()
-                .name("Prueba2")
-                .username("curcu2")
-                .password("Testpassword2#")
-                .email("test@gmail.com")
-                .genre(Genre.PNTS)
-                .profilePictureURL(null)
-                .premium(false)
-                .build();
-
-        responseCreate = usersController.register(user2);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseCreate.getStatusCode());
-    }
-
-    @Test
-    void searchControllerTotalUserTest() {
-
-        responseSearch = usersController.searchUser("curcu", 0, 10).getBody();
-
-        assertNotNull(responseSearch);
-        assertFalse(responseSearch.getResults().isEmpty());
-
-        UserSearchDTO foundUser = responseSearch.getResults().getFirst();
-
-        assertEquals("curcu", foundUser.getUsername());
-        assertNull(foundUser.getProfilePictureURL());
-    }
-
-    @Test
-    void searchControllerPartialUserTest() {
-
-        Users user2 = Users.builder()
-                .name("Prueba2")
-                .username("curceido")
-                .password("Testpassword2#")
+                .password("Testpassword12#")
                 .email("test123@gmail.com")
                 .genre(Genre.PNTS)
                 .profilePictureURL(null)
-                .premium(false)
+                .premium(true)
                 .build();
-        usersController.register(user2);
-
-        ResponseEntity<SearchResponse<UserSearchDTO>> response = usersController.searchUser("cur", 0, 10);
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        responseSearch = response.getBody();
-
-        assertNotNull(responseSearch);
-        assertFalse(responseSearch.getResults().isEmpty());
-
-        List<UserSearchDTO> foundUsers = responseSearch.getResults();
-
-        assertEquals(2, foundUsers.size());
-
-        assertTrue(foundUsers.stream().anyMatch(user -> user1.getUsername().equals("curcu")));
-        assertTrue(foundUsers.stream().anyMatch(user -> user2.getUsername().equals("curceido")));
     }
 
     @Test
-    void searchControllerZeroUserTest() {
+    void registerControllerTest() throws Exception {
 
-        ResponseEntity<SearchResponse<UserSearchDTO>> response = usersController.searchUser("curct", 0, 10);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        when(usersService.createUser(any(Users.class))).thenReturn(user);
+
+        mockMvc.perform(post("/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test123@gmail.com\", " +
+                                "\"password\":\"Testpassword12#\", \"genre\":\"PNTS\", " +
+                                "\"profilePictureURL\":\"null\"," +
+                                " \"premium\":true}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("User created successfully"))
+                .andExpect(jsonPath("$.userCreate.name").value("Prueba"))
+                .andExpect(jsonPath("$.userCreate.username").value("curcu"))
+                .andExpect(jsonPath("$.userCreate.email").value("test123@gmail.com"))
+                .andExpect(jsonPath("$.userCreate.genre").value("PNTS"))
+                .andExpect(jsonPath("$.userCreate.profilePictureURL").value(nullValue()))
+                .andExpect(jsonPath("$.userCreate.premium").value(true));
     }
 
     @Test
-    void updateUserControllerTest() {
+    void registerControllerDuplicatedUsernameTest() throws Exception {
 
-        ResponseEntity<UpdateUserResponse> responseUpdate = usersController.updateUser("curcu",
-                UserDTO.builder().username("circulito").build());
-        assertEquals(HttpStatus.OK, responseUpdate.getStatusCode());
+        when(usersService.createUser(any(Users.class)))
+                .thenThrow(new UserValidateException("Can't create user: The username 'curcu' is already taken."));
+
+        mockMvc.perform(post("/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test12@gmail.com\", " +
+                                "\"password\":\"Testpassword1#\", \"genre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
+                                " \"premium\":true}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("Can't create user: The username 'curcu' is already taken."));
     }
 
     @Test
-    void updateUserControllerFailTest() {
+    void registerControllerDuplicatedEmailTest() throws Exception {
 
-        ResponseEntity<UpdateUserResponse> responseUpdate = usersController.updateUser("curcu",
-                UserDTO.builder().username("curcu").build());
-        assertEquals(HttpStatus.BAD_REQUEST, responseUpdate.getStatusCode());
+        when(usersService.createUser(any(Users.class)))
+                .thenThrow(
+                        new UserValidateException("Can't create user: The email 'test@gmail.com' is already taken."));
+
+        mockMvc.perform(post("/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test@gmail.com\", " +
+                                "\"password\":\"Testpassword1#\", \"genre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
+                                " \"premium\":true}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("Can't create user: The email 'test@gmail.com' is already taken."));
     }
 
     @Test
-    void deleteUserControllerTest() {
+    void registerControllerErrorTest() throws Exception {
 
-        ResponseEntity<String> responseDelete = usersController.deleteUser("curcu");
-        assertEquals(HttpStatus.OK, responseDelete.getStatusCode());
+        when(usersService.createUser(any(Users.class))).thenThrow(new RuntimeException("Can't create user: Some " +
+                "internal error occurred."));
+
+        mockMvc.perform(post("/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test@gmail.com\", " +
+                                "\"password\":\"Testpassword1#\", \"genre\":\"PNTS\", \"profilePictureURL\":null," +
+                                "\"premium\":true}"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("Can't create user: Some internal error occurred."));
     }
 
     @Test
-    void deleteUserControllerFailTest() {
+    void searchTotalUserControllerTest() throws Exception {
 
-        ResponseEntity<String> responseDelete = usersController.deleteUser("curca");
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseDelete.getStatusCode());
+        when(usersService.searchUser(anyString(), anyInt(), anyInt())).thenReturn(List.of(user));
+
+        mockMvc.perform(post("/search/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("\"curcu\"")
+                        .param("page", "1")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].username").value("curcu"))
+                .andExpect(jsonPath("$.results[0].profilePictureURL").value(nullValue()))
+                .andExpect(jsonPath("$.totalResults").value(1))
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.totalPage").value(1));
+
     }
 
     @Test
-    void loginUserControllerTest() {
+    void searchPartialUserControllerTest() throws Exception {
 
-        UserLoginDTO userLoginDTO =
-                UserLoginDTO.builder().username(user1.getUsername()).email(user1.getEmail()).password("Testpassword1" +
-                        "#").build();
-        ResponseEntity<LoginResponse> responseLogin = usersController.loginUser(userLoginDTO);
+        Users user2 = Users.builder()
+                .name("Prueba")
+                .username("curcoide")
+                .password("Testpassword12#")
+                .email("test@gmail.com")
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true)
+                .build();
 
-        assertEquals(HttpStatus.OK, responseLogin.getStatusCode());
+        when(usersService.searchUser(anyString(), any(Integer.class), any(Integer.class)))
+                .thenReturn(List.of(user, user2));
+
+        mockMvc.perform(post("/search/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("\"cur\"")
+                        .param("page", "1")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].username").value("curcu"))
+                .andExpect(jsonPath("$.results[0].profilePictureURL").value(nullValue()))
+                .andExpect(jsonPath("$.results[1].username").value("curcoide"))
+                .andExpect(jsonPath("$.results[1].profilePictureURL").value(nullValue()))
+                .andExpect(jsonPath("$.totalResults").value(2))
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.totalPage").value(1));
     }
 
     @Test
-    void loginUserControllerFailTest() {
+    void searchZeroUserControllerTest() throws Exception {
 
-        UserLoginDTO userLoginDTO =
-                UserLoginDTO.builder().username(user1.getUsername()).email(user1.getEmail()).password("Testpassword1").build();
-        ResponseEntity<LoginResponse> responseLogin = usersController.loginUser(userLoginDTO);
+        when(usersService.searchUser(anyString(), anyInt(), anyInt())).thenReturn(List.of());
 
-        assertEquals(HttpStatus.UNAUTHORIZED, responseLogin.getStatusCode());
+        mockMvc.perform(post("/search/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("curc")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void searchUserErrorControllerTest() throws Exception {
+
+        when(usersService.searchUser(anyString(), any(Integer.class), any(Integer.class)))
+                .thenThrow(new RuntimeException("Can't search user: Some internal error occurred."));
+
+        mockMvc.perform(post("/search/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("curcu"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void updateTotalUserControllerTest() throws Exception {
+
+        String identifier = "curcu";
+
+        UserDTO userDTO = UserDTO.builder()
+                .name("Test")
+                .username("chikitronix")
+                .password("TestSuperPAssword123#")
+                .email("testemail@gmail.com")
+                .genre(Genre.F)
+                .profilePictureURL(null)
+                .premium(true)
+                .build();
+
+        when(usersService.updateUser(anyString(), any(UserDTO.class)))
+                .thenReturn(new Users(1L, "Test", "chikitronix",
+                        "TestSuperPAssword123#", "testemail@gmail.com",
+                        Genre.F, null, true));
+
+        String userUpdateDTOJson = new ObjectMapper().writeValueAsString(userDTO);
+
+        mockMvc.perform(patch("/{identifier}/update", identifier)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userUpdateDTOJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("User updated successfully"))
+                .andExpect(jsonPath("$.user.name").value("Test"))
+                .andExpect(jsonPath("$.user.username").value("chikitronix"))
+                .andExpect(jsonPath("$.user.email").value("testemail@gmail.com"))
+                .andExpect(jsonPath("$.user.genre").value("F"))
+                .andExpect(jsonPath("$.user.profilePictureURL").isEmpty())
+                .andExpect(jsonPath("$.user.premium").value(true))
+                .andExpect(jsonPath("$.message").value("User updated successfully"));
+    }
+
+    @Test
+    void updatePartialUserControllerTest() throws Exception {
+
+        String identifier = "curcu";
+
+        UserDTO userDTO = UserDTO.builder()
+                .username("chikitronix")
+                .build();
+
+        when(usersService.updateUser(anyString(), any(UserDTO.class)))
+                .thenReturn(new Users(1L, "Prueba", "chikitronix",
+                        "Testpassword12#", "test123@gmail.com",
+                        Genre.PNTS, null, true));
+
+        String userDTOJson = new ObjectMapper().writeValueAsString(userDTO);
+
+        mockMvc.perform(patch("/{identifier}/update", identifier)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDTOJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("User updated successfully"))
+                .andExpect(jsonPath("$.user.username").value("chikitronix"));
+    }
+
+    @Test
+    void updateUserDuplicatedUsernameControllerTest() throws Exception {
+
+        String identifier = "chikitronix";
+        String newIdentifier = "curcu";
+
+        UserDTO userDTO = UserDTO.builder()
+                .username(newIdentifier)
+                .build();
+
+        when(usersService.updateUser(anyString(), any(UserDTO.class)))
+                .thenThrow(new UserValidateException("User update failed. The username " + newIdentifier + " is " +
+                        "already taken."));
+
+        String userDTOJson = new ObjectMapper().writeValueAsString(userDTO);
+
+        mockMvc.perform(patch("/{identifier}/update", identifier)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDTOJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("User update failed. The username " + newIdentifier + " is " +
+                        "already taken."));
+    }
+
+    @Test
+    void updateUserDuplicatedEmailControllerTest() throws Exception {
+
+        String identifier = "curcu";
+        String newEmail = "test1234545@gmail.com";
+
+        UserDTO userDTO = UserDTO.builder()
+                .email(newEmail)
+                .build();
+
+        when(usersService.updateUser(anyString(), any(UserDTO.class)))
+                .thenThrow(new UserValidateException("User update failed. The email " + newEmail + " is already taken" +
+                        "."));
+
+        String userDTOJson = new ObjectMapper().writeValueAsString(userDTO);
+
+        mockMvc.perform(patch("/{identifier}/update", identifier)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDTOJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("User update failed. The email " + newEmail + " is already taken."));
+    }
+
+    @Test
+    void updateUserInvalidPasswordControllerTest() throws Exception {
+
+        String identifier = "curcu";
+
+        UserDTO userDTO = UserDTO.builder()
+                .password("as23")
+                .build();
+
+        when(usersService.updateUser(anyString(), any(UserDTO.class)))
+                .thenThrow(
+                        new UserValidateException("The password does not meet the security requirements. "
+                                + "Special characters allowed: !?/@#$%^&*()_+=-"));
+
+        String userDTOJson = new ObjectMapper().writeValueAsString(userDTO);
+
+        mockMvc.perform(patch("/{identifier}/update", identifier)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDTOJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("The password does not meet the security requirements. "
+                                + "Special characters allowed: !?/@#$%^&*()_+=-"))
+                .andExpect(jsonPath("$.user").doesNotExist());
+    }
+
+    @Test
+    void updateUserControllerErrorTest() throws Exception {
+
+        String identifier = "curcu";
+
+        UserDTO userDTO = UserDTO.builder()
+                .username("curcu")
+                .build();
+
+        when(usersService.updateUser(anyString(), any(UserDTO.class)))
+                .thenThrow(new RuntimeException("Can't update user: Some internal error occurred."));
+
+        String userDTOJson = new ObjectMapper().writeValueAsString(userDTO);
+
+        mockMvc.perform(patch("/{identifier}/update", identifier)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDTOJson))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("Can't update user: Some internal error occurred."));
+
+    }
+
+    @Test
+    void deleteUserControllerTest() throws Exception {
+
+        String identifier = "curcu";
+
+        mockMvc.perform(delete("/settings/{identifier}", identifier)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("User deleted successfully"));
+    }
+
+    @Test
+    void deleteUserControllerErrorTest() throws Exception {
+
+        String identifier = "curcu";
+
+        doThrow(new RuntimeException("Can't delete user: Some internal error occurred."));
+        mockMvc.perform(delete("/settings/{identifier}", identifier)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("Can't delete user: Some internal error occurred."));
+    }
+
+    @Test
+    void loginUserUsernameControllerTest() throws Exception {
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .username("curcu")
+                .password("testPassword123#")
+                .build();
+
+        when(usersService.loginUser(any(UserLoginDTO.class))).thenReturn(true);
+
+        String userLoginDTOJson = new ObjectMapper().writeValueAsString(userLoginDTO);
+
+        mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userLoginDTOJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Logged successfully"));
+    }
+
+    @Test
+    void loginUserEmailControllerTest() throws Exception {
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .email("curcu@gmail.com")
+                .password("testPassword123#")
+                .build();
+
+        when(usersService.loginUser(any(UserLoginDTO.class))).thenReturn(true);
+
+        String userLoginDTOJson = new ObjectMapper().writeValueAsString(userLoginDTO);
+
+        mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userLoginDTOJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Logged successfully"));
+    }
+
+    @Test
+    void loginUserControllerFailedTest() throws Exception {
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .email("curcu@gmail.com")
+                .password("testPassword123#")
+                .build();
+
+        when(usersService.loginUser(any(UserLoginDTO.class))).thenReturn(false);
+
+        String userLoginDTOJson = new ObjectMapper().writeValueAsString(userLoginDTO);
+
+        mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userLoginDTOJson))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("Can't logged the user. Ensure the email/username and password are correct"));
+    }
+
+    @Test
+    void loginUserControllerErrorTest() throws Exception {
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .username("curcu")
+                .password("testPassword123#")
+                .build();
+
+        when(usersService.loginUser(any(UserLoginDTO.class)))
+                .thenThrow(new RuntimeException("Can't logged the user: Some internal error occurred."));
+
+        String userLoginDTOJson = new ObjectMapper().writeValueAsString(userLoginDTO);
+
+        mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userLoginDTOJson))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("Can't logged the user: Some internal error occurred."));
     }
 
 }

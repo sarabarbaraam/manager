@@ -1,15 +1,14 @@
 package com.sarabarbara.manager.services;
 
-import com.sarabarbara.manager.dto.CreateResponse;
-import com.sarabarbara.manager.dto.LoginResponse;
-import com.sarabarbara.manager.dto.SearchResponse;
-import com.sarabarbara.manager.dto.UpdateUserResponse;
-import com.sarabarbara.manager.dto.users.*;
+import com.sarabarbara.manager.apis.ZeroBounceAPI;
+import com.sarabarbara.manager.dto.users.UserDTO;
+import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.exceptions.UserNotFoundException;
+import com.sarabarbara.manager.exceptions.UserValidateException;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
-import com.sarabarbara.manager.utils.UsersUtils;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +17,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.sarabarbara.manager.constants.Constants.SPECIAL_CHARACTERS_ALLOWED;
+import static com.sarabarbara.manager.constants.Constants.USER_NOT_FOUND;
 import static com.sarabarbara.manager.utils.UsersUtils.isValidPassword;
 
 /**
@@ -37,49 +39,34 @@ import static com.sarabarbara.manager.utils.UsersUtils.isValidPassword;
 @AllArgsConstructor
 public class UsersService {
 
-    private final UserRepository userRepository;
-    private final UsersUtils usersUtils;
+    private UserRepository userRepository;
+    private final ZeroBounceAPI zeroBounceAPI;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final ModelMapper modelMapper = new ModelMapper();
+
     private static final Logger logger = LoggerFactory.getLogger(UsersService.class);
+    private StringBuilder errorMessages;
 
     /**
      * Create a user in the BBDD
      *
      * @param user the user
+     *
+     * @return the creation of the user
+     *
+     * @throws UserValidateException the {@link UserValidateException}
      */
 
-    public CreateResponse createUser(Users user) {
+    public Users createUser(Users user) throws UserValidateException {
 
         logger.info("Creating user: {}", user);
+        validateNewUser(user);
 
-        logger.info("Validating username...");
-        usersUtils.usernameValidator(user.getUsername());
+        logger.info("Encoding password...");
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        logger.info("Validating email...");
-        usersUtils.emailValidator(user.getEmail());
-
-        logger.info("Validating password...");
-        isValidPassword(user.getPassword());
-
-        UserCreateDTO userCreateDTO = null;
-
-        if (isValidPassword(user.getPassword())) {
-
-            logger.info("Encoding password...");
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            Users savedUser = userRepository.save(user);
-
-            logger.info("User created successfully: {}", savedUser);
-
-            userCreateDTO =
-                    UserCreateDTO.builder().name(user.getName()).username(user.getUsername()).email(user.getEmail())
-                            .genre(user.getGenre()).profilePictureURL(user.getProfilePictureURL()).premium(user.getPremium()).build();
-
-            return new CreateResponse(true, userCreateDTO, "User created successfully");
-        }
-
-        return new CreateResponse(false, userCreateDTO, "Can't create user: ");
+        logger.info("User created successfully: {}", user);
+        return userRepository.save(user);
     }
 
     /**
@@ -92,32 +79,18 @@ public class UsersService {
      * @return the results of the search
      */
 
-    public SearchResponse<UserSearchDTO> searchUser(String identifier, int page, int size) {
+    public List<Users> searchUser(String identifier, int page, int size) {
 
         // page number (default = 0) and the number of elements in the page
         PageRequest pageRequest = PageRequest.of(page, size);
 
         logger.info("Searching user: {}, Page: {}, Size: {}", identifier, page, size);
 
-        Page<Users> userPage = userRepository.findAllByUsernameContaining(identifier, pageRequest);
+        Page<Users> userPage = userRepository.findAllByUsernameContainingIgnoreCase(identifier, pageRequest);
 
-        List<UserSearchDTO> userDTO = userPage.stream()
-                .map(user -> UserSearchDTO.builder()
-                        .username(user.getUsername())
-                        .profilePictureURL(user.getProfilePictureURL())
-                        .build())
-                .toList();  // immutable list
-
-        int totalPages = userPage.getTotalPages();
-
-        if (userPage.isEmpty()) {
-
-            return new SearchResponse<>(userDTO, (int) userPage.getTotalElements(), page, totalPages);
-        }
-
-        logger.info("Users found: {}, Page number: {}, Total pages: {}", userDTO.size(), page, totalPages);
-
-        return new SearchResponse<>(userDTO, (int) userPage.getTotalElements(), page, totalPages);
+        logger.info("Users found: {}, Page number: {}, Total pages: {}", userPage.getTotalElements(), page,
+                userPage.getTotalPages());
+        return userPage.getContent();
     }
 
 
@@ -126,12 +99,15 @@ public class UsersService {
      *
      * @param identifier the identifier
      * @param newInfo    the newInfo
+     *
+     * @return the updated user
+     *
+     * @throws UserValidateException the {@link UserValidateException}
      */
 
-    public UpdateUserResponse updateUser(String identifier, UserDTO newInfo) {
+    public Users updateUser(String identifier, UserDTO newInfo) throws UserValidateException {
 
         Optional<Users> optionalUser = userRepository.findByUsernameIgnoreCase(identifier);
-        UserUpdateDTO userUpdateDTO = null;
 
         logger.info("Updating user: {}", optionalUser);
 
@@ -142,7 +118,7 @@ public class UsersService {
             logger.info("New user info: {}", newInfo);
 
             // checks that the new password is valid and username/email are unique
-            usersUtils.checks(newInfo, existingUser);
+            checks(newInfo, existingUser);
 
             // ignores the id field
             modelMapper.typeMap(Users.class, Users.class).addMappings(mapper -> mapper.skip(Users::setId));
@@ -158,42 +134,41 @@ public class UsersService {
             logger.info("Updating user {}...", existingUser.getUsername());
             userRepository.save(existingUser);
 
-            userUpdateDTO =
-                    UserUpdateDTO.builder().name(existingUser.getName()).username(existingUser.getUsername()).email(existingUser.getEmail())
-                    .genre(existingUser.getGenre()).profilePictureURL(existingUser.getProfilePictureURL()).premium(existingUser.getPremium()).build();
-            logger.info("User {} updated successfully", existingUser);
-            return new UpdateUserResponse("User updated successfully", userUpdateDTO);
 
+            logger.info("User {} updated successfully", existingUser);
+            return existingUser;
         }
 
-        logger.error("User with identifier {} can't be updated", identifier);
-        return new UpdateUserResponse("Can't update user: ", userUpdateDTO);
+        logger.error("User with identifier {} can't be updated: user not found", identifier);
+        throw new UserNotFoundException("Can't update user: User not found");
     }
 
     /**
      * Delete a user from the BBDD
      *
      * @param identifier the identifier
+     *
+     * @throws UserNotFoundException the {@link UserNotFoundException}
      */
 
-    public void deleteUser(String identifier) {
+    public void deleteUser(String identifier) throws UserNotFoundException {
 
         Optional<Users> optionalUser = userRepository.findByUsernameIgnoreCase(identifier);
-        Long id;
 
-        if (optionalUser.isPresent()) {
 
-            id = optionalUser.get().getId();
+        if (optionalUser.isEmpty()) {
 
-            logger.info("Deleting user: {}", optionalUser);
-            userRepository.deleteById(id);
-
-            logger.info("User with id {} (username: {}) has been deleted successfully.", id, identifier);
-        } else {
-
-            logger.error("User with username {} not found", identifier);
-            throw new UserNotFoundException("User with username " + identifier + " not found");
+            logger.error(USER_NOT_FOUND);
+            throw new UserNotFoundException(USER_NOT_FOUND);
         }
+
+        Long id = optionalUser.get().getId();
+
+        logger.info("Deleting user: {}", optionalUser);
+        userRepository.deleteById(id);
+
+        logger.info("User with id {} (username: {}) has been deleted successfully.", id, identifier);
+
     }
 
     /**
@@ -201,32 +176,203 @@ public class UsersService {
      *
      * @param user the user
      *
-     * @return the LoginResponse
+     * @return true or false
      */
 
-    public LoginResponse loginUser(UserLoginDTO user) {
+    public boolean loginUser(@RequestBody UserLoginDTO user) {
 
         logger.info("Logging user (identifier: {})", user);
         logger.info("Checking if the user exist...");
 
-        List<Optional<Users>> userExistence = usersUtils.userExist(user);
-        Optional<Users> optionalUsername = userExistence.get(0);
-        Optional<Users> optionalEmail = userExistence.get(1);
+        Optional<Users> userExistence = userExist(user);
 
-        if (optionalUsername.isPresent() || optionalEmail.isPresent()) {
+        logger.info("Checking user information...");
 
-            logger.info("Checking user information...");
-            if ((optionalEmail.isPresent() && passwordEncoder.matches(user.getPassword(),
-                    optionalEmail.get().getPassword())) || (optionalUsername.isPresent() && passwordEncoder.matches(user.getPassword(),
-                    optionalUsername.get().getPassword()))) {
+        if ((userExistence.isPresent() && passwordEncoder.matches(user.getPassword(),
+                userExistence.get().getPassword()))) {
 
-                logger.info("Logged successfully");
-                return new LoginResponse(true, "Logged successfully");
+            logger.info("Logged successfully");
+
+            return true;
+        }
+
+        logger.error("Credential doesn't match");
+        return false;
+
+    }
+
+    // Complementary methods
+
+    /**
+     * Validate the info of new user is correct
+     *
+     * @param user the user
+     */
+
+    private void validateNewUser(@NonNull Users user) {
+
+        logger.info("Validating username...");
+        usernameValidator(user.getUsername());
+
+        logger.info("Validating email...");
+        emailValidator(user.getEmail());
+
+        logger.info("Validating password...");
+        if (!isValidPassword(user.getPassword())) {
+
+            logger.error(SPECIAL_CHARACTERS_ALLOWED);
+
+            throw new UserValidateException(SPECIAL_CHARACTERS_ALLOWED);
+
+        }
+    }
+
+    /**
+     * Checks if the password, username and email are correct
+     *
+     * @param newInfo      the newInfo
+     * @param existingUser the updatedUser
+     *
+     * @throws UserValidateException the {@link UserValidateException}
+     */
+
+    public void checks(@NonNull UserDTO newInfo, Users existingUser) throws UserValidateException {
+
+        if (newInfo.getUsername() != null && !newInfo.getUsername().isBlank()) {
+            try {
+
+                usernameValidator(newInfo.getUsername());
+
+            } catch (UserValidateException e) {
+
+                errorMessages = new StringBuilder();
+
+                errorMessages.append("Username validation failed: ").append(e.getMessage());
+                throw new UserValidateException(errorMessages);
             }
         }
 
-        logger.info("Username/email or password are incorrect");
-        return new LoginResponse(false, "Can't logged the user. Ensure the email/username and password are correct");
+        if (newInfo.getEmail() != null && !newInfo.getEmail().isBlank()) {
+            try {
+
+                emailValidator(newInfo.getEmail());
+
+            } catch (UserValidateException e) {
+
+                errorMessages = new StringBuilder();
+
+                errorMessages.append("Email validation failed: ").append(e.getMessage());
+                throw new UserValidateException(errorMessages);
+            }
+        }
+
+        if (newInfo.getPassword() != null && !newInfo.getPassword().isBlank()) {
+            try {
+
+                passwordValidator(newInfo, existingUser);
+
+            } catch (UserValidateException e) {
+
+                errorMessages = new StringBuilder();
+
+                errorMessages.append("Password validation failed: ").append(e.getMessage());
+                throw new UserValidateException(errorMessages);
+            }
+        }
+
+    }
+
+    /**
+     * Validates if the username is taken
+     *
+     * @param username the username
+     */
+
+    public void usernameValidator(String username) {
+
+        Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(username);
+
+        if (optionalUsername.isPresent()) {
+
+            logger.error("The username {} is already taken.", username);
+            throw new UserValidateException("The username " + username + " is already taken.");
+        }
+
+        logger.info("The username {} is available", username);
+    }
+
+    /**
+     * Validates if the email is taken
+     *
+     * @param email the email
+     */
+
+    public void emailValidator(String email) {
+
+        Optional<Users> optionalEmail = userRepository.findByEmail(email);
+
+        if (optionalEmail.isPresent()) {
+
+            logger.error("The email {} is already taken.", email);
+            throw new UserValidateException("The email " + email + " is already taken.");
+        }
+
+        logger.info("The email {} is available", email);
+
+        zeroBounceAPI.emailIsReal(email);
+    }
+
+    /**
+     * Validates the password format
+     *
+     * @param newInfo      the newInfo
+     * @param existingUser the updatedUser
+     *
+     * @throws UserValidateException the {@link UserValidateException}
+     */
+
+    private void passwordValidator(@NonNull UserDTO newInfo, Users existingUser) throws UserValidateException {
+
+        if (!isValidPassword(newInfo.getPassword())) {
+
+            logger.error("Invalid password.");
+            throw new UserValidateException(SPECIAL_CHARACTERS_ALLOWED);
+        }
+
+        logger.info("Password is valid, proceeding to encrypt");
+        existingUser.setPassword(passwordEncoder.encode(newInfo.getPassword()));
+
+        logger.info("Encrypted password: {}", existingUser.getPassword());
+        userRepository.save(existingUser);
+
+    }
+
+    /**
+     * Checks if the user exist
+     *
+     * @param user the user
+     *
+     * @return the optional user
+     */
+
+    public Optional<Users> userExist(@NonNull UserLoginDTO user) {
+
+        Optional<Users> optionalUsername = userRepository.findByUsernameIgnoreCase(user.getUsername());
+        if (optionalUsername.isPresent()) {
+
+            logger.info("User existence check completed.");
+            return optionalUsername;
+        }
+
+        Optional<Users> optionalEmail = userRepository.findByEmail(user.getEmail());
+        if (optionalEmail.isPresent()) {
+
+            logger.info("User existence check completed.");
+            return optionalEmail;
+        }
+
+        logger.error("User not exist");
+        return Optional.empty();
     }
 
 }

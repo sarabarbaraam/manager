@@ -23,16 +23,22 @@ import java.util.Objects;
 public class UpdateUserResponse {
 
     /**
-     * The message
+     * The success
      */
 
-    private String message;
+    private boolean success;
 
     /**
      * The user
      */
 
     private UserUpdateDTO user;
+
+    /**
+     * The message
+     */
+
+    private String message;
 
     /**
      * The equals
@@ -42,7 +48,7 @@ public class UpdateUserResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UpdateUserResponse that)) return false;
-        return Objects.equals(getMessage(), that.getMessage()) && Objects.equals(getUser(), that.getUser());
+        return isSuccess() == that.isSuccess() && Objects.equals(getMessage(), that.getMessage()) && Objects.equals(getUser(), that.getUser());
     }
 
     /**
@@ -51,7 +57,7 @@ public class UpdateUserResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getMessage(), getUser());
+        return Objects.hash(isSuccess(), getMessage(), getUser());
     }
 
 }

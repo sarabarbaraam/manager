@@ -15,10 +15,11 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 @Setter
 @ToString
-public class SearchResponse<T> {
+public class SearchUserResponse<T> {
 
     /**
      * The results
@@ -51,7 +52,7 @@ public class SearchResponse<T> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SearchResponse<?> that)) return false;
+        if (!(o instanceof SearchUserResponse<?> that)) return false;
         return getTotalResults() == that.getTotalResults() && getCurrentPage() == that.getCurrentPage()
                 && getTotalPage() == that.getTotalPage() && Objects.equals(getResults(), that.getResults());
     }

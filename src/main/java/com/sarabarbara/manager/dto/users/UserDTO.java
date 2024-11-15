@@ -15,17 +15,12 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 //@JsonInclude(JsonInclude.Include.NON_NULL) // prevent null fields from being processed in JSON conversion
 public class UserDTO {
-
-    /**
-     * The id
-     */
-
-    private Long id;
 
     /**
      * The name
@@ -95,7 +90,7 @@ public class UserDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getUsername(), getPassword(), getEmail(), getGenre(),
+        return Objects.hash(getName(), getUsername(), getPassword(), getEmail(), getGenre(),
                 getProfilePictureURL());
     }
 
