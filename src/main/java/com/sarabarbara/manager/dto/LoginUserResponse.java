@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-public class LoginResponse {
+public class LoginUserResponse {
 
     /**
      * The success
@@ -43,7 +43,7 @@ public class LoginResponse {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LoginResponse that)) return false;
+        if (!(o instanceof LoginUserResponse that)) return false;
         return isSuccess() == that.isSuccess() && Objects.equals(getMessage(), that.getMessage());
     }
 

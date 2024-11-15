@@ -1,10 +1,8 @@
 package com.sarabarbara.manager.services;
 
-import com.sarabarbara.manager.dto.LoginResponse;
-import com.sarabarbara.manager.dto.SearchResponse;
+import com.sarabarbara.manager.apis.ZeroBounceAPI;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.exceptions.UserValidateException;
 import com.sarabarbara.manager.models.Genre;
@@ -12,187 +10,497 @@ import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 class UsersServiceTest {
 
-    @Autowired
+    @InjectMocks
     private UsersService usersService;
 
-    @Autowired
+    @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ZeroBounceAPI zeroBounceAPI;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
     private Users user;
 
     @BeforeEach
-    void init() {
+    void setUp() {
 
-        userRepository.deleteAll();
+        user = Users.builder()
+                .id(1L)
+                .name("Curcu")
+                .username("curcu")
+                .email("email@gmail.com")
+                .password("Testpassword124#!")
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
 
-        user = Users.builder().id(1502L).name("Prueba").username("prueba").password("Testpassword1#")
-                .email("test@gmail.com").genre(Genre.PNTS).profilePictureURL(null).premium(true).build();
+    }
 
-        usersService.createUser(user);
+    /**
+     * The createUser Service
+     */
+
+    @Test
+    void createUserServiceTest() {
+
+        when(userRepository.save(any(Users.class))).thenReturn(user);
+
+        Users createdUser = usersService.createUser(user);
+
+        assertThat(createdUser.getId()).isEqualTo(1L);
+        assertThat(createdUser.getName()).isEqualTo("Curcu");
+        assertThat(createdUser.getUsername()).isEqualTo("curcu");
+        assertThat(createdUser.getEmail()).isEqualTo("email@gmail.com");
+        assertThat(createdUser.getPassword()).startsWith("$2a$10");
+        assertThat(createdUser.getGenre()).isEqualTo(Genre.PNTS);
+        assertNull(createdUser.getProfilePictureURL());
+        assertTrue(createdUser.getPremium());
     }
 
     @Test
-    void createUserTest() {
+    void CreateUserServiceDuplicatedUsernameTest() throws UserValidateException {
 
-        Users createdUser = Users.builder().name("Pruebas").username("pruebasS123").password("Testpassword#12")
-                .email("test123@gmail.com").genre(Genre.F).profilePictureURL(null).premium(false).build();
+        when(userRepository.findByUsernameIgnoreCase(anyString()))
+                .thenReturn(Optional.of(user));
 
-        usersService.createUser(createdUser);
-        assertThat(userRepository.findByUsernameIgnoreCase(createdUser.getUsername())).isPresent();
+        UserValidateException exception = assertThrows(UserValidateException.class,
+                () -> usersService.createUser(user));
+
+        assertThat(exception.getMessage())
+                .isEqualTo("The username " + user.getUsername() + " is already taken.");
+
     }
 
     @Test
-    void createUserErrorTest() {
+    void CreateUserServiceDuplicatedEmailTest() throws UserValidateException {
 
-        Users badUser = Users.builder().name("Pruebas").username("pruebasS").password("Testpassword12")
-                .email("test23@gmail.com").genre(Genre.F).profilePictureURL(null).premium(false).build();
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
 
-        assertThrows(UserValidateException.class, () -> usersService.createUser(badUser));
+        UserValidateException exception = assertThrows(UserValidateException.class,
+                () -> usersService.createUser(user));
+
+        assertThat(exception.getMessage()).isEqualTo("The email " + user.getEmail() + " is already taken.");
     }
 
     @Test
-    void searchTotalUserTest() {
+    void createUserServiceInvalidPasswordTest() throws UserValidateException {
 
-        SearchResponse<UserSearchDTO> response = usersService.searchUser("pru", 0, 10);
+        Users user2 = Users.builder()
+                .id(5332L)
+                .name("Test")
+                .username("carapan")
+                .email("email@gmail.com")
+                .password("Testpassword124")
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
 
-        assertThat(response.getTotalResults()).isEqualTo(1);
-        assertThat(response.getResults()).hasSize(1);
-
-        UserSearchDTO foundUser = response.getResults().getFirst();
-        assertThat(foundUser.getUsername()).isEqualTo("prueba");
-        assertThat(foundUser.getProfilePictureURL()).isNull();
+        UserValidateException exception = assertThrows(UserValidateException.class,
+                () -> usersService.createUser(user2));
+        assertThat(exception.getMessage())
+                .isEqualTo("The password does not meet the security requirements. "
+                        + "Special characters allowed: !?/@#$%^&*()_+=-");
     }
 
     @Test
-    void searchPartialUserTest() {
+    void searchTotalUserServiceTest() {
 
-        Users user2 = Users.builder().name("Pruebas").username("pruebasS").password("Testpassword1#2")
-                .email("test23@gmail.com").genre(Genre.F).profilePictureURL(null).premium(false).build();
+        PageRequest pageRequest = PageRequest.of(0, 10);
 
-        userRepository.save(user2);
+        List<Users> userList = new ArrayList<>(Collections.singletonList(user));
 
-        SearchResponse<UserSearchDTO> response = usersService.searchUser("a", 0, 10);
+        Page<Users> pageList = new PageImpl<>(userList, pageRequest, userList.size());
 
-        assertThat(response.getTotalResults()).isEqualTo(2);
-        assertThat(response.getResults()).hasSize(2);
+        when(userRepository.findAllByUsernameContainingIgnoreCase("curcu", pageRequest)).thenReturn(pageList);
+
+        List<Users> usersList = usersService.searchUser("curcu", 0, 10);
+
+        assertThat(usersList).hasSize(1);
+        assertThat(userList.get(0).getUsername()).isEqualTo("curcu");
+
+    }
+
+    /**
+     * The searchUser Service
+     */
+
+    @Test
+    void searchPartialUserServiceTest() {
+
+        Users user3 = Users.builder()
+                .id(5332L)
+                .name("Test")
+                .username("curcaido")
+                .email("email@gmail.com")
+                .password("Testpassword124")
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        List<Users> userList = new ArrayList<>(List.of(user, user3));
+
+        Page<Users> pageList = new PageImpl<>(userList, pageRequest, userList.size());
+
+        when(userRepository.findAllByUsernameContainingIgnoreCase("cur", pageRequest)).thenReturn(pageList);
+
+        List<Users> usersList = usersService.searchUser("cur", 0, 10);
+
+        assertThat(usersList).hasSize(2);
+        assertThat(userList.get(0).getUsername()).isEqualTo("curcu");
+        assertThat(userList.get(1).getUsername()).isEqualTo("curcaido");
     }
 
     @Test
-    void searchZeroUserTest() {
+    void searchZeroUserServiceTest() {
 
-        SearchResponse<UserSearchDTO> response = usersService.searchUser("NonExistent", 0, 10);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<Users> emptyPage = new PageImpl<>(Collections.emptyList(), pageRequest, 0);
 
-        assertThat(response.getTotalResults()).isZero();
-        assertThat(response.getResults()).isEmpty();
+        when(userRepository.findAllByUsernameContainingIgnoreCase("chikitronix", pageRequest)).thenReturn(emptyPage);
+
+        List<Users> usersList = usersService.searchUser("chikitronix", 0, 10);
+
+        assertThat(usersList).isEmpty();
     }
 
+    /**
+     * The updateUser Service
+     */
+
     @Test
-    void updateTotalUserTest() {
+    void updateTotalUserServiceTest() {
 
-        UserDTO updateUser =
-                UserDTO.builder().name("Pruebas").username("pruebasS").password("Testpassword1#2")
-                        .email("test23@gmail.com").genre(Genre.F).profilePictureURL(null).premium(true).build();
+        when(userRepository.findByUsernameIgnoreCase("curcu")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameIgnoreCase("curiquiqui")).thenReturn(Optional.empty());
 
-        usersService.updateUser(user.getUsername(), updateUser);
+        UserDTO newInfo = UserDTO.builder()
+                .name("Test")
+                .username("curiquiqui")
+                .email("email@gmail.com")
+                .password("Testpassword124$")
+                .genre(Genre.F)
+                .profilePictureURL(null)
+                .premium(false)
+                .build();
 
-        assertThat(updateUser.getName()).isEqualTo("Pruebas");
-        assertThat(updateUser.getUsername()).isEqualTo("pruebasS");
-        assertThat(updateUser.getPassword()).isEqualTo("Testpassword1#2");
-        assertThat(updateUser.getEmail()).isEqualTo("test23@gmail.com");
+        Users updateUser = usersService.updateUser(user.getUsername(), newInfo);
+
+        assertThat(updateUser.getName()).isEqualTo("Test");
+        assertThat(updateUser.getUsername()).isEqualTo("curiquiqui");
+        assertThat(updateUser.getEmail()).isEqualTo("email@gmail.com");
+        assertThat(updateUser.getPassword()).startsWith("$2a$10");
         assertThat(updateUser.getGenre()).isEqualTo(Genre.F);
-        assertThat(updateUser.getProfilePictureURL()).isNull();
+        assertNull(updateUser.getProfilePictureURL());
+        assertFalse(updateUser.getPremium());
+    }
+
+    @Test
+    void updatePartialUserServiceTest() {
+
+        when(userRepository.findByUsernameIgnoreCase("curcu")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameIgnoreCase("curiquiqui")).thenReturn(Optional.empty());
+
+        UserDTO newInfo = UserDTO.builder()
+                .name("Test")
+                .username("curiquiqui")
+                .build();
+
+        Users updateUser = usersService.updateUser(user.getUsername(), newInfo);
+
+        assertThat(updateUser.getName()).isEqualTo("Test");
+        assertThat(updateUser.getUsername()).isEqualTo("curiquiqui");
+    }
+
+    @Test
+    void updateUsernameFailServiceTest() throws UserValidateException {
+
+        Users user4 = Users.builder()
+                .id(14L)
+                .name("Tralala")
+                .username("carapan")
+                .email("emailtest@gmail.com")
+                .password("Testpassword124#!")
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true)
+                .build();
+
+        when(userRepository.findByUsernameIgnoreCase("curcu")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameIgnoreCase("carapan")).thenReturn(Optional.of(user4));
+
+        UserDTO newInfo = UserDTO.builder()
+                .username("carapan")
+                .build();
+
+        UserValidateException exception = assertThrows(UserValidateException.class,
+                () -> usersService.updateUser("curcu", newInfo));
+
+        assertThat(exception.getMessage())
+                .isEqualTo("Username validation failed: The username "
+                        + user4.getUsername() + " is already taken.");
+    }
+
+    @Test
+    void updateEmailFailServiceTest() throws UserValidateException {
+
+        Users user5 = Users.builder()
+                .id(14L)
+                .name("Tralala")
+                .username("carapan")
+                .email("emailtest@gmail.com")
+                .password("Testpassword124#!")
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true)
+                .build();
+
+        when(userRepository.findByUsernameIgnoreCase("curcu")).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail("emailtest@gmail.com")).thenReturn(Optional.of(user5));
+
+        UserDTO newInfo = UserDTO.builder()
+                .email("emailtest@gmail.com")
+                .build();
+
+        UserValidateException exception = assertThrows(UserValidateException.class,
+                () -> usersService.updateUser("curcu", newInfo));
+
+        assertThat(exception.getMessage())
+                .isEqualTo("Email validation failed: The email "
+                        + user5.getEmail() + " is already taken.");
+    }
+
+    @Test
+    void updatePasswordFailServiceTest() throws UserValidateException {
+
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(user));
+
+        UserDTO newInfo = UserDTO.builder()
+                .password("cuchurrumin")
+                .build();
+
+        UserValidateException exception = assertThrows(UserValidateException.class,
+                () -> usersService.updateUser("curcu", newInfo));
+
+        assertThat(exception.getMessage())
+                .isEqualTo("Password validation failed: The password does not meet the security requirements. "
+                        + "Special characters allowed: !?/@#$%^&*()_+=-");
 
     }
 
     @Test
-    void updatePartialUserTest() {
+    void updateUserFailServiceTest() throws UserNotFoundException {
 
-        UserDTO updateUser = UserDTO.builder().username("pruebasS").build();
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
 
-        usersService.updateUser(user.getUsername(), updateUser);
+        UserDTO newInfo = UserDTO.builder()
+                .email("emailtest@gmail.com")
+                .build();
 
-        assertThat(updateUser.getUsername()).isEqualTo("pruebasS");
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+                () -> usersService.updateUser("chikitronix", newInfo));
+
+        assertThat(exception.getMessage()).isEqualTo("Can't update user: User not found");
     }
 
-    @Test
-    void updateUserErrorTest() {
-
-        UserDTO updateUser = UserDTO.builder().name("Pruebas").username("pruebasS").password("Testpassword1#2")
-                .email("test@gmail.com").genre(Genre.F).profilePictureURL(null).premium(false).build();
-
-        String identifier = user.getUsername();
-
-        assertThrows(UserValidateException.class, () -> usersService.updateUser(identifier, updateUser));
-    }
+    /**
+     * The deleteUser Service
+     */
 
     @Test
-    void deleteUserTest() {
+    void deleteUserServiceTest() {
 
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(user));
 
         usersService.deleteUser(user.getUsername());
 
-        assertThat(userRepository.findByUsernameIgnoreCase(user.getUsername())).isEmpty();
-
+        verify(userRepository, times(1)).deleteById(user.getId());
     }
 
     @Test
-    void deleteUserErrorTest() {
+    void deleteUserFailServiceTest() throws UserNotFoundException {
 
-        UserDTO userToDelete = UserDTO.builder().id(1804L).name("Pruebas").username("pruebasSfdds5").password(
-                        "Testpassword1#2")
-                .email("test23@gmail.com").genre(Genre.F).profilePictureURL(null).premium(false).build();
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
 
-        String username = userToDelete.getUsername();
-        assertThrows(UserNotFoundException.class, () -> usersService.deleteUser(username));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+                () -> usersService.deleteUser("curcu"));
+
+        verify(userRepository, never()).deleteById(anyLong());
+        assertThat(exception.getMessage()).isEqualTo("User not found.");
+    }
+
+    /**
+     * The loginUser Service
+     */
+
+    @Test
+    void loginUserUsernameServiceTest() {
+
+        passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("Testpassword124#!");
+
+        Users user5 = Users.builder()
+                .id(1L)
+                .name("Curcu")
+                .username("carapan")
+                .email("email@gmail.com")
+                .password(encodedPassword)
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .username("curcu")
+                .password("Testpassword124#!")
+                .build();
+
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(user5));
+
+        boolean loggedUser = usersService.loginUser(userLoginDTO);
+
+        assertTrue(loggedUser);
     }
 
     @Test
-    void loginUserUsernameTest() {
+    void loginUserEmailServiceTest() {
 
-        UserLoginDTO loginUser =
-                UserLoginDTO.builder().username(user.getUsername()).password("Testpassword1#").build();
+        passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("Testpassword124#!");
 
-        LoginResponse loginResponse = usersService.loginUser(loginUser);
+        Users user6 = Users.builder()
+                .id(1L)
+                .name("Curcu")
+                .username("carapan")
+                .email("email@gmail.com")
+                .password(encodedPassword)
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
 
-        assertThat(loginResponse.isSuccess()).isTrue();
-        assertThat(loginResponse.getMessage()).isEqualTo("Logged successfully");
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .email("email@gmail.com")
+                .password("Testpassword124#!")
+                .build();
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user6));
+
+        boolean loggedUser = usersService.loginUser(userLoginDTO);
+
+        assertTrue(loggedUser);
     }
 
     @Test
-    void loginUserEmailTest() {
+    void loginUserFailWithUsernameServiceTest() {
 
-        UserLoginDTO loginUser =
-                UserLoginDTO.builder().email(user.getEmail()).password("Testpassword1#").build();
+        passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("Testpassword124#!");
 
-        LoginResponse loginResponse = usersService.loginUser(loginUser);
+        Users user7 = Users.builder()
+                .id(1L)
+                .name("Curcu")
+                .username("carapan")
+                .email("email@gmail.com")
+                .password(encodedPassword)
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
 
-        assertThat(loginResponse.isSuccess()).isTrue();
-        assertThat(loginResponse.getMessage()).isEqualTo("Logged successfully");
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(user7));
+        when(userRepository.findByUsernameIgnoreCase("carapino")).thenReturn(Optional.empty());
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .username("carapino")
+                .password("Testpassword124#!")
+                .build();
+
+        boolean loggedUser = usersService.loginUser(userLoginDTO);
+
+        assertFalse(loggedUser);
     }
 
     @Test
-    void loginUserErrorTest() {
+    void loginUserFailWithEmailServiceTest() {
 
-        UserLoginDTO loginUser =
-                UserLoginDTO.builder().email(user.getEmail()).password("Testpassword1").build();
+        passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("Testpassword124#!");
 
-        LoginResponse loginResponse = usersService.loginUser(loginUser);
+        Users user6 = Users.builder()
+                .id(1L)
+                .name("Curcu")
+                .username("carapan")
+                .email("email@gmail.com")
+                .password(encodedPassword)
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
 
-        assertThat(loginResponse.isSuccess()).isFalse();
-        assertThat(loginResponse.getMessage()).isEqualTo("Can't logged the user. Ensure the email/username and " +
-                "password are correct");
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user6));
+        when(userRepository.findByEmail("email123@gmail.com")).thenReturn(Optional.empty());
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .email("email123@gmail.com")
+                .password("Testpassword124#!")
+                .build();
+
+        boolean loggedUser = usersService.loginUser(userLoginDTO);
+
+        assertFalse(loggedUser);
+    }
+
+    @Test
+    void loginUserFailWithPasswordServiceTest() {
+
+        passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("Testpassword124#!");
+
+        Users user6 = Users.builder()
+                .id(1L)
+                .name("Curcu")
+                .username("carapan")
+                .email("email@gmail.com")
+                .password(encodedPassword)
+                .genre(Genre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user6));
+
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .email("email@gmail.com")
+                .password("Testpassword12456")
+                .build();
+
+        boolean loggedUser = usersService.loginUser(userLoginDTO);
+
+        assertFalse(loggedUser);
     }
 
 }
-

@@ -30,7 +30,7 @@ public class ZeroBounceAPI {
 
     public void emailIsReal(String email) {
 
-        logger.info("checking if the email {} is real, disposable or spamtrap...", email);
+        logger.info("checking if the email {} is real, disposable or spam trap...", email);
 
         String apiKey = zeroBounceConfig.getApiKey();
         String url = ZERO_BOUNCE_URL + "?email=" + email + "&api_key=" + apiKey;
@@ -41,7 +41,7 @@ public class ZeroBounceAPI {
 
             if ("valid".equals(response.getStatus())
                     && !"disposable".equals(response.getSubStatus())
-                    && !"spamtrap".equals(response.getSubStatus())) {
+                    && !"spam trap".equals(response.getSubStatus())) {
 
                 logger.info("It's a real email. Proceeding with registration...");
 
@@ -49,6 +49,9 @@ public class ZeroBounceAPI {
 
                 throw new UserValidateException("The email " + email + " is not acceptable: " + response.getSubStatus());
             }
+        } else {
+
+            throw new UserValidateException("Email validation service returned a null response");
         }
     }
 
