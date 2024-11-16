@@ -23,14 +23,14 @@ public class UsersUtils {
     private static final Logger logger = LoggerFactory.getLogger(UsersUtils.class);
 
     /**
-     * Validates if the password is correct
+     * Validates if the password's format is correct
      *
      * @param password password
      *
      * @return true or false
      */
 
-    public static boolean isValidPassword(String password) {
+    public static boolean isFormatPasswordCorrect(String password) {
 
         logger.info("isValidPassword started");
         final Pattern pattern = Pattern.compile(
@@ -44,7 +44,7 @@ public class UsersUtils {
             return false;
         }
 
-        logger.info("The password is valid");
+        logger.info("The password's format is correct");
         logger.info("isValidPassword finished");
         return true;
 

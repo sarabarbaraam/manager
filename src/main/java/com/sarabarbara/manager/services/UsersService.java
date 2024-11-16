@@ -20,11 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.sarabarbara.manager.constants.Constants.SPECIAL_CHARACTERS_ALLOWED;
 import static com.sarabarbara.manager.constants.Constants.USER_NOT_FOUND;
-import static com.sarabarbara.manager.utils.UsersUtils.isValidPassword;
+import static com.sarabarbara.manager.utils.UsersUtils.isFormatPasswordCorrect;
 
 /**
  * UsersService class
@@ -218,7 +219,7 @@ public class UsersService {
         emailValidator(user.getEmail());
 
         logger.info("Validating password...");
-        if (!isValidPassword(user.getPassword())) {
+        if (!isFormatPasswordCorrect(user.getPassword())) {
 
             logger.error(SPECIAL_CHARACTERS_ALLOWED);
 
@@ -275,6 +276,7 @@ public class UsersService {
 
                 errorMessages = new StringBuilder();
 
+                logger.error("Password validation failed: {}", e.getMessage());
                 errorMessages.append("Password validation failed: ").append(e.getMessage());
                 throw new UserValidateException(errorMessages);
             }
@@ -333,10 +335,16 @@ public class UsersService {
 
     private void passwordValidator(@NonNull UserDTO newInfo, Users existingUser) throws UserValidateException {
 
-        if (!isValidPassword(newInfo.getPassword())) {
+        if (!isFormatPasswordCorrect(newInfo.getPassword())) {
 
             logger.error("Invalid password.");
             throw new UserValidateException(SPECIAL_CHARACTERS_ALLOWED);
+        }
+
+        if (Objects.equals(newInfo.getPassword(), existingUser.getPassword())) {
+
+            logger.error("The password can't be the same as the previous one");
+            throw new UserValidateException("The password can't be the same as the previous one");
         }
 
         logger.info("Password is valid, proceeding to encrypt");
