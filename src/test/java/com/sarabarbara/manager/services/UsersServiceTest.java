@@ -317,6 +317,23 @@ class UsersServiceTest {
     }
 
     @Test
+    void updateEqualPasswordFailServiceTest(){
+
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(user));
+
+        UserDTO newInfo = UserDTO.builder()
+                .password("Testpassword124#!")
+                .build();
+
+        UserValidateException exception = assertThrows(UserValidateException.class,
+                () -> usersService.updateUser("curcu", newInfo));
+
+        assertThat(exception.getMessage())
+                .isEqualTo("Password validation failed: The password can't be the same as the previous one");
+
+    }
+
+    @Test
     void updateUserFailServiceTest() throws UserNotFoundException {
 
         when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
