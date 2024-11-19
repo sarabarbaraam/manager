@@ -15,11 +15,21 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class AppConfig {
 
+    /**
+     * The {@link RestTemplate}
+     *
+     * @return RestTemplate
+     */
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
+    /**
+     * The {@link StringBuilder} bean
+     *
+     * @return StringBuilder
+     */
     @Bean
     public StringBuilder stringBuilder() {
         return new StringBuilder();

@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.dto;
+package com.sarabarbara.manager.responses.users;
 
 import lombok.*;
 

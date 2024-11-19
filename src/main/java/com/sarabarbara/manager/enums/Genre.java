@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.models;
+package com.sarabarbara.manager.enums;
 
 
 import lombok.AllArgsConstructor;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
 import com.sarabarbara.manager.exceptions.UserValidateException;
-import com.sarabarbara.manager.models.Genre;
+import com.sarabarbara.manager.enums.Genre;
 import com.sarabarbara.manager.models.Users;
 import com.sarabarbara.manager.services.UsersService;
 import org.junit.jupiter.api.BeforeEach;

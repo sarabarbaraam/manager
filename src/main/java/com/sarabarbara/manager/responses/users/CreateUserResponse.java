@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.dto;
+package com.sarabarbara.manager.responses.users;
 
 import com.sarabarbara.manager.dto.users.UserCreateDTO;
 import lombok.*;
@@ -19,7 +19,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-public class CreateResponse {
+public class CreateUserResponse {
 
     /**
      * The success
@@ -28,7 +28,7 @@ public class CreateResponse {
     private boolean success;
 
     /**
-     * The userDTO
+     * The userCreateDTO
      */
 
     private UserCreateDTO userCreate;
@@ -46,7 +46,7 @@ public class CreateResponse {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CreateResponse that)) return false;
+        if (!(o instanceof CreateUserResponse that)) return false;
         return isSuccess() == that.isSuccess() && Objects.equals(getUserCreate(), that.getUserCreate()) && Objects.equals(getMessage(), that.getMessage());
     }
 

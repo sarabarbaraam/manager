@@ -1,7 +1,7 @@
 package com.sarabarbara.manager.apis;
 
 import com.sarabarbara.manager.config.ZeroBounceConfig;
-import com.sarabarbara.manager.dto.EmailValidationResponse;
+import com.sarabarbara.manager.responses.users.EmailValidationResponse;
 import com.sarabarbara.manager.exceptions.UserValidateException;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -27,6 +27,12 @@ public class ZeroBounceAPI {
 
     private ZeroBounceConfig zeroBounceConfig;
     private final RestTemplate restTemplate;
+
+    /**
+     * Validate if the email is real and not a temporal or spam trap
+     *
+     * @param email the email
+     */
 
     public void emailIsReal(String email) {
 
