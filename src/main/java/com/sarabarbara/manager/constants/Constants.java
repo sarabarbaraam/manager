@@ -10,9 +10,23 @@ package com.sarabarbara.manager.constants;
 
 public class Constants {
 
-    private Constants(){}
+    /**
+     * The private constructor
+     */
 
-    public static final String SPECIAL_CHARACTERS_ALLOWED = "The password does not meet the security requirements. Special characters allowed: !?/@#$%^&*()_+=-";
+    private Constants() {
+    }
+
+    /**
+     * The SPECIAL_CHARACTERS_ALLOWED constant
+     */
+
+    public static final String SPECIAL_CHARACTERS_ALLOWED = "The password does not meet the security requirements. " +
+            "Special characters allowed: !?/@#$%^&*()_+=-";
+
+    /**
+     * The USER_NOT_FOUND constant
+     */
 
     public static final String USER_NOT_FOUND = "User not found.";
 
