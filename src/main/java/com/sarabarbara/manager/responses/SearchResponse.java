@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.dto;
+package com.sarabarbara.manager.responses;
 
 import lombok.*;
 
@@ -19,7 +19,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-public class SearchUserResponse<T> {
+public class SearchResponse<T> {
 
     /**
      * The results
@@ -52,7 +52,7 @@ public class SearchUserResponse<T> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SearchUserResponse<?> that)) return false;
+        if (!(o instanceof SearchResponse<?> that)) return false;
         return getTotalResults() == that.getTotalResults() && getCurrentPage() == that.getCurrentPage()
                 && getTotalPage() == that.getTotalPage() && Objects.equals(getResults(), that.getResults());
     }

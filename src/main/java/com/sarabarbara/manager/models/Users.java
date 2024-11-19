@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.models;
 
 
+import com.sarabarbara.manager.enums.Genre;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
