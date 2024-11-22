@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.config;
 
+import com.sarabarbara.manager.apis.SteamAPI;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -20,6 +21,7 @@ public class AppConfig {
      *
      * @return RestTemplate
      */
+
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -30,9 +32,12 @@ public class AppConfig {
      *
      * @return StringBuilder
      */
+
     @Bean
     public StringBuilder stringBuilder() {
         return new StringBuilder();
     }
 
+    @Bean
+    public SteamAPI steamAPI(){ return new SteamAPI();}
 }

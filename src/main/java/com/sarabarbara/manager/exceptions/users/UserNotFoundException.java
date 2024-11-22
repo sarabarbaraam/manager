@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.exceptions;
+package com.sarabarbara.manager.exceptions.users;
 
 /**
  * UserNotFoundException class

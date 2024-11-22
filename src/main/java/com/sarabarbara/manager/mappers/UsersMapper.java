@@ -3,8 +3,8 @@ package com.sarabarbara.manager.mappers;
 import com.sarabarbara.manager.dto.users.UserCreateDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.dto.users.UserUpdateDTO;
-import com.sarabarbara.manager.enums.Genre;
-import com.sarabarbara.manager.models.Users;
+import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.models.users.Users;
 import lombok.Builder;
 
 import java.util.List;
@@ -33,21 +33,21 @@ public class UsersMapper {
      * @param name              the name
      * @param username          the username
      * @param email             the email
-     * @param genre             the genre
+     * @param userGenre         the userGenre
      * @param profilePictureURL the profile picture url
      * @param premium           the premium
      *
      * @return the mapper of UserCreateDTO
      */
 
-    public static UserCreateDTO toUserCreateDTOMapper(String name, String username, String email, Genre genre,
+    public static UserCreateDTO toUserCreateDTOMapper(String name, String username, String email, UserGenre userGenre,
                                                       String profilePictureURL, boolean premium) {
 
         return UserCreateDTO.builder()
                 .name(name)
                 .username(username)
                 .email(email)
-                .genre(genre)
+                .userGenre(userGenre)
                 .profilePictureURL(profilePictureURL)
                 .premium(premium)
                 .build();
@@ -77,20 +77,20 @@ public class UsersMapper {
      * @param name              the name
      * @param username          the username
      * @param email             the email
-     * @param genre             the genre
+     * @param userGenre         the userGenre
      * @param profilePictureURL the profile picture url
      * @param premium           the premium
      *
      * @return the mapper of UserUpdateDTO
      */
-    public static UserUpdateDTO toUserUpdateDTOMapper(String name, String username, String email, Genre genre,
+    public static UserUpdateDTO toUserUpdateDTOMapper(String name, String username, String email, UserGenre userGenre,
                                                       String profilePictureURL, boolean premium) {
 
         return UserUpdateDTO.builder()
                 .name(name)
                 .username(username)
                 .email(email)
-                .genre(genre)
+                .userGenre(userGenre)
                 .profilePictureURL(profilePictureURL)
                 .premium(premium)
                 .build();

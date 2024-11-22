@@ -30,4 +30,16 @@ public class Constants {
 
     public static final String USER_NOT_FOUND = "User not found.";
 
+    /**
+     * The CONTENT_TYPE constant
+     */
+
+    public static final String CONTENT_TYPE = "Content-Type";
+
+    /**
+     * The APPLICATION_JSON constant
+     */
+
+    public static final String APPLICATION_JSON = "application/json";
+
 }

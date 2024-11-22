@@ -3,9 +3,9 @@ package com.sarabarbara.manager.services;
 import com.sarabarbara.manager.apis.ZeroBounceAPI;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserValidateException;
-import com.sarabarbara.manager.models.Users;
+import com.sarabarbara.manager.exceptions.users.UserNotFoundException;
+import com.sarabarbara.manager.exceptions.users.UserValidateException;
+import com.sarabarbara.manager.models.users.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -87,11 +87,10 @@ public class UsersService {
 
         logger.info("Searching user: {}, Page: {}, Size: {}", identifier, page, size);
 
-        Page<Users> userPage = userRepository.findAllByUsernameContainingIgnoreCase(identifier, pageRequest);
+        Page<Users> searchedUser = userRepository.findAllByUsernameContainingIgnoreCase(identifier, pageRequest);
 
-        logger.info("Users found: {}, Page number: {}, Total pages: {}", userPage.getTotalElements(), page,
-                userPage.getTotalPages());
-        return userPage.getContent();
+        logger.info("Users found: {}. {}", searchedUser.getTotalElements(), page);
+        return searchedUser.getContent();
     }
 
 
@@ -191,8 +190,6 @@ public class UsersService {
 
         if ((userExistence.isPresent() && passwordEncoder.matches(user.getPassword(),
                 userExistence.get().getPassword()))) {
-
-            logger.info("Logged successfully");
 
             return true;
         }

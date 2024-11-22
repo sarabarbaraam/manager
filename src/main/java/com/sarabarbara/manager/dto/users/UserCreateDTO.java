@@ -1,6 +1,6 @@
 package com.sarabarbara.manager.dto.users;
 
-import com.sarabarbara.manager.enums.Genre;
+import com.sarabarbara.manager.enums.UserGenre;
 import lombok.*;
 
 import java.util.Objects;
@@ -40,10 +40,10 @@ public class UserCreateDTO {
     private String email;
 
     /**
-     * The genre
+     * The userGenre
      */
 
-    private Genre genre;
+    private UserGenre userGenre;
 
     /**
      * The profilePictureURL
@@ -65,7 +65,7 @@ public class UserCreateDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserCreateDTO that)) return false;
-        return Objects.equals(getName(), that.getName()) && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getEmail(), that.getEmail()) && getGenre() == that.getGenre() && Objects.equals(getProfilePictureURL(), that.getProfilePictureURL()) && Objects.equals(getPremium(), that.getPremium());
+        return Objects.equals(getName(), that.getName()) && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getEmail(), that.getEmail()) && getUserGenre() == that.getUserGenre() && Objects.equals(getProfilePictureURL(), that.getProfilePictureURL()) && Objects.equals(getPremium(), that.getPremium());
     }
 
     /**
@@ -74,7 +74,7 @@ public class UserCreateDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getUsername(), getEmail(), getGenre(), getProfilePictureURL(), getPremium());
+        return Objects.hash(getName(), getUsername(), getEmail(), getUserGenre(), getProfilePictureURL(), getPremium());
     }
 
 }

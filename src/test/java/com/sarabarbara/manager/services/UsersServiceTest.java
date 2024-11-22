@@ -3,10 +3,10 @@ package com.sarabarbara.manager.services;
 import com.sarabarbara.manager.apis.ZeroBounceAPI;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserValidateException;
-import com.sarabarbara.manager.enums.Genre;
-import com.sarabarbara.manager.models.Users;
+import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.exceptions.users.UserNotFoundException;
+import com.sarabarbara.manager.exceptions.users.UserValidateException;
+import com.sarabarbara.manager.models.users.Users;
 import com.sarabarbara.manager.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class UsersServiceTest {
                 .username("curcu")
                 .email("email@gmail.com")
                 .password("Testpassword124#!")
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -79,7 +79,7 @@ class UsersServiceTest {
         assertThat(createdUser.getUsername()).isEqualTo("curcu");
         assertThat(createdUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(createdUser.getPassword()).startsWith("$2a$10");
-        assertThat(createdUser.getGenre()).isEqualTo(Genre.PNTS);
+        assertThat(createdUser.getUserGenre()).isEqualTo(UserGenre.PNTS);
         assertNull(createdUser.getProfilePictureURL());
         assertTrue(createdUser.getPremium());
     }
@@ -118,7 +118,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password("Testpassword124")
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -160,7 +160,7 @@ class UsersServiceTest {
                 .username("curcaido")
                 .email("email@gmail.com")
                 .password("Testpassword124")
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -207,7 +207,7 @@ class UsersServiceTest {
                 .username("curiquiqui")
                 .email("email@gmail.com")
                 .password("Testpassword124$")
-                .genre(Genre.F)
+                .userGenre(UserGenre.F)
                 .profilePictureURL(null)
                 .premium(false)
                 .build();
@@ -218,7 +218,7 @@ class UsersServiceTest {
         assertThat(updateUser.getUsername()).isEqualTo("curiquiqui");
         assertThat(updateUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(updateUser.getPassword()).startsWith("$2a$10");
-        assertThat(updateUser.getGenre()).isEqualTo(Genre.F);
+        assertThat(updateUser.getUserGenre()).isEqualTo(UserGenre.F);
         assertNull(updateUser.getProfilePictureURL());
         assertFalse(updateUser.getPremium());
     }
@@ -249,7 +249,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("emailtest@gmail.com")
                 .password("Testpassword124#!")
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true)
                 .build();
@@ -278,7 +278,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("emailtest@gmail.com")
                 .password("Testpassword124#!")
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true)
                 .build();
@@ -390,7 +390,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password(encodedPassword)
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -418,7 +418,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password(encodedPassword)
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -446,7 +446,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password(encodedPassword)
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -475,7 +475,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password(encodedPassword)
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -504,7 +504,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password(encodedPassword)
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true).build();
 

@@ -3,9 +3,9 @@ package com.sarabarbara.manager.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.exceptions.UserValidateException;
-import com.sarabarbara.manager.enums.Genre;
-import com.sarabarbara.manager.models.Users;
+import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.exceptions.users.UserValidateException;
+import com.sarabarbara.manager.models.users.Users;
 import com.sarabarbara.manager.services.UsersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ class UsersControllersTest {
                 .username("curcu")
                 .password("Testpassword12#")
                 .email("test123@gmail.com")
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true)
                 .build();
@@ -74,7 +74,7 @@ class UsersControllersTest {
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test123@gmail.com\", " +
-                                "\"password\":\"Testpassword12#\", \"genre\":\"PNTS\", " +
+                                "\"password\":\"Testpassword12#\", \"userGenre\":\"PNTS\", " +
                                 "\"profilePictureURL\":\"null\"," +
                                 " \"premium\":true}"))
                 .andExpect(status().isCreated())
@@ -83,7 +83,7 @@ class UsersControllersTest {
                 .andExpect(jsonPath("$.userCreate.name").value("Prueba"))
                 .andExpect(jsonPath("$.userCreate.username").value("curcu"))
                 .andExpect(jsonPath("$.userCreate.email").value("test123@gmail.com"))
-                .andExpect(jsonPath("$.userCreate.genre").value("PNTS"))
+                .andExpect(jsonPath("$.userCreate.userGenre").value("PNTS"))
                 .andExpect(jsonPath("$.userCreate.profilePictureURL").value(nullValue()))
                 .andExpect(jsonPath("$.userCreate.premium").value(true));
     }
@@ -97,7 +97,7 @@ class UsersControllersTest {
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test12@gmail.com\", " +
-                                "\"password\":\"Testpassword1#\", \"genre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
+                                "\"password\":\"Testpassword1#\", \"userGenre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
                                 " \"premium\":true}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
@@ -115,7 +115,7 @@ class UsersControllersTest {
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test@gmail.com\", " +
-                                "\"password\":\"Testpassword1#\", \"genre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
+                                "\"password\":\"Testpassword1#\", \"userGenre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
                                 " \"premium\":true}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
@@ -132,7 +132,7 @@ class UsersControllersTest {
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test@gmail.com\", " +
-                                "\"password\":\"Testpassword1#\", \"genre\":\"PNTS\", \"profilePictureURL\":null," +
+                                "\"password\":\"Testpassword1#\", \"userGenre\":\"PNTS\", \"profilePictureURL\":null," +
                                 "\"premium\":true}"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.success").value(false))
@@ -167,7 +167,7 @@ class UsersControllersTest {
                 .username("curcoide")
                 .password("Testpassword12#")
                 .email("test@gmail.com")
-                .genre(Genre.PNTS)
+                .userGenre(UserGenre.PNTS)
                 .profilePictureURL(null)
                 .premium(true)
                 .build();
@@ -225,7 +225,7 @@ class UsersControllersTest {
                 .username("chikitronix")
                 .password("TestSuperPAssword123#")
                 .email("testemail@gmail.com")
-                .genre(Genre.F)
+                .userGenre(UserGenre.F)
                 .profilePictureURL(null)
                 .premium(true)
                 .build();
@@ -233,7 +233,7 @@ class UsersControllersTest {
         when(usersService.updateUser(anyString(), any(UserDTO.class)))
                 .thenReturn(new Users(1L, "Test", "chikitronix",
                         "TestSuperPAssword123#", "testemail@gmail.com",
-                        Genre.F, null, true));
+                        UserGenre.F, null, true));
 
         String userUpdateDTOJson = new ObjectMapper().writeValueAsString(userDTO);
 
@@ -246,7 +246,7 @@ class UsersControllersTest {
                 .andExpect(jsonPath("$.user.name").value("Test"))
                 .andExpect(jsonPath("$.user.username").value("chikitronix"))
                 .andExpect(jsonPath("$.user.email").value("testemail@gmail.com"))
-                .andExpect(jsonPath("$.user.genre").value("F"))
+                .andExpect(jsonPath("$.user.userGenre").value("F"))
                 .andExpect(jsonPath("$.user.profilePictureURL").isEmpty())
                 .andExpect(jsonPath("$.user.premium").value(true))
                 .andExpect(jsonPath("$.message").value("User updated successfully"));
@@ -264,7 +264,7 @@ class UsersControllersTest {
         when(usersService.updateUser(anyString(), any(UserDTO.class)))
                 .thenReturn(new Users(1L, "Prueba", "chikitronix",
                         "Testpassword12#", "test123@gmail.com",
-                        Genre.PNTS, null, true));
+                        UserGenre.PNTS, null, true));
 
         String userDTOJson = new ObjectMapper().writeValueAsString(userDTO);
 
