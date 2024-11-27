@@ -319,7 +319,20 @@ class UsersServiceTest {
     @Test
     void updateEqualPasswordFailServiceTest(){
 
-        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(user));
+        passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("Testpassword124#!");
+
+        Users user9 = Users.builder()
+                .id(1L)
+                .name("Curcu")
+                .username("curcu")
+                .email("email@gmail.com")
+                .password(encodedPassword)
+                .userGenre(UserGenre.PNTS)
+                .profilePictureURL(null)
+                .premium(true).build();
+
+        when(userRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(user9));
 
         UserDTO newInfo = UserDTO.builder()
                 .password("Testpassword124#!")
@@ -418,7 +431,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password(encodedPassword)
-                .userGenre(UserGenre.PNTS)
+                .userGenre(UserGenre.NB)
                 .profilePictureURL(null)
                 .premium(true).build();
 
@@ -446,7 +459,7 @@ class UsersServiceTest {
                 .username("carapan")
                 .email("email@gmail.com")
                 .password(encodedPassword)
-                .userGenre(UserGenre.PNTS)
+                .userGenre(UserGenre.M)
                 .profilePictureURL(null)
                 .premium(true).build();
 

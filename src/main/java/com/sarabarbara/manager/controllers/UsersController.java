@@ -138,9 +138,7 @@ public class UsersController {
 
             Users updatedUser = usersService.updateUser(identifier, user);
 
-            UserUpdateDTO userUpdateDTO = toUserUpdateDTOMapper(updatedUser.getName(), updatedUser.getUsername(),
-                    updatedUser.getEmail(), updatedUser.getUserGenre(),
-                    updatedUser.getProfilePictureURL(), updatedUser.getPremium());
+            UserUpdateDTO userUpdateDTO = toUserUpdateDTOMapper(updatedUser);
 
             logger.info("User updated successfully: {}", userUpdateDTO);
 

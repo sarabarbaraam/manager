@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.sarabarbara.manager.constants.Constants.SPECIAL_CHARACTERS_ALLOWED;
@@ -338,7 +337,7 @@ public class UsersService {
             throw new UserValidateException(SPECIAL_CHARACTERS_ALLOWED);
         }
 
-        if (Objects.equals(newInfo.getPassword(), existingUser.getPassword())) {
+        if (passwordEncoder.matches(newInfo.getPassword(), existingUser.getPassword())) {
 
             logger.error("The password can't be the same as the previous one");
             throw new UserValidateException("The password can't be the same as the previous one");
