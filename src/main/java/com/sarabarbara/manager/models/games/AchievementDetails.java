@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.models.games;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.Objects;
@@ -27,20 +28,56 @@ public class AchievementDetails {
     private String name;
 
     /**
-     * The percent
+     * The defaultValue
      */
 
-    private float percent;
+    @JsonProperty("defaultvalue")
+    private int defaultValue;
+
+    /**
+     * The displayName
+     */
+
+    private String displayName;
+
+    /**
+     * The hidden
+     */
+
+    private int hidden;
+
+    /**
+     * The description
+     */
+
+    private String description;
+
+    /**
+     * The icon
+     */
+
+    private String icon;
+
+    /**
+     * The iconGray
+     */
+
+    @JsonProperty("icongray")
+    private String iconGray;
 
     /**
      * The equals
      */
-
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof AchievementDetails that)) return false;
-        return Float.compare(getPercent(), that.getPercent()) == 0
-                && Objects.equals(getName(), that.getName());
+        return getDefaultValue() == that.getDefaultValue()
+                && getHidden() == that.getHidden()
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(getDisplayName(), that.getDisplayName())
+                && Objects.equals(getDescription(), that.getDescription())
+                && Objects.equals(getIcon(), that.getIcon())
+                && Objects.equals(getIconGray(), that.getIconGray());
     }
 
     /**
@@ -49,7 +86,8 @@ public class AchievementDetails {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getPercent());
+        return Objects.hash(getName(), getDefaultValue(), getDisplayName(), getHidden(), getDescription(),
+                getIcon(), getIconGray());
     }
 
 }

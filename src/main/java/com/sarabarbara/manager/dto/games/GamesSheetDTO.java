@@ -1,19 +1,21 @@
-package com.sarabarbara.manager.models.games;
+package com.sarabarbara.manager.dto.games;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sarabarbara.manager.models.games.*;
 import lombok.*;
 
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Games class
+ * GamesSheetDTO class
  *
  * @author sarabarbaraam
  * @version 1.0
- * @since 20/11/2024
+ * @since 25/11/2024
  */
 
 @Builder
@@ -23,14 +25,8 @@ import java.util.Objects;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Games {
-
-    /**
-     * The id
-     */
-
-    @JsonProperty("steam_appid")
-    private int id;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class GamesSheetDTO {
 
     /**
      * The type
@@ -66,25 +62,11 @@ public class Games {
     private List<Integer> dlc;
 
     /**
-     * The detailedDescription
-     */
-
-    @JsonProperty("detailed_description")
-    private String detailedDescription;
-
-    /**
      * The aboutTheGame
      */
 
     @JsonProperty("about_the_game")
     private String aboutTheGame;
-
-    /**
-     * The shortDescription
-     */
-
-    @JsonProperty("short_description")
-    private String shortDescription;
 
     /**
      * The supportedLanguages
@@ -106,13 +88,6 @@ public class Games {
 
     @JsonProperty("capsule_image")
     private String capsuleImage; // cover
-
-    /**
-     * The capsuleImageV5
-     */
-
-    @JsonProperty("capsule_imagev5")
-    private String capsuleImageV5;
 
     /**
      * The website
@@ -234,19 +209,15 @@ public class Games {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Games games)) return false;
-        return getId() == games.getId()
-                && isFree() == games.isFree()
+        return isFree() == games.isFree()
                 && Objects.equals(getType(), games.getType())
                 && Objects.equals(getName(), games.getName())
                 && Objects.equals(getControllerSupport(), games.getControllerSupport())
                 && Objects.equals(getDlc(), games.getDlc())
-                && Objects.equals(getDetailedDescription(), games.getDetailedDescription())
                 && Objects.equals(getAboutTheGame(), games.getAboutTheGame())
-                && Objects.equals(getShortDescription(), games.getShortDescription())
                 && Objects.equals(getSupportedLanguages(), games.getSupportedLanguages())
                 && Objects.equals(getHeaderImage(), games.getHeaderImage())
                 && Objects.equals(getCapsuleImage(), games.getCapsuleImage())
-                && Objects.equals(getCapsuleImageV5(), games.getCapsuleImageV5())
                 && Objects.equals(getWebsite(), games.getWebsite())
                 && Objects.equals(getPcRequirements(), games.getPcRequirements())
                 && Objects.equals(getMacRequirements(), games.getMacRequirements())
@@ -273,12 +244,11 @@ public class Games {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getType(), getName(), isFree(), getControllerSupport(), getDlc(),
-                getDetailedDescription(), getAboutTheGame(), getShortDescription(), getSupportedLanguages(),
-                getHeaderImage(), getCapsuleImage(), getCapsuleImageV5(), getWebsite(), getPcRequirements(),
-                getMacRequirements(), getLinuxRequirements(), getLegalNotice(), getDevelopers(), getPublishers(),
-                getPrice(), getPlatforms(), getMetacritic(), getCategories(), getGenres(), getScreenShots(),
-                getMovies(), getAchievements(), getReleaseDate(), getRatings());
+        return Objects.hash(getType(), getName(), isFree(), getControllerSupport(), getDlc(),
+                getAboutTheGame(), getSupportedLanguages(), getHeaderImage(), getCapsuleImage(), getWebsite(),
+                getPcRequirements(), getMacRequirements(), getLinuxRequirements(), getLegalNotice(), getDevelopers(),
+                getPublishers(), getPrice(), getPlatforms(), getMetacritic(), getCategories(), getGenres(),
+                getScreenShots(), getMovies(), getAchievements(), getReleaseDate(), getRatings());
     }
 
 }

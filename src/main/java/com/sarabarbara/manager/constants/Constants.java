@@ -42,4 +42,41 @@ public class Constants {
 
     public static final String APPLICATION_JSON = "application/json";
 
+    /**
+     * The ACCEPT constant
+     */
+
+    public static final String ACCEPT = "Accept";
+
+    /**
+     * The APPLICATION_JSON_CHARSET_UTF_8 constant
+     */
+
+    public static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json; charset=UTF-8";
+
+    /**
+     * The IOEXCEPTION constant
+     */
+
+    public static final String IOEXCEPTION = "IOException occurred while making the request: {}";
+
+    /**
+     * The THREAD_WAS_INTERRUPTED_DURING_THE_REQUEST constant
+     */
+
+    public static final String THREAD_WAS_INTERRUPTED_DURING_THE_REQUEST =
+            "Thread was interrupted during the request: {}";
+
+    /**
+     * The BODY constant
+     */
+
+    public static final String BODY = "Body: {}";
+
+    /**
+     * The L_SPANISH constant
+     */
+
+    public static final String L_SPANISH = "&l=spanish";
+
 }

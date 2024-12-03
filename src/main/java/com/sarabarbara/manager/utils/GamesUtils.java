@@ -58,10 +58,10 @@ public class GamesUtils {
      *
      * @return the cleaned string
      */
+
     public static String cleanInvalidJsonCharacters(String string) {
 
         return string.replaceAll("[\\x00-\\x1F\\x7F\\uFFFD]", "");
     }
-
 
 }

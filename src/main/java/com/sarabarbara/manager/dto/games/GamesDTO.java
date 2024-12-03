@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.dto.games;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sarabarbara.manager.models.games.*;
 import lombok.*;
 
@@ -41,6 +42,13 @@ public class GamesDTO {
 
     @JsonProperty("is_free")
     private boolean isFree;
+
+    /**
+     * The controllerSupport
+     */
+
+    @JsonProperty("controller_support")
+    private String controllerSupport;
 
     /**
      * The dlc
@@ -109,26 +117,27 @@ public class GamesDTO {
      */
 
     @JsonProperty("pc_requirements")
-    private SystemRequirements pcRequirements;
+    private JsonNode pcRequirements;
 
     /**
      * The macRequirements
      */
 
     @JsonProperty("mac_requirements")
-    private SystemRequirements macRequirements;
+    private JsonNode macRequirements;
 
     /**
      * The linuxRequirements
      */
 
     @JsonProperty("linux_requirements")
-    private SystemRequirements linuxRequirements;
+    private JsonNode linuxRequirements;
 
     /**
      * The legalNotice
      */
 
+    @JsonProperty("legal_notice")
     private String legalNotice;
 
     /**
@@ -138,10 +147,10 @@ public class GamesDTO {
     private List<String> developers;
 
     /**
-     * The publisher
+     * The publishers
      */
 
-    private String publisher;
+    private List<String> publishers;
 
     /**
      * The price
@@ -175,28 +184,36 @@ public class GamesDTO {
     private List<GameGenre> genres;
 
     /**
+     * The screenShots
+     */
+
+    @JsonProperty("screenshots")
+    private List<Screenshots> screenShots;
+
+    /**
      * The movies
      */
 
     private List<Movies> movies;
 
     /**
-     * The achievement
+     * The achievements
      */
 
-    private Achievement achievement;
+    private Achievement achievements;
 
     /**
      * The releaseDate
      */
 
+    @JsonProperty("release_date")
     private ReleaseDate releaseDate;
 
     /**
      * The rating
      */
 
-    private Ratings rating;
+    private Ratings ratings;
 
     /**
      * The equals
@@ -226,16 +243,16 @@ public class GamesDTO {
                 && Objects.equals(getLinuxRequirements(), gamesDTO.getLinuxRequirements())
                 && Objects.equals(getLegalNotice(), gamesDTO.getLegalNotice())
                 && Objects.equals(getDevelopers(), gamesDTO.getDevelopers())
-                && Objects.equals(getPublisher(), gamesDTO.getPublisher())
+                && Objects.equals(getPublishers(), gamesDTO.getPublishers())
                 && Objects.equals(getPrice(), gamesDTO.getPrice())
                 && Objects.equals(getPlatforms(), gamesDTO.getPlatforms())
                 && Objects.equals(getMetacritic(), gamesDTO.getMetacritic())
                 && Objects.equals(getCategories(), gamesDTO.getCategories())
                 && Objects.equals(getGenres(), gamesDTO.getGenres())
                 && Objects.equals(getMovies(), gamesDTO.getMovies())
-                && Objects.equals(getAchievement(), gamesDTO.getAchievement())
+                && Objects.equals(getAchievements(), gamesDTO.getAchievements())
                 && Objects.equals(getReleaseDate(), gamesDTO.getReleaseDate())
-                && Objects.equals(getRating(), gamesDTO.getRating());
+                && Objects.equals(getRatings(), gamesDTO.getRatings());
     }
 
     /**
@@ -249,8 +266,8 @@ public class GamesDTO {
         return Objects.hash(getType(), getName(), isFree(), getDlc(), getDetailedDescription(), getAboutTheGame(),
                 getShortDescription(), getSupportedLanguages(), getHeaderImage(), getCapsuleImage(),
                 getCapsuleImageV5(), getWebsite(), getPcRequirements(), getMacRequirements(), getLinuxRequirements(),
-                getLegalNotice(), getDevelopers(), getPublisher(), getPrice(), getPlatforms(), getMetacritic(),
-                getCategories(), getGenres(), getMovies(), getAchievement(), getReleaseDate(), getRating());
+                getLegalNotice(), getDevelopers(), getPublishers(), getPrice(), getPlatforms(), getMetacritic(),
+                getCategories(), getGenres(), getMovies(), getAchievements(), getReleaseDate(), getRatings());
     }
 
 }

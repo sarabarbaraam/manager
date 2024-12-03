@@ -138,6 +138,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Junit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -145,6 +146,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- httpclient5 -->
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
@@ -156,12 +158,18 @@
         </exclusions>
         </dependency>
 
+        <!-- jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.18.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.1</version>
+        </dependency>
 
     </dependencies>
 

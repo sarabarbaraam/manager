@@ -25,7 +25,7 @@ public class ZeroBounceAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(ZeroBounceAPI.class);
 
-    private ZeroBounceConfig zeroBounceConfig;
+    private final ZeroBounceConfig zeroBounceConfig;
     private final RestTemplate restTemplate;
 
     /**

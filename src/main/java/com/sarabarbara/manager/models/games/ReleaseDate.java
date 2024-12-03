@@ -1,8 +1,9 @@
 package com.sarabarbara.manager.models.games;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -25,13 +26,15 @@ public class ReleaseDate {
      * The comingSoon
      */
 
+    @JsonProperty("coming_soon")
     private boolean comingSoon;
 
     /**
      * The date
      */
 
-    private LocalDate date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMM, yyyy")
+    private String date;
 
     /**
      * The equals

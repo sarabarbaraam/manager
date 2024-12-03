@@ -31,9 +31,11 @@ public class SteamConstants {
 
     /**
      * The GET_GAME_ACHIEVEMENT constant
+     * <p>
+     * apiKey, appid
      */
 
     public static final String GET_GAME_ACHIEVEMENT =
-            "https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v2/?gameid=";
+            "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/";
 
 }

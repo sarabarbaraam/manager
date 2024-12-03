@@ -29,6 +29,16 @@ public class GamesService {
 
     private SteamAPI steamAPI;
 
+    /**
+     * Method that search a game
+     *
+     * @param gameName the gameName
+     * @param page     the page
+     * @param size     the size
+     *
+     * @return the game that is search
+     */
+
     public List<Games> searchGames(String gameName, int page, int size) {
 
         logger.info("Searching game: {}. Page: {}. Size: {}", gameName, page, size);
@@ -40,6 +50,13 @@ public class GamesService {
 
         logger.info("Games found: {}. {}. ", gameDetail.size(), searchedGame);
         return searchedGame.getContent();
+    }
+
+    public Games gameSheet(Integer gameId) {
+
+        logger.info("Game sheet for id: {}", gameId);
+
+        return steamAPI.getGameSheet(gameId);
     }
 
 }

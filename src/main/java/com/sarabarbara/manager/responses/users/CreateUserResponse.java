@@ -47,7 +47,9 @@ public class CreateUserResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CreateUserResponse that)) return false;
-        return isSuccess() == that.isSuccess() && Objects.equals(getUserCreate(), that.getUserCreate()) && Objects.equals(getMessage(), that.getMessage());
+        return isSuccess() == that.isSuccess()
+                && Objects.equals(getUserCreate(), that.getUserCreate())
+                && Objects.equals(getMessage(), that.getMessage());
     }
 
     /**

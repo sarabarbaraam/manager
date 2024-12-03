@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.models.games;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Achievement {
 
     /**
@@ -31,7 +33,7 @@ public class Achievement {
      * The achievementList
      */
 
-    private List<AchievementDetails> achievementList;
+    private List<AchievementDetails> achievements;
 
     /**
      * The equals
@@ -41,7 +43,7 @@ public class Achievement {
     public boolean equals(Object o) {
         if (!(o instanceof Achievement that)) return false;
         return getTotal() == that.getTotal()
-                && Objects.equals(getAchievementList(), that.getAchievementList());
+                && Objects.equals(getAchievements(), that.getAchievements());
     }
 
     /**
@@ -50,7 +52,7 @@ public class Achievement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTotal(), getAchievementList());
+        return Objects.hash(getTotal(), getAchievements());
     }
 
 }
