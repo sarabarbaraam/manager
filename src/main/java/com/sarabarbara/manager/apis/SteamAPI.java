@@ -10,6 +10,7 @@ import com.sarabarbara.manager.config.SteamConfig;
 import com.sarabarbara.manager.models.games.Achievement;
 import com.sarabarbara.manager.models.games.AchievementDetails;
 import com.sarabarbara.manager.models.games.Games;
+import com.sarabarbara.manager.models.games.Ratings;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -187,7 +188,7 @@ public class SteamAPI {
             HttpRequest requestGameInformation = HttpRequest.newBuilder()
                     .uri(URI.create(GET_GAME_DETAIL + gameId + L_SPANISH))
                     .header(CONTENT_TYPE, APPLICATION_JSON)
-                    .header("Accept", APPLICATION_JSON_CHARSET_UTF_8)
+                    .header(ACCEPT, APPLICATION_JSON_CHARSET_UTF_8)
                     .build();
 
             HttpResponse<String> responseGameInformation =
@@ -206,7 +207,7 @@ public class SteamAPI {
             HttpRequest requestAchievementsInformation = HttpRequest.newBuilder()
                     .uri(URI.create(GET_GAME_ACHIEVEMENT + "?key=" + apiKey + "&appid=" + gameId))
                     .header(CONTENT_TYPE, APPLICATION_JSON)
-                    .header("Accept", APPLICATION_JSON_CHARSET_UTF_8)
+                    .header(ACCEPT, APPLICATION_JSON_CHARSET_UTF_8)
                     .build();
 
             HttpResponse<String> responseAchievementsInformation =
@@ -226,14 +227,40 @@ public class SteamAPI {
             if (achievementTree.isArray()) {
                 achievementDetailsList = mapper.convertValue(
                         achievementTree,
-                        new TypeReference<>() {}
+                        new TypeReference<>() {
+
+                        }
                 );
             }
 
-             Achievement achievement = Achievement.builder().total(game.getAchievements().getTotal()).achievements(achievementDetailsList).build();
-             game.setAchievements(achievement);
+            Achievement achievement =
+                    Achievement.builder().total(game.getAchievements().getTotal())
+                            .achievements(achievementDetailsList).build();
 
-             return game;
+            game.setAchievements(achievement);
+
+            // Rating information
+
+            HttpRequest requestRatingInformation = HttpRequest.newBuilder()
+                    .uri(URI.create(GET_GAME_RATING + gameId + "?json=1"))
+                    .header(CONTENT_TYPE, APPLICATION_JSON)
+                    .header(ACCEPT, APPLICATION_JSON_CHARSET_UTF_8)
+                    .build();
+
+            HttpResponse<String> responseRatingInformation = client.send(requestRatingInformation,
+                    HttpResponse.BodyHandlers.ofString());
+
+            String infoRatingBody = responseRatingInformation.body();
+            logger.info("Rating information: {}", infoRatingBody);
+
+            JsonNode ratingTree = mapper.readTree(infoRatingBody)
+                    .path("query_summary");
+
+            Ratings rating = mapper.treeToValue(ratingTree, Ratings.class);
+
+            game.setRatings(rating);
+
+            return game;
 
         } catch (IOException e) {
 

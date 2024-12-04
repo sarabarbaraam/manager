@@ -38,4 +38,11 @@ public class SteamConstants {
     public static final String GET_GAME_ACHIEVEMENT =
             "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/";
 
+    /**
+     * The GET_GAME_RATING constant
+     * <p>
+     * app_id, json = 1
+     */
+
+    public static final String GET_GAME_RATING = "https://store.steampowered.com/appreviews/";
 }

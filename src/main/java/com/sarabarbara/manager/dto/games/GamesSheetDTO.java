@@ -186,6 +186,13 @@ public class GamesSheetDTO {
     private Achievement achievements;
 
     /**
+     * The ratings
+     */
+
+    @JsonProperty("query_summary")
+    private Ratings ratings;
+
+    /**
      * The releaseDate
      */
 
@@ -196,7 +203,7 @@ public class GamesSheetDTO {
      * The rating
      */
 
-    private Ratings ratings;
+    private AgeRatings ageRatings;
 
     /**
      * The equals
@@ -208,33 +215,34 @@ public class GamesSheetDTO {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Games games)) return false;
-        return isFree() == games.isFree()
-                && Objects.equals(getType(), games.getType())
-                && Objects.equals(getName(), games.getName())
-                && Objects.equals(getControllerSupport(), games.getControllerSupport())
-                && Objects.equals(getDlc(), games.getDlc())
-                && Objects.equals(getAboutTheGame(), games.getAboutTheGame())
-                && Objects.equals(getSupportedLanguages(), games.getSupportedLanguages())
-                && Objects.equals(getHeaderImage(), games.getHeaderImage())
-                && Objects.equals(getCapsuleImage(), games.getCapsuleImage())
-                && Objects.equals(getWebsite(), games.getWebsite())
-                && Objects.equals(getPcRequirements(), games.getPcRequirements())
-                && Objects.equals(getMacRequirements(), games.getMacRequirements())
-                && Objects.equals(getLinuxRequirements(), games.getLinuxRequirements())
-                && Objects.equals(getLegalNotice(), games.getLegalNotice())
-                && Objects.equals(getDevelopers(), games.getDevelopers())
-                && Objects.equals(getPublishers(), games.getPublishers())
-                && Objects.equals(getPrice(), games.getPrice())
-                && Objects.equals(getPlatforms(), games.getPlatforms())
-                && Objects.equals(getMetacritic(), games.getMetacritic())
-                && Objects.equals(getCategories(), games.getCategories())
-                && Objects.equals(getGenres(), games.getGenres())
-                && Objects.equals(getScreenShots(), games.getScreenShots())
-                && Objects.equals(getMovies(), games.getMovies())
-                && Objects.equals(getAchievements(), games.getAchievements())
-                && Objects.equals(getReleaseDate(), games.getReleaseDate())
-                && Objects.equals(getRatings(), games.getRatings());
+        if (!(o instanceof Games gamesSheetDTO)) return false;
+        return isFree() == gamesSheetDTO.isFree()
+                && Objects.equals(getType(), gamesSheetDTO.getType())
+                && Objects.equals(getName(), gamesSheetDTO.getName())
+                && Objects.equals(getControllerSupport(), gamesSheetDTO.getControllerSupport())
+                && Objects.equals(getDlc(), gamesSheetDTO.getDlc())
+                && Objects.equals(getAboutTheGame(), gamesSheetDTO.getAboutTheGame())
+                && Objects.equals(getSupportedLanguages(), gamesSheetDTO.getSupportedLanguages())
+                && Objects.equals(getHeaderImage(), gamesSheetDTO.getHeaderImage())
+                && Objects.equals(getCapsuleImage(), gamesSheetDTO.getCapsuleImage())
+                && Objects.equals(getWebsite(), gamesSheetDTO.getWebsite())
+                && Objects.equals(getPcRequirements(), gamesSheetDTO.getPcRequirements())
+                && Objects.equals(getMacRequirements(), gamesSheetDTO.getMacRequirements())
+                && Objects.equals(getLinuxRequirements(), gamesSheetDTO.getLinuxRequirements())
+                && Objects.equals(getLegalNotice(), gamesSheetDTO.getLegalNotice())
+                && Objects.equals(getDevelopers(), gamesSheetDTO.getDevelopers())
+                && Objects.equals(getPublishers(), gamesSheetDTO.getPublishers())
+                && Objects.equals(getPrice(), gamesSheetDTO.getPrice())
+                && Objects.equals(getPlatforms(), gamesSheetDTO.getPlatforms())
+                && Objects.equals(getMetacritic(), gamesSheetDTO.getMetacritic())
+                && Objects.equals(getCategories(), gamesSheetDTO.getCategories())
+                && Objects.equals(getGenres(), gamesSheetDTO.getGenres())
+                && Objects.equals(getScreenShots(), gamesSheetDTO.getScreenShots())
+                && Objects.equals(getMovies(), gamesSheetDTO.getMovies())
+                && Objects.equals(getAchievements(), gamesSheetDTO.getAchievements())
+                && Objects.equals(getReleaseDate(), gamesSheetDTO.getReleaseDate())
+                && Objects.equals(getAgeRatings(), gamesSheetDTO.getAgeRatings())
+                && Objects.equals(getRatings(), gamesSheetDTO.getRatings());
     }
 
     /**
@@ -242,13 +250,14 @@ public class GamesSheetDTO {
      *
      * @return the hashCode
      */
+
     @Override
     public int hashCode() {
         return Objects.hash(getType(), getName(), isFree(), getControllerSupport(), getDlc(),
                 getAboutTheGame(), getSupportedLanguages(), getHeaderImage(), getCapsuleImage(), getWebsite(),
                 getPcRequirements(), getMacRequirements(), getLinuxRequirements(), getLegalNotice(), getDevelopers(),
                 getPublishers(), getPrice(), getPlatforms(), getMetacritic(), getCategories(), getGenres(),
-                getScreenShots(), getMovies(), getAchievements(), getReleaseDate(), getRatings());
+                getScreenShots(), getMovies(), getAchievements(), getReleaseDate(), getAgeRatings(), getRatings());
     }
 
 }

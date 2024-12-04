@@ -203,6 +203,13 @@ public class GamesDTO {
     private Achievement achievements;
 
     /**
+     * The ratings
+     */
+
+    @JsonProperty("query_summary")
+    private Ratings ratings;
+
+    /**
      * The releaseDate
      */
 
@@ -213,7 +220,7 @@ public class GamesDTO {
      * The rating
      */
 
-    private Ratings ratings;
+    private AgeRatings ageRatings;
 
     /**
      * The equals
@@ -252,6 +259,7 @@ public class GamesDTO {
                 && Objects.equals(getMovies(), gamesDTO.getMovies())
                 && Objects.equals(getAchievements(), gamesDTO.getAchievements())
                 && Objects.equals(getReleaseDate(), gamesDTO.getReleaseDate())
+                && Objects.equals(getAgeRatings(), gamesDTO.getAgeRatings())
                 && Objects.equals(getRatings(), gamesDTO.getRatings());
     }
 
@@ -267,7 +275,8 @@ public class GamesDTO {
                 getShortDescription(), getSupportedLanguages(), getHeaderImage(), getCapsuleImage(),
                 getCapsuleImageV5(), getWebsite(), getPcRequirements(), getMacRequirements(), getLinuxRequirements(),
                 getLegalNotice(), getDevelopers(), getPublishers(), getPrice(), getPlatforms(), getMetacritic(),
-                getCategories(), getGenres(), getMovies(), getAchievements(), getReleaseDate(), getRatings());
+                getCategories(), getGenres(), getMovies(), getAchievements(), getReleaseDate(), getAgeRatings(),
+                getRatings());
     }
 
 }

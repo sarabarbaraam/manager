@@ -72,8 +72,9 @@ public class GamesMapper {
                 .screenShots(gameName.getScreenShots())
                 .movies(gameName.getMovies())
                 .achievements(gameName.getAchievements())
-                .releaseDate(gameName.getReleaseDate())
                 .ratings(gameName.getRatings())
+                .releaseDate(gameName.getReleaseDate())
+                .ageRatings(gameName.getAgeRatings())
                 .build();
     }
 

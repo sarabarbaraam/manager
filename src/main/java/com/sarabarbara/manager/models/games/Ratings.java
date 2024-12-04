@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.models.games;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import java.util.Objects;
  *
  * @author sarabarbaraam
  * @version 1.0
- * @since 20/11/2024
+ * @since 04/12/2024
  */
 
 @Builder
@@ -19,50 +20,43 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Ratings {
 
     /**
-     * The esrb
+     * The reviewScore
      */
 
-    private PEGI esrb;
+    @JsonProperty("review_score")
+    private int reviewScore;
 
     /**
-     * The pegi
+     * The reviewScoreDescription
      */
 
-    private PEGI pegi;
+    @JsonProperty("review_score_desc")
+    private String reviewScoreDescription;
 
     /**
-     * The usk
+     * The totalPositive
      */
 
-    private PEGI usk;
+    @JsonProperty("total_positive")
+    private Integer totalPositive;
 
     /**
-     * The oflc
+     * The totalNegative
      */
 
-    private PEGI oflc;
+    @JsonProperty("total_negative")
+    private Integer totalNegative;
 
     /**
-     * The bbfc
+     * The totalReviews
      */
 
-    private PEGI bbfc;
-
-    /**
-     * The dejus
-     */
-
-    private PEGI dejus;
-
-    /**
-     * The steamGermany
-     */
-
-    @JsonProperty("steam_germany")
-    private PEGI steamGermany;
+    @JsonProperty("total_reviews")
+    private Integer totalReviews;
 
     /**
      * The equals
@@ -75,13 +69,11 @@ public class Ratings {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Ratings ratings)) return false;
-        return Objects.equals(getEsrb(), ratings.getEsrb())
-                && Objects.equals(getPegi(), ratings.getPegi())
-                && Objects.equals(getUsk(), ratings.getUsk())
-                && Objects.equals(getOflc(), ratings.getOflc())
-                && Objects.equals(getBbfc(), ratings.getBbfc())
-                && Objects.equals(getDejus(), ratings.getDejus())
-                && Objects.equals(getSteamGermany(), ratings.getSteamGermany());
+        return getReviewScore() == ratings.getReviewScore()
+                && Objects.equals(getReviewScoreDescription(), ratings.getReviewScoreDescription())
+                && Objects.equals(getTotalPositive(), ratings.getTotalPositive())
+                && Objects.equals(getTotalNegative(), ratings.getTotalNegative())
+                && Objects.equals(getTotalReviews(), ratings.getTotalReviews());
     }
 
     /**
@@ -92,7 +84,8 @@ public class Ratings {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getEsrb(), getPegi(), getUsk(), getOflc(), getBbfc(), getDejus(), getSteamGermany());
+        return Objects.hash(getReviewScore(), getReviewScoreDescription(), getTotalPositive(), getTotalNegative(),
+                getTotalReviews());
     }
 
 }

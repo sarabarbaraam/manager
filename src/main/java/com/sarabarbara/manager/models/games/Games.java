@@ -211,6 +211,13 @@ public class Games {
     private Achievement achievements;
 
     /**
+     * The ratings
+     */
+
+    @JsonProperty("query_summary")
+    private Ratings ratings;
+
+    /**
      * The releaseDate
      */
 
@@ -221,7 +228,7 @@ public class Games {
      * The rating
      */
 
-    private Ratings ratings;
+    private AgeRatings ageRatings;
 
     /**
      * The equals
@@ -263,6 +270,7 @@ public class Games {
                 && Objects.equals(getMovies(), games.getMovies())
                 && Objects.equals(getAchievements(), games.getAchievements())
                 && Objects.equals(getReleaseDate(), games.getReleaseDate())
+                && Objects.equals(getAgeRatings(), games.getAgeRatings())
                 && Objects.equals(getRatings(), games.getRatings());
     }
 
@@ -271,6 +279,7 @@ public class Games {
      *
      * @return the hashCode
      */
+
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getType(), getName(), isFree(), getControllerSupport(), getDlc(),
@@ -278,7 +287,7 @@ public class Games {
                 getHeaderImage(), getCapsuleImage(), getCapsuleImageV5(), getWebsite(), getPcRequirements(),
                 getMacRequirements(), getLinuxRequirements(), getLegalNotice(), getDevelopers(), getPublishers(),
                 getPrice(), getPlatforms(), getMetacritic(), getCategories(), getGenres(), getScreenShots(),
-                getMovies(), getAchievements(), getReleaseDate(), getRatings());
+                getMovies(), getAchievements(), getReleaseDate(), getAgeRatings(), getRatings());
     }
 
 }
