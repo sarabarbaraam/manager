@@ -1,6 +1,6 @@
 package com.sarabarbara.manager.dto.users;
 
-import com.sarabarbara.manager.enums.Genre;
+import com.sarabarbara.manager.enums.UserGenre;
 import lombok.*;
 
 import java.util.Objects;
@@ -40,10 +40,10 @@ public class UserUpdateDTO {
     private String email;
 
     /**
-     * The genre
+     * The userGenre
      */
 
-    private Genre genre;
+    private UserGenre userGenre;
 
     /**
      * The profilePictureURL
@@ -66,7 +66,7 @@ public class UserUpdateDTO {
         if (this == o) return true;
         if (!(o instanceof UserUpdateDTO that)) return false;
         return Objects.equals(name, that.name) && Objects.equals(username, that.username) && Objects.equals(email,
-                that.email) && genre == that.genre && Objects.equals(profilePictureURL, that.profilePictureURL) && Objects.equals(premium, that.premium);
+                that.email) && userGenre == that.userGenre && Objects.equals(profilePictureURL, that.profilePictureURL) && Objects.equals(premium, that.premium);
     }
 
     /**
@@ -75,7 +75,7 @@ public class UserUpdateDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, username, email, genre, profilePictureURL, premium);
+        return Objects.hash(name, username, email, userGenre, profilePictureURL, premium);
     }
 
 }

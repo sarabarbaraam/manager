@@ -1,9 +1,9 @@
 package com.sarabarbara.manager.controllers;
 
 import com.sarabarbara.manager.dto.users.*;
-import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserValidateException;
-import com.sarabarbara.manager.models.Users;
+import com.sarabarbara.manager.exceptions.users.UserNotFoundException;
+import com.sarabarbara.manager.exceptions.users.UserValidateException;
+import com.sarabarbara.manager.models.users.Users;
 import com.sarabarbara.manager.responses.SearchResponse;
 import com.sarabarbara.manager.responses.users.CreateUserResponse;
 import com.sarabarbara.manager.responses.users.LoginUserResponse;
@@ -51,7 +51,7 @@ public class UsersController {
             Users createdUser = usersService.createUser(user);
 
             UserCreateDTO userCreateDTO = toUserCreateDTOMapper(createdUser.getName(), createdUser.getUsername(),
-                    createdUser.getEmail(), createdUser.getGenre(), createdUser.getProfilePictureURL(),
+                    createdUser.getEmail(), createdUser.getUserGenre(), createdUser.getProfilePictureURL(),
                     createdUser.getPremium());
 
             logger.info("Creating user finished");
@@ -101,11 +101,13 @@ public class UsersController {
             List<UserSearchDTO> userSearchDTOs = toUserSearchDTOMapper(searchedUser);
 
             int totalPage = (int) Math.ceil((double) searchedUser.size() / size);
+
             SearchResponse<UserSearchDTO> response = new SearchResponse<>(
                     userSearchDTOs, searchedUser.size(), page, totalPage);
 
             logger.info("Total users found with identifier {} : {}. Current page: {}. Total pages: {}", identifier,
-                    searchedUser.size(), page, totalPage);
+                    response.getResults(), response.getCurrentPage(), response.getTotalPage());
+
             logger.info("Users found:");
             userSearchDTOs.forEach(user -> logger.info("  - {}", user.getUsername()));
 
@@ -136,9 +138,7 @@ public class UsersController {
 
             Users updatedUser = usersService.updateUser(identifier, user);
 
-            UserUpdateDTO userUpdateDTO = toUserUpdateDTOMapper(updatedUser.getName(), updatedUser.getUsername(),
-                    updatedUser.getEmail(), updatedUser.getGenre(),
-                    updatedUser.getProfilePictureURL(), updatedUser.getPremium());
+            UserUpdateDTO userUpdateDTO = toUserUpdateDTOMapper(updatedUser);
 
             logger.info("User updated successfully: {}", userUpdateDTO);
 

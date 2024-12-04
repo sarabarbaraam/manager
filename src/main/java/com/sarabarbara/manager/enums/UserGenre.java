@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * Genre class
+ * UserGenre class
  *
  * @author sarabarbaraam
  * @version 1.0
@@ -16,7 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @ToString
-public enum Genre {
+public enum UserGenre {
 
     M("Male"),
     F("Female"),

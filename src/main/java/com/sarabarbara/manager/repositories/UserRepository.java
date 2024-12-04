@@ -1,6 +1,6 @@
 package com.sarabarbara.manager.repositories;
 
-import com.sarabarbara.manager.models.Users;
+import com.sarabarbara.manager.models.users.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

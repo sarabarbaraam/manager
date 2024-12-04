@@ -2,7 +2,7 @@ package com.sarabarbara.manager.apis;
 
 import com.sarabarbara.manager.config.ZeroBounceConfig;
 import com.sarabarbara.manager.responses.users.EmailValidationResponse;
-import com.sarabarbara.manager.exceptions.UserValidateException;
+import com.sarabarbara.manager.exceptions.users.UserValidateException;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public class ZeroBounceAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(ZeroBounceAPI.class);
 
-    private ZeroBounceConfig zeroBounceConfig;
+    private final ZeroBounceConfig zeroBounceConfig;
     private final RestTemplate restTemplate;
 
     /**

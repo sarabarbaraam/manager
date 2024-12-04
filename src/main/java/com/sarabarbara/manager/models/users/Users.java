@@ -1,7 +1,7 @@
-package com.sarabarbara.manager.models;
+package com.sarabarbara.manager.models.users;
 
 
-import com.sarabarbara.manager.enums.Genre;
+import com.sarabarbara.manager.enums.UserGenre;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -82,12 +82,13 @@ public class Users implements Serializable {
     private String email;
 
     /**
-     * The genre
+     * The userGenre
      */
 
     @NonNull
     @Enumerated(EnumType.STRING)
-    private Genre genre;
+    @Column(name = "genre")
+    private UserGenre userGenre;
 
     /**
      * The profilePictureURL
@@ -128,7 +129,7 @@ public class Users implements Serializable {
         return Objects.equals(getId(), users.getId()) && Objects.equals(getName(), users.getName()) && Objects.equals(getUsername()
                 , users.getUsername())
                 && Objects.equals(getPassword(), users.getPassword()) && Objects.equals(getEmail(), users.getEmail())
-                && Objects.equals(getGenre(), users.getGenre()) && Objects.equals(getProfilePictureURL(),
+                && Objects.equals(getUserGenre(), users.getUserGenre()) && Objects.equals(getProfilePictureURL(),
                 users.getProfilePictureURL())
                 && Objects.equals(getPremium(), users.getPremium());
     }
@@ -141,7 +142,7 @@ public class Users implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getUsername(), getPassword(), getEmail(), getGenre(),
+        return Objects.hash(getId(), getName(), getUsername(), getPassword(), getEmail(), getUserGenre(),
                 getProfilePictureURL(), getPremium());
     }
 
