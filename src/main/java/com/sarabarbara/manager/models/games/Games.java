@@ -30,7 +30,7 @@ public class Games {
      */
 
     @JsonProperty("steam_appid")
-    private int id;
+    private Long id;
 
     /**
      * The type
@@ -241,8 +241,8 @@ public class Games {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Games games)) return false;
-        return getId() == games.getId()
-                && isFree() == games.isFree()
+        return isFree() == games.isFree()
+                && Objects.equals(getId(), games.getId())
                 && Objects.equals(getType(), games.getType())
                 && Objects.equals(getName(), games.getName())
                 && Objects.equals(getControllerSupport(), games.getControllerSupport())
