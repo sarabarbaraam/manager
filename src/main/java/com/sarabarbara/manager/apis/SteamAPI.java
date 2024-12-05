@@ -223,21 +223,23 @@ public class SteamAPI {
                     .path("availableGameStats")
                     .path("achievements");
 
-            List<AchievementDetails> achievementDetailsList = new ArrayList<>();
             if (achievementTree.isArray()) {
+
+                List<AchievementDetails> achievementDetailsList;
                 achievementDetailsList = mapper.convertValue(
                         achievementTree,
                         new TypeReference<>() {
 
                         }
                 );
+
+                Achievement achievement =
+                        Achievement.builder().total(game.getAchievements().getTotal())
+                                .achievements(achievementDetailsList).build();
+
+                game.setAchievements(achievement);
+
             }
-
-            Achievement achievement =
-                    Achievement.builder().total(game.getAchievements().getTotal())
-                            .achievements(achievementDetailsList).build();
-
-            game.setAchievements(achievement);
 
             // Rating information
 
