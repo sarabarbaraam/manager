@@ -25,44 +25,44 @@ public class AgeRatings {
      * The esrb
      */
 
-    private PEGI esrb;
+    private AgeRatingDetails esrb;
 
     /**
-     * The pegi
+     * The ageRate
      */
 
-    private PEGI pegi;
+    private AgeRatingDetails pegi;
 
     /**
      * The usk
      */
 
-    private PEGI usk;
+    private AgeRatingDetails usk;
 
     /**
      * The oflc
      */
 
-    private PEGI oflc;
+    private AgeRatingDetails oflc;
 
     /**
      * The bbfc
      */
 
-    private PEGI bbfc;
+    private AgeRatingDetails bbfc;
 
     /**
      * The dejus
      */
 
-    private PEGI dejus;
+    private AgeRatingDetails dejus;
 
     /**
      * The steamGermany
      */
 
     @JsonProperty("steam_germany")
-    private PEGI steamGermany;
+    private AgeRatingDetails steamGermany;
 
     /**
      * The equals

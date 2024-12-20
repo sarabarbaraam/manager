@@ -1,7 +1,7 @@
 package com.sarabarbara.manager.models.games;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.Objects;
@@ -42,10 +42,11 @@ public class Movies {
     private String thumbnail;
 
     /**
-     * The web
+     * The webMovies
      */
 
-    private JsonNode webm;
+    @JsonProperty("webm")
+    private MovieFormat webMovies;
 
     /**
      * The equals
@@ -57,15 +58,16 @@ public class Movies {
         return getId() == movies.getId()
                 && Objects.equals(getName(), movies.getName())
                 && Objects.equals(getThumbnail(), movies.getThumbnail())
-                && Objects.equals(getWebm(), movies.getWebm());
+                && Objects.equals(getWebMovies(), movies.getWebMovies());
     }
 
     /**
      * The hashCode
      */
+
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getThumbnail(), getWebm());
+        return Objects.hash(getId(), getName(), getThumbnail(), getWebMovies());
     }
 
 }

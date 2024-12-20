@@ -90,6 +90,7 @@ public class GamesController {
 
             GamesSheetDTO gamesSheetDTO = toGamesSheetDTOMapper(game);
 
+            logger.info("Game sheet information: {}", gamesSheetDTO);
             logger.info("GameSheet finished");
             return ResponseEntity.status(HttpStatus.OK).body(new GameSheetResponse(true, gamesSheetDTO));
 

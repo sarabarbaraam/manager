@@ -331,7 +331,7 @@ public class SteamAPI {
 
     private static void gameType(@NonNull Games games, List<Games> gamesList) {
 
-        if (games.getType() != null && "game".equalsIgnoreCase(games.getType()) || "dlc".equalsIgnoreCase(games.getType())) {
+        if (games.getType() != null && "game" .equalsIgnoreCase(games.getType()) || "dlc" .equalsIgnoreCase(games.getType())) {
 
             gamesList.add(games);
         }

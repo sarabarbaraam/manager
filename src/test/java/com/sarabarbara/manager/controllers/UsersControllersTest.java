@@ -97,7 +97,8 @@ class UsersControllersTest {
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test12@gmail.com\", " +
-                                "\"password\":\"Testpassword1#\", \"userGenre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
+                                "\"password\":\"Testpassword1#\", \"userGenre\":\"PNTS\", " +
+                                "\"profilePictureURL\":\"null\"," +
                                 " \"premium\":true}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
@@ -115,7 +116,8 @@ class UsersControllersTest {
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Prueba\", \"username\":\"curcu\", \"email\":\"test@gmail.com\", " +
-                                "\"password\":\"Testpassword1#\", \"userGenre\":\"PNTS\", \"profilePictureURL\":\"null\"," +
+                                "\"password\":\"Testpassword1#\", \"userGenre\":\"PNTS\", " +
+                                "\"profilePictureURL\":\"null\"," +
                                 " \"premium\":true}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
@@ -211,7 +213,9 @@ class UsersControllersTest {
 
         mockMvc.perform(post("/search/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("curcu"))
+                        .content("curcu")
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isInternalServerError());
     }
 

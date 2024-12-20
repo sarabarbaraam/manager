@@ -228,6 +228,7 @@ public class Games {
      * The rating
      */
 
+    @JsonProperty("ratings")
     private AgeRatings ageRatings;
 
     /**

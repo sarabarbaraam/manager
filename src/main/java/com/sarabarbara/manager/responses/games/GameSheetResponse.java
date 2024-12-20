@@ -31,7 +31,7 @@ public class GameSheetResponse {
      * The gamesSheet
      */
 
-    private GamesSheetDTO gamesSheet;
+    private GamesSheetDTO gameSheet;
 
     /**
      * The equals
@@ -41,7 +41,7 @@ public class GameSheetResponse {
     public boolean equals(Object o) {
         if (!(o instanceof GameSheetResponse that)) return false;
         return isSuccess() == that.isSuccess()
-                && Objects.equals(getGamesSheet(), that.getGamesSheet());
+                && Objects.equals(getGameSheet(), that.getGameSheet());
     }
 
     /**
@@ -50,7 +50,7 @@ public class GameSheetResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(isSuccess(), getGamesSheet());
+        return Objects.hash(isSuccess(), getGameSheet());
     }
 
 }
