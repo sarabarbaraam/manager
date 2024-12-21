@@ -30,7 +30,7 @@ public class Games {
      */
 
     @JsonProperty("steam_appid")
-    private Long id;
+    private Integer id;
 
     /**
      * The type

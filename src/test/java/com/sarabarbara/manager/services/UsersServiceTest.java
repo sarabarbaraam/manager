@@ -47,6 +47,7 @@ class UsersServiceTest {
     private BCryptPasswordEncoder passwordEncoder;
 
     private Users user;
+    private final PageRequest pageRequest = PageRequest.of(0, 10);
 
     @BeforeEach
     void setUp() {
@@ -132,8 +133,6 @@ class UsersServiceTest {
     @Test
     void searchTotalUserServiceTest() {
 
-        PageRequest pageRequest = PageRequest.of(0, 10);
-
         List<Users> userList = new ArrayList<>(Collections.singletonList(user));
 
         Page<Users> pageList = new PageImpl<>(userList, pageRequest, userList.size());
@@ -164,8 +163,6 @@ class UsersServiceTest {
                 .profilePictureURL(null)
                 .premium(true).build();
 
-        PageRequest pageRequest = PageRequest.of(0, 10);
-
         List<Users> userList = new ArrayList<>(List.of(user, user3));
 
         Page<Users> pageList = new PageImpl<>(userList, pageRequest, userList.size());
@@ -182,7 +179,6 @@ class UsersServiceTest {
     @Test
     void searchZeroUserServiceTest() {
 
-        PageRequest pageRequest = PageRequest.of(0, 10);
         Page<Users> emptyPage = new PageImpl<>(Collections.emptyList(), pageRequest, 0);
 
         when(userRepository.findAllByUsernameContainingIgnoreCase("chikitronix", pageRequest)).thenReturn(emptyPage);
@@ -317,7 +313,7 @@ class UsersServiceTest {
     }
 
     @Test
-    void updateEqualPasswordFailServiceTest(){
+    void updateEqualPasswordFailServiceTest() {
 
         passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode("Testpassword124#!");

@@ -68,7 +68,7 @@ public class GamesController {
             logger.info("Games found:");
             gamesSearchDTOS.forEach(games -> logger.info(" - {}", games.getName()));
 
-            logger.info("Searching games finished");
+            logger.info("Searching game finished");
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (Exception e) {
