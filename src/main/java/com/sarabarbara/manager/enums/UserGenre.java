@@ -18,10 +18,18 @@ import lombok.ToString;
 @ToString
 public enum UserGenre {
 
+    /**
+     * The Enum
+     */
+
     M("Male"),
     F("Female"),
     NB("Non Binary"),
     PNTS("Prefer not to say");
+
+    /**
+     * The description
+     */
 
     private final String description;
 }

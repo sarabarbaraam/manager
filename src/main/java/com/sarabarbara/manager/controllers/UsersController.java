@@ -38,11 +38,17 @@ public class UsersController {
     private final UsersService usersService;
 
     /**
-     * The Register Controller
+     * The Register User Controller
+     *
+     * @param user the user information
+     *
+     * @return the register user
+     *
+     * @throws UserValidateException the {@link UserValidateException}
      */
 
     @PostMapping("/register")
-    public ResponseEntity<CreateUserResponse> register(@Validated @RequestBody Users user) throws UserValidateException {
+    public ResponseEntity<CreateUserResponse> registerUser(@Validated @RequestBody Users user) throws UserValidateException {
 
         try {
 
@@ -77,6 +83,12 @@ public class UsersController {
 
     /**
      * The Search User Controller
+     *
+     * @param identifier the identifier
+     * @param page       the page
+     * @param size       the size
+     *
+     * @return the user searched
      */
 
     @PostMapping("/search/users")
@@ -126,17 +138,24 @@ public class UsersController {
 
     /**
      * The Update Controller
+     *
+     * @param identifier the identifier
+     * @param userDTO    the userDTO
+     *
+     * @return the user updated
+     *
+     * @throws UserValidateException the {@link UserValidateException}
      */
 
     @PatchMapping("/{identifier}/update")
-    public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String identifier, @RequestBody UserDTO user)
+    public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String identifier, @RequestBody UserDTO userDTO)
             throws UserValidateException {
 
         try {
 
             logger.info("Updating user started");
 
-            Users updatedUser = usersService.updateUser(identifier, user);
+            Users updatedUser = usersService.updateUser(identifier, userDTO);
 
             UserUpdateDTO userUpdateDTO = toUserUpdateDTOMapper(updatedUser);
 
@@ -164,6 +183,10 @@ public class UsersController {
 
     /**
      * The Delete Controller
+     *
+     * @param identifier the identifier
+     *
+     * @return a message
      */
 
     @DeleteMapping("/settings/{identifier}")
@@ -188,16 +211,22 @@ public class UsersController {
 
     /**
      * The Login Controller
+     *
+     * @param userLoginDTO the userLoginDTO
+     *
+     * @return the {@link LoginUserResponse}
+     *
+     * @throws UserNotFoundException the {@link UserNotFoundException}
      */
 
     @PostMapping("/login")
-    public ResponseEntity<LoginUserResponse> loginUser(@RequestBody UserLoginDTO user) throws UserNotFoundException {
+    public ResponseEntity<LoginUserResponse> loginUser(@RequestBody UserLoginDTO userLoginDTO) throws UserNotFoundException {
 
         try {
 
             logger.info("Logging user started");
 
-            boolean loginUser = usersService.loginUser(user);
+            boolean loginUser = usersService.loginUser(userLoginDTO);
 
             if (!loginUser) {
 

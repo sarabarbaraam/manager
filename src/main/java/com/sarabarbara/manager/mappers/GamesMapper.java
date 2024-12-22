@@ -45,6 +45,14 @@ public class GamesMapper {
                 .toList();
     }
 
+    /**
+     * The {@link GamesSheetDTO} mapper
+     *
+     * @param gameName the name of the game
+     *
+     * @return the GamesSheetDTO
+     */
+
     public static GamesSheetDTO toGamesSheetDTOMapper(@NonNull Games gameName) {
 
         return GamesSheetDTO.builder()

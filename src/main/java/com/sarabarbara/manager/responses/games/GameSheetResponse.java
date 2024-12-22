@@ -35,6 +35,10 @@ public class GameSheetResponse {
 
     /**
      * The equals
+     *
+     * @param o the o
+     *
+     * @return the equals
      */
 
     @Override
@@ -45,7 +49,9 @@ public class GameSheetResponse {
     }
 
     /**
-     * The hashCode
+     * The hasCode
+     *
+     * @return the hashCode
      */
 
     @Override

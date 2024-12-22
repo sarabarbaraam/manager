@@ -21,6 +21,7 @@ public class SteamConstants {
     /**
      * The GET_GAMES_LIST constant
      */
+
     public static final String GET_GAMES_LIST = "https://api.steampowered.com/ISteamApps/GetAppList/v2/";
 
     /**

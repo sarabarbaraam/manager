@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.utils;
 
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -35,7 +36,8 @@ public class GamesUtils {
      *
      * @return List<T> paginated
      */
-    public static <T> Page<T> paginate(List<T> list, int page, int size) {
+
+    public static <T> @NonNull Page<T> paginate(@NonNull List<T> list, int page, int size) {
 
 
         int startIndex = page * size;
@@ -59,7 +61,7 @@ public class GamesUtils {
      * @return the cleaned string
      */
 
-    public static String cleanInvalidJsonCharacters(String string) {
+    public static String cleanInvalidJsonCharacters(@NonNull String string) {
 
         return string.replaceAll("[\\x00-\\x1F\\x7F\\uFFFD]", "");
     }

@@ -47,18 +47,26 @@ public class SearchResponse<T> {
 
     /**
      * The equals
+     *
+     * @param o the o
+     *
+     * @return the equals
      */
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SearchResponse<?> that)) return false;
-        return getTotalResults() == that.getTotalResults() && getCurrentPage() == that.getCurrentPage()
-                && getTotalPage() == that.getTotalPage() && Objects.equals(getResults(), that.getResults());
+        return getTotalResults() == that.getTotalResults()
+                && getCurrentPage() == that.getCurrentPage()
+                && getTotalPage() == that.getTotalPage()
+                && Objects.equals(getResults(), that.getResults());
     }
 
     /**
-     * The hashCode
+     * The hasCode
+     *
+     * @return the hashCode
      */
 
     @Override

@@ -33,18 +33,25 @@ public class EmailValidationResponse {
     private String subStatus;
 
     /**
-     * The equals
+     * the equals
+     *
+     * @param o the o
+     *
+     * @return the equals
      */
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EmailValidationResponse that)) return false;
-        return Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getSubStatus(), that.getSubStatus());
+        return Objects.equals(getStatus(), that.getStatus())
+                && Objects.equals(getSubStatus(), that.getSubStatus());
     }
 
     /**
      * The hashCode
+     *
+     * @return the hashCode
      */
 
     @Override

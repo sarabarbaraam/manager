@@ -10,8 +10,15 @@ package com.sarabarbara.manager.exceptions.users;
 
 public class UserNotFoundException extends RuntimeException {
 
+    /**
+     * The User Not Found Exception
+     *
+     * @param message the message
+     */
+
     public UserNotFoundException(String message) {
 
         super(message);
     }
+
 }

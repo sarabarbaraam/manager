@@ -9,10 +9,22 @@ package com.sarabarbara.manager.exceptions.users;
  */
 public class UserValidateException extends RuntimeException {
 
+    /**
+     * The User Validate Exception
+     *
+     * @param message the message (String)
+     */
+
     public UserValidateException(String message) {
 
         super(message);
     }
+
+    /**
+     * The User Validate Exception
+     *
+     * @param message the message (StringBuilder(
+     */
 
     public UserValidateException(StringBuilder message) {
 

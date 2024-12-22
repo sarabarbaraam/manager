@@ -52,6 +52,14 @@ public class GamesService {
         return searchedGame.getContent();
     }
 
+    /**
+     * Sheet of the game searched
+     *
+     * @param gameId the gameId
+     *
+     * @return all the information about the game searched
+     */
+
     public Games gameSheet(Integer gameId) {
 
         logger.info("Game sheet for id: {}", gameId);

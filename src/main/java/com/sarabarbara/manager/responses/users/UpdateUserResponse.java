@@ -42,17 +42,25 @@ public class UpdateUserResponse {
 
     /**
      * The equals
+     *
+     * @param o the o
+     *
+     * @return the equals
      */
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UpdateUserResponse that)) return false;
-        return isSuccess() == that.isSuccess() && Objects.equals(getMessage(), that.getMessage()) && Objects.equals(getUser(), that.getUser());
+        return isSuccess() == that.isSuccess()
+                && Objects.equals(getMessage(), that.getMessage())
+                && Objects.equals(getUser(), that.getUser());
     }
 
     /**
-     * The hashCode
+     * The hasCode
+     *
+     * @return the hashCode
      */
 
     @Override

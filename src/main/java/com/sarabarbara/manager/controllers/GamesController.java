@@ -35,6 +35,16 @@ public class GamesController {
 
     private final GamesService gamesService;
 
+    /**
+     * The searchGameController
+     *
+     * @param gameName the gameName
+     * @param page     the page
+     * @param size     the size
+     *
+     * @return the searched game
+     */
+
     @PostMapping("/search")
     public ResponseEntity<SearchResponse<GamesSearchDTO>> searchGame(@RequestBody String gameName,
                                                                      @RequestParam(defaultValue = "1") int page,
@@ -78,6 +88,14 @@ public class GamesController {
                     .body(new SearchResponse<>(null, 0, 0, 0));
         }
     }
+
+    /**
+     * The gameSheetController
+     *
+     * @param gameId the gameId
+     *
+     * @return the sheet of the game searched
+     */
 
     @GetMapping("/{gameId}")
     public ResponseEntity<GameSheetResponse> gameSheet(@PathVariable Integer gameId) {

@@ -20,19 +20,23 @@ import java.util.Objects;
 @NoArgsConstructor
 public class UserLoginDTO {
 
-    private String username;
-
     /**
-     * The password
+     * The username
      */
 
-    private String password;
+    private String username;
 
     /**
      * The email
      */
 
     private String email;
+
+    /**
+     * The password
+     */
+
+    private String password;
 
     /**
      * The equals
@@ -46,7 +50,9 @@ public class UserLoginDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserLoginDTO that)) return false;
-        return Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(), that.getPassword()) && Objects.equals(getEmail(), that.getEmail());
+        return Objects.equals(getUsername(), that.getUsername())
+                && Objects.equals(getPassword(), that.getPassword())
+                && Objects.equals(getEmail(), that.getEmail());
     }
 
     /**

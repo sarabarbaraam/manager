@@ -44,13 +44,14 @@ public class LoginUserResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof LoginUserResponse that)) return false;
-        return isSuccess() == that.isSuccess() && Objects.equals(getMessage(), that.getMessage());
+        return isSuccess() == that.isSuccess()
+                && Objects.equals(getMessage(), that.getMessage());
     }
 
     /**
-     * The hashcode
+     * The hashCode
      *
-     * @return the hash
+     * @return the hashCode
      */
 
     @Override

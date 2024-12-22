@@ -44,6 +44,7 @@ public class AppConfig {
      *
      * @return httpClient
      */
+
     @Bean
     public HttpClient httpClient() {
         return HttpClient.newHttpClient();
