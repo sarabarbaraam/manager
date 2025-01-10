@@ -115,7 +115,7 @@ public class UsersController {
             int totalPage = (int) Math.ceil((double) searchedUser.size() / size);
 
             SearchResponse<UserSearchDTO> response = new SearchResponse<>(
-                    userSearchDTOs, searchedUser.size(), page, totalPage);
+                    userSearchDTOs, searchedUser.size(), page, totalPage, "Successful");
 
             logger.info("Total users found with identifier {} : {}. Current page: {}. Total pages: {}", identifier,
                     response.getResults(), response.getCurrentPage(), response.getTotalPage());
@@ -131,7 +131,8 @@ public class UsersController {
 
             logger.error("Can't search user: Some internal error occurred.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new SearchResponse<>(null, 0, 0, 0));
+                    .body(new SearchResponse<>(null, 0, 0, 0,
+                            "Some internal error occurred."));
         }
 
     }

@@ -18,7 +18,7 @@ import java.net.http.HttpClient;
 public class AppConfig {
 
     /**
-     * The {@link RestTemplate}
+     * The {@link RestTemplate} bean
      *
      * @return RestTemplate
      */

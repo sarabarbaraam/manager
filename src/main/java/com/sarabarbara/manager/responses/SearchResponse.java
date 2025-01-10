@@ -46,6 +46,12 @@ public class SearchResponse<T> {
     private int totalPage;
 
     /**
+     * The message
+     */
+
+    private String message;
+
+    /**
      * The equals
      *
      * @param o the o
@@ -60,7 +66,8 @@ public class SearchResponse<T> {
         return getTotalResults() == that.getTotalResults()
                 && getCurrentPage() == that.getCurrentPage()
                 && getTotalPage() == that.getTotalPage()
-                && Objects.equals(getResults(), that.getResults());
+                && Objects.equals(getResults(), that.getResults())
+                && Objects.equals(getMessage(), that.getMessage());
     }
 
     /**
@@ -71,7 +78,8 @@ public class SearchResponse<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getResults(), getTotalResults(), getCurrentPage(), getTotalPage());
+        return Objects.hash(getResults(), getTotalResults(),
+                getCurrentPage(), getTotalPage(), getMessage());
     }
 
 }
