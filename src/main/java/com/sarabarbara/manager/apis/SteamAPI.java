@@ -59,7 +59,7 @@ public class SteamAPI {
 
     public Map<Integer, String> getGamesList(String gameName) {
 
-        Map<Integer, String> foundGames = new HashMap<>();
+        Map<Integer, String> gamesFound = new HashMap<>();
 
         try {
 
@@ -86,7 +86,7 @@ public class SteamAPI {
 
                 if (appName.toLowerCase().contains(gameName.toLowerCase())) {
 
-                    foundGames.put(appId, appName);
+                    gamesFound.put(appId, appName);
                 }
             }
 
@@ -100,7 +100,7 @@ public class SteamAPI {
             Thread.currentThread().interrupt();
         }
 
-        return foundGames;
+        return gamesFound;
     }
 
     /**
@@ -290,7 +290,7 @@ public class SteamAPI {
      * @return true or false
      */
 
-    private static boolean isValidJson(@NonNull HttpResponse<String> response, String cleanedResponseBody,
+    private static boolean  isValidJson(@NonNull HttpResponse<String> response, String cleanedResponseBody,
                                        Integer gameId,
                                        String responseBody) {
 

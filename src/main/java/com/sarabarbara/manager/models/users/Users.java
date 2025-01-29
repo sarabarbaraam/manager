@@ -1,7 +1,7 @@
 package com.sarabarbara.manager.models.users;
 
 
-import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.enums.user.UserGenre;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;

@@ -3,7 +3,7 @@ package com.sarabarbara.manager.services;
 import com.sarabarbara.manager.apis.ZeroBounceAPI;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.enums.user.UserGenre;
 import com.sarabarbara.manager.exceptions.users.UserNotFoundException;
 import com.sarabarbara.manager.exceptions.users.UserValidateException;
 import com.sarabarbara.manager.models.users.Users;

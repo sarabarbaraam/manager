@@ -1,6 +1,6 @@
 package com.sarabarbara.manager.dto.users;
 
-import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.enums.user.UserGenre;
 import lombok.*;
 
 import java.util.Objects;

@@ -3,7 +3,7 @@ package com.sarabarbara.manager.mappers;
 import com.sarabarbara.manager.dto.users.UserCreateDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.dto.users.UserUpdateDTO;
-import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.enums.user.UserGenre;
 import com.sarabarbara.manager.models.users.Users;
 import lombok.Builder;
 import lombok.NonNull;

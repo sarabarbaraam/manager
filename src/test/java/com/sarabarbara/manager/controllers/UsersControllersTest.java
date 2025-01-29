@@ -3,7 +3,7 @@ package com.sarabarbara.manager.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sarabarbara.manager.dto.users.UserDTO;
 import com.sarabarbara.manager.dto.users.UserLoginDTO;
-import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.enums.user.UserGenre;
 import com.sarabarbara.manager.exceptions.users.UserValidateException;
 import com.sarabarbara.manager.models.users.Users;
 import com.sarabarbara.manager.services.UsersService;
