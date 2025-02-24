@@ -52,14 +52,14 @@ public class SteamAPI {
     /**
      * Get the games of the Steam API
      *
-     * @param gameName the gameName
+     * @param gameName the name of the game
      *
      * @return the appid and the name
      */
 
     public Map<Integer, String> getGamesList(String gameName) {
 
-        Map<Integer, String> foundGames = new HashMap<>();
+        Map<Integer, String> gamesFound = new HashMap<>();
 
         try {
 
@@ -86,7 +86,7 @@ public class SteamAPI {
 
                 if (appName.toLowerCase().contains(gameName.toLowerCase())) {
 
-                    foundGames.put(appId, appName);
+                    gamesFound.put(appId, appName);
                 }
             }
 
@@ -100,7 +100,7 @@ public class SteamAPI {
             Thread.currentThread().interrupt();
         }
 
-        return foundGames;
+        return gamesFound;
     }
 
     /**
@@ -290,7 +290,7 @@ public class SteamAPI {
      * @return true or false
      */
 
-    private static boolean isValidJson(@NonNull HttpResponse<String> response, String cleanedResponseBody,
+    private static boolean  isValidJson(@NonNull HttpResponse<String> response, String cleanedResponseBody,
                                        Integer gameId,
                                        String responseBody) {
 
@@ -331,7 +331,7 @@ public class SteamAPI {
 
     private static void gameType(@NonNull Games games, List<Games> gamesList) {
 
-        if (games.getType() != null && "game".equalsIgnoreCase(games.getType()) || "dlc".equalsIgnoreCase(games.getType())) {
+        if (games.getType() != null && "game" .equalsIgnoreCase(games.getType()) || "dlc" .equalsIgnoreCase(games.getType())) {
 
             gamesList.add(games);
         }

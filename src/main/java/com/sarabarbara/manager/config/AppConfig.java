@@ -18,7 +18,7 @@ import java.net.http.HttpClient;
 public class AppConfig {
 
     /**
-     * The {@link RestTemplate}
+     * The {@link RestTemplate} bean
      *
      * @return RestTemplate
      */
@@ -44,6 +44,7 @@ public class AppConfig {
      *
      * @return httpClient
      */
+
     @Bean
     public HttpClient httpClient() {
         return HttpClient.newHttpClient();

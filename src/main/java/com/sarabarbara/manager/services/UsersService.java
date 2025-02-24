@@ -72,7 +72,7 @@ public class UsersService {
     /**
      * Search a user in the BBDD
      *
-     * @param identifier the identifier
+     * @param identifier the identifier of the user
      * @param page       the page
      * @param size       the size
      *
@@ -96,8 +96,8 @@ public class UsersService {
     /**
      * Updates the user information
      *
-     * @param identifier the identifier
-     * @param newInfo    the newInfo
+     * @param identifier the identifier of the user
+     * @param newInfo    the new info of the user
      *
      * @return the updated user
      *
@@ -145,7 +145,7 @@ public class UsersService {
     /**
      * Delete a user from the BBDD
      *
-     * @param identifier the identifier
+     * @param identifier the identifier of the user
      *
      * @throws UserNotFoundException the {@link UserNotFoundException}
      */
@@ -227,8 +227,8 @@ public class UsersService {
     /**
      * Checks if the password, username and email are correct
      *
-     * @param newInfo      the newInfo
-     * @param existingUser the updatedUser
+     * @param newInfo      the new info of the user
+     * @param existingUser the existing user
      *
      * @throws UserValidateException the {@link UserValidateException}
      */
@@ -324,7 +324,7 @@ public class UsersService {
      * Validates the password format
      *
      * @param newInfo      the newInfo
-     * @param existingUser the updatedUser
+     * @param existingUser the existingUser
      *
      * @throws UserValidateException the {@link UserValidateException}
      */

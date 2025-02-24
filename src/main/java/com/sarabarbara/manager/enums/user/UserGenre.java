@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.enums;
+package com.sarabarbara.manager.enums.user;
 
 
 import lombok.AllArgsConstructor;
@@ -18,10 +18,18 @@ import lombok.ToString;
 @ToString
 public enum UserGenre {
 
+    /**
+     * The Enum
+     */
+
     M("Male"),
     F("Female"),
     NB("Non Binary"),
     PNTS("Prefer not to say");
+
+    /**
+     * The description
+     */
 
     private final String description;
 }

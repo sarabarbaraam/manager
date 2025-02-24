@@ -1,16 +1,16 @@
-package com.sarabarbara.manager.responses.games;
+package com.sarabarbara.manager.responses.viewing;
 
-import com.sarabarbara.manager.dto.games.GamesSheetDTO;
+import com.sarabarbara.manager.dto.viewing.ViewingSheetDTO;
 import lombok.*;
 
 import java.util.Objects;
 
 /**
- * GameSheetResponse class
+ * ViewingSheetResponse class
  *
  * @author sarabarbaraam
  * @version 1.0
- * @since 27/11/2024
+ * @since 18/02/2025
  */
 
 @AllArgsConstructor
@@ -19,7 +19,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-public class GameSheetResponse {
+public class ViewingSheetResponse {
 
     /**
      * The success
@@ -28,10 +28,10 @@ public class GameSheetResponse {
     private boolean success;
 
     /**
-     * The gamesSheet
+     * The movieSheet
      */
 
-    private GamesSheetDTO gameSheet;
+    private ViewingSheetDTO viewingSheet;
 
     /**
      * The message
@@ -49,9 +49,9 @@ public class GameSheetResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof GameSheetResponse that)) return false;
+        if (!(o instanceof ViewingSheetResponse that)) return false;
         return isSuccess() == that.isSuccess()
-                && Objects.equals(getGameSheet(), that.getGameSheet())
+                && Objects.equals(getViewingSheet(), that.getViewingSheet())
                 && Objects.equals(getMessage(), that.getMessage());
     }
 
@@ -63,7 +63,7 @@ public class GameSheetResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(isSuccess(), getGameSheet(), getMessage());
+        return Objects.hash(isSuccess(), getViewingSheet(), getMessage());
     }
 
 }

@@ -1,7 +1,6 @@
 package com.sarabarbara.manager.dto.games;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sarabarbara.manager.models.games.*;
@@ -25,7 +24,6 @@ import java.util.Objects;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GamesSheetDTO {
 
     /**
@@ -203,6 +201,7 @@ public class GamesSheetDTO {
      * The rating
      */
 
+    @JsonProperty("ratings")
     private AgeRatings ageRatings;
 
     /**

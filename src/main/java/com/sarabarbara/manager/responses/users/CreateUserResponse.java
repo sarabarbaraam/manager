@@ -41,6 +41,10 @@ public class CreateUserResponse {
 
     /**
      * The equals
+     *
+     * @param o the o
+     *
+     * @return the equals
      */
 
     @Override
@@ -53,7 +57,9 @@ public class CreateUserResponse {
     }
 
     /**
-     * The hashCode
+     * The hasCode
+     *
+     * @return the hashCode
      */
 
     @Override

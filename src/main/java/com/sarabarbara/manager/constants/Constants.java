@@ -74,9 +74,17 @@ public class Constants {
     public static final String BODY = "Body: {}";
 
     /**
+     * FOR STEAM
      * The L_SPANISH constant
      */
 
     public static final String L_SPANISH = "&l=spanish";
+
+    /**
+     * FOR TMDB
+     * The LANGUAGE_SPANISH constant
+     */
+
+    public static final String LANGUAGE_SPANISH = "&language=es-ES";
 
 }

@@ -46,24 +46,40 @@ public class SearchResponse<T> {
     private int totalPage;
 
     /**
+     * The message
+     */
+
+    private String message;
+
+    /**
      * The equals
+     *
+     * @param o the o
+     *
+     * @return the equals
      */
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SearchResponse<?> that)) return false;
-        return getTotalResults() == that.getTotalResults() && getCurrentPage() == that.getCurrentPage()
-                && getTotalPage() == that.getTotalPage() && Objects.equals(getResults(), that.getResults());
+        return getTotalResults() == that.getTotalResults()
+                && getCurrentPage() == that.getCurrentPage()
+                && getTotalPage() == that.getTotalPage()
+                && Objects.equals(getResults(), that.getResults())
+                && Objects.equals(getMessage(), that.getMessage());
     }
 
     /**
-     * The hashCode
+     * The hasCode
+     *
+     * @return the hashCode
      */
 
     @Override
     public int hashCode() {
-        return Objects.hash(getResults(), getTotalResults(), getCurrentPage(), getTotalPage());
+        return Objects.hash(getResults(), getTotalResults(),
+                getCurrentPage(), getTotalPage(), getMessage());
     }
 
 }

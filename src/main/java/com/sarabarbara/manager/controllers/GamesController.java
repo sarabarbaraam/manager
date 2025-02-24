@@ -35,6 +35,16 @@ public class GamesController {
 
     private final GamesService gamesService;
 
+    /**
+     * The searchGameController
+     *
+     * @param gameName the gameName
+     * @param page     the page
+     * @param size     the size
+     *
+     * @return the searched game
+     */
+
     @PostMapping("/search")
     public ResponseEntity<SearchResponse<GamesSearchDTO>> searchGame(@RequestBody String gameName,
                                                                      @RequestParam(defaultValue = "1") int page,
@@ -59,7 +69,7 @@ public class GamesController {
             int totalPages = (int) Math.ceil((double) searchedGame.size() / size);
 
             SearchResponse<GamesSearchDTO> response = new SearchResponse<>(
-                    gamesSearchDTOS, gamesSearchDTOS.size(), page, totalPages
+                    gamesSearchDTOS, gamesSearchDTOS.size(), page, totalPages, "Successful."
             );
 
             logger.info("Total games found with name {}: {}. Current Page: {}. Total Page: {}", gameName,
@@ -68,16 +78,25 @@ public class GamesController {
             logger.info("Games found:");
             gamesSearchDTOS.forEach(games -> logger.info(" - {}", games.getName()));
 
-            logger.info("Searching games finished");
+            logger.info("Searching game finished");
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (Exception e) {
 
-            logger.error("Can't search game: Some internal error ocurred.");
+            logger.error("Can't search game: Some internal error occurred.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new SearchResponse<>(null, 0, 0, 0));
+                    .body(new SearchResponse<>(null, 0, 0, 0,
+                            "Some internal error occurred."));
         }
     }
+
+    /**
+     * The gameSheetController
+     *
+     * @param gameId the gameId
+     *
+     * @return the sheet of the game searched
+     */
 
     @GetMapping("/{gameId}")
     public ResponseEntity<GameSheetResponse> gameSheet(@PathVariable Integer gameId) {
@@ -90,13 +109,17 @@ public class GamesController {
 
             GamesSheetDTO gamesSheetDTO = toGamesSheetDTOMapper(game);
 
+            logger.info("Game sheet information: {}", gamesSheetDTO);
             logger.info("GameSheet finished");
-            return ResponseEntity.status(HttpStatus.OK).body(new GameSheetResponse(true, gamesSheetDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(new GameSheetResponse(true, gamesSheetDTO,
+                    "Successful."));
 
         } catch (Exception e) {
 
-            logger.error("Can't load the game's sheet");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GameSheetResponse(false, null));
+            logger.error("Can't load the game's sheet. Some internal error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new GameSheetResponse(false, null,
+                            "Some internal error occurred."));
 
         }
     }

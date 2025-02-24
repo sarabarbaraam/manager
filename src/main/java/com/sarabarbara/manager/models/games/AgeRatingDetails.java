@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.Objects;
 
 /**
- * PEGI class
+ * AgeRatingDetails class
  *
  * @author sarabarbaraam
  * @version 1.0
@@ -21,7 +21,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PEGI {
+public class AgeRatingDetails {
 
     /**
      * The rating
@@ -58,11 +58,11 @@ public class PEGI {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PEGI pegi)) return false;
-        return isDisplayOnlineNotice() == pegi.isDisplayOnlineNotice()
-                && Objects.equals(getRating(), pegi.getRating())
-                && Objects.equals(getDescriptors(), pegi.getDescriptors())
-                && Objects.equals(getRequiredAge(), pegi.getRequiredAge());
+        if (!(o instanceof AgeRatingDetails ageRatingDetails)) return false;
+        return isDisplayOnlineNotice() == ageRatingDetails.isDisplayOnlineNotice()
+                && Objects.equals(getRating(), ageRatingDetails.getRating())
+                && Objects.equals(getDescriptors(), ageRatingDetails.getDescriptors())
+                && Objects.equals(getRequiredAge(), ageRatingDetails.getRequiredAge());
     }
 
     /**

@@ -3,7 +3,7 @@ package com.sarabarbara.manager.mappers;
 import com.sarabarbara.manager.dto.users.UserCreateDTO;
 import com.sarabarbara.manager.dto.users.UserSearchDTO;
 import com.sarabarbara.manager.dto.users.UserUpdateDTO;
-import com.sarabarbara.manager.enums.UserGenre;
+import com.sarabarbara.manager.enums.user.UserGenre;
 import com.sarabarbara.manager.models.users.Users;
 import lombok.Builder;
 import lombok.NonNull;
@@ -62,7 +62,7 @@ public class UsersMapper {
      * @return the mapper of the list of UserSearchDTO
      */
 
-    public static List<UserSearchDTO> toUserSearchDTOMapper(List<Users> searchedUser) {
+    public static List<UserSearchDTO> toUserSearchDTOMapper(@NonNull List<Users> searchedUser) {
 
         return searchedUser.stream()
                 .map(user -> UserSearchDTO.builder()
@@ -79,6 +79,7 @@ public class UsersMapper {
      *
      * @return the mapper of UserUpdateDTO
      */
+
     public static UserUpdateDTO toUserUpdateDTOMapper(@NonNull Users updateUser) {
 
         return UserUpdateDTO.builder()
