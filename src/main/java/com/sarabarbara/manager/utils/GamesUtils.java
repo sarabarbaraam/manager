@@ -29,28 +29,28 @@ public class GamesUtils {
     /**
      * Method to paginate
      *
-     * @param list the list
+     * @param gameList the gameList
      * @param page the page
-     * @param size the size
+     * @param size the size of the page
      * @param <T>  the <T>
      *
      * @return List<T> paginated
      */
 
-    public static <T> @NonNull Page<T> paginate(@NonNull List<T> list, int page, int size) {
+    public static <T> @NonNull Page<T> paginate(@NonNull List<T> gameList, int page, int size) {
 
 
         int startIndex = page * size;
-        int endIndex = Math.min(startIndex + size, list.size());
+        int endIndex = Math.min(startIndex + size, gameList.size());
 
         // Make sure that the indexes are not out of range.
-        if (startIndex >= list.size()) {
+        if (startIndex >= gameList.size()) {
 
-            return Page.empty(); // Returns an empty list if the requested page is out of range.
+            return Page.empty(); // Returns an empty gameList if the requested page is out of range.
         }
 
-        List<T> pageContent = list.subList(startIndex, endIndex);
-        return new PageImpl<>(pageContent, PageRequest.of(page, size), list.size());
+        List<T> pageContent = gameList.subList(startIndex, endIndex);
+        return new PageImpl<>(pageContent, PageRequest.of(page, size), gameList.size());
     }
 
     /**

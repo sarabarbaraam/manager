@@ -25,7 +25,7 @@ public class UsersUtils {
     /**
      * Validates if the password's format is correct
      *
-     * @param password password
+     * @param password the password that the user wants to enter
      *
      * @return true or false
      */

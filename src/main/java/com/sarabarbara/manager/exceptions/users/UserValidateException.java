@@ -23,7 +23,7 @@ public class UserValidateException extends RuntimeException {
     /**
      * The User Validate Exception
      *
-     * @param message the message (StringBuilder(
+     * @param message the message (StringBuilder)
      */
 
     public UserValidateException(StringBuilder message) {

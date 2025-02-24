@@ -52,7 +52,7 @@ public class SteamAPI {
     /**
      * Get the games of the Steam API
      *
-     * @param gameName the gameName
+     * @param gameName the name of the game
      *
      * @return the appid and the name
      */

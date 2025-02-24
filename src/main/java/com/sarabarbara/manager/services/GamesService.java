@@ -32,7 +32,7 @@ public class GamesService {
     /**
      * Method that search a game
      *
-     * @param gameName the gameName
+     * @param gameName the name of the game the user wants to search
      * @param page     the page
      * @param size     the size
      *
@@ -55,7 +55,7 @@ public class GamesService {
     /**
      * Sheet of the game searched
      *
-     * @param gameId the gameId
+     * @param gameId the id of the game
      *
      * @return all the information about the game searched
      */
