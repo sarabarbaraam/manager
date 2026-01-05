@@ -1,10 +1,9 @@
-package com.sarabarbara.manager.users.service;
+package com.sarabarbara.manager.users;
 
 
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.users.UserRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

@@ -22,6 +22,9 @@ public record CreateUserDTO(
     @Schema(description = "The name of the user", examples = "John")
     String name,
 
+    @Schema(description = "The username of the user", examples = "johnsmith")
+    String username,
+
     @Schema(description = "The email of the user", examples = "johnsmith@example.com")
     String email,
 

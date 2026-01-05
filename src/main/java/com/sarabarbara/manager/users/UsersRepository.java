@@ -2,7 +2,7 @@ package com.sarabarbara.manager.users;
 
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -19,5 +19,5 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
     Optional<Users> findByUsernameIgnoreCase(String username);
     Optional<Users> findByEmail(String email);
-    Page<Users> findAllByUsernameContainingIgnoreCase(String username, Pageable pageable);
+    Page<Users> findByUsernameIgnoreCaseAndActiveTrue(String username, PageRequest pageRequest);
 }

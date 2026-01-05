@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 /**
  * Users class.
  *
@@ -14,11 +16,7 @@ import lombok.*;
  * @since 30/12/2025
  */
 
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 @Builder
 @Entity
 @Table(name = "users")
@@ -32,12 +30,15 @@ public class Users {
     @Column(nullable = false, length = 45)
     private String name;
 
-    @ToString.Exclude
-    @Column(nullable = false, length = 70)
-    private String password;
+    @Column(nullable = false, length = 45, unique = true)
+    private String username;
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @ToString.Exclude
+    @Column(nullable = false, length = 70)
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 1)
@@ -46,17 +47,12 @@ public class Users {
     @Column(name = "profile_picture_url", length = 500)
     private String profilePictureURL;
 
-    /**
-     * The premium status of the user
-     */
-
-    private Boolean premium;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    private Set<RolesEnum> role;
 
     private Boolean active;
-
-    /**
-     * The trimPassword method trims whitespace from the password before persisting or updating.
-     */
 
     @PrePersist
     @PreUpdate

@@ -1,19 +1,18 @@
 package com.sarabarbara.manager.users;
 
 
-import com.sarabarbara.manager.users.dtos.UsersDTO;
-import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import com.sarabarbara.manager.shared.BaseResponse;
-import com.sarabarbara.manager.users.service.UsersService;
+import com.sarabarbara.manager.users.dtos.CreateUserDTO;
+import com.sarabarbara.manager.users.dtos.UsersDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,7 +63,7 @@ public class UsersController {
                             )))
     })
     @PostMapping("/register")
-    public BaseResponse<CreateUserDTO> registerUser(@Validated @RequestBody UserRequest request) {
+    public BaseResponse<CreateUserDTO> registerUser(@Valid @RequestBody UserRequest request) {
 
         log.info("UsersController - createUser called");
         log.info("UsersController - createUser finished with data: {}", request);

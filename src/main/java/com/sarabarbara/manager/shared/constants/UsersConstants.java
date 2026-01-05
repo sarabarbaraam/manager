@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.users;
+package com.sarabarbara.manager.shared.constants;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;

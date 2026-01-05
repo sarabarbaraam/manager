@@ -7,9 +7,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
 
-import static com.sarabarbara.manager.users.UsersConstants.*;
+import static com.sarabarbara.manager.shared.constants.UsersConstants.*;
 
 /**
  * UserRequest class.
@@ -19,65 +18,36 @@ import static com.sarabarbara.manager.users.UsersConstants.*;
  * @since 30/12/2025
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
 @Schema(name = "User Request", description = "Request object for creating or updating a user")
-public class UserRequest {
+public record UserRequest(
 
-    /**
-     * The name of the user
-     */
+        @NotBlank
+        @Size(min = 3, max = 45, message = NAME_CHARACTERS_LIMIT)
+        @Schema(description = "The name of the user", example = "John")
+        String name,
 
-    @NotBlank
-    @Size(min = 3, max = 45, message = NAME_CHARACTERS_LIMIT)
-    @Schema(description = "The name of the user", examples = "John")
-    private String name;
+        @NotBlank
+        @Size(min = 3, max = 20, message = USERNAME_CHARACTERS_LIMIT)
+        @Pattern(regexp = USERNAME_REGEX, message = USERNAME_PATTERN)
+        @Schema(description = "The username of the user", example = "john_smith")
+        String username,
 
-    /**
-     * The username of the user
-     */
+        @NotBlank
+        @Size(min = 8, max = 70, message = PASSWORD_CHARACTERS_LIMIT)
+        @Pattern(regexp = PASSWORD_REGEX, message = PASSWORD_PATTERN)
+        @Schema(description = "The password of the user", example = "Testpassword123!")
+        String password,
 
-    @NotBlank
-    @Size(min = 3, max = 20, message = USERNAME_CHARACTERS_LIMIT)
-    @Pattern(regexp = USERNAME_REGEX, message = USERNAME_PATTERN)
-    @Schema(description = "The username of the user", examples = "john_smith")
-    private String username;
+        @NotBlank
+        @Email(message = EMAIL_MUST_BE_VALID)
+        @Pattern(regexp = EMAIL_REGEX)
+        @Schema(description = "The email of the user", example = "johnsmith@example.com")
+        String email,
 
-    /**
-     * The password
-     */
+        @Schema(description = "The genre of the user", example = "M, F, NB, NP")
+        GenreEnum genre,
 
-    @NotBlank
-    @Size(min = 8, max = 70, message = PASSWORD_CHARACTERS_LIMIT)
-    @Pattern(regexp = PASSWORD_REGEX, message = PASSWORD_PATTERN)
-    @Schema(description = "The password of the user", examples = "Testpassword123!")
-    private String password;
-
-    /**
-     * The email
-     */
-
-    @NotBlank
-    @Email(message = EMAIL_MUST_BE_VALID)
-    @Pattern(regexp = EMAIL_REGEX)
-    @Schema(description = "The email of the user", examples = "johnsmith@example.com")
-    private String email;
-
-    /**
-     * The genre of the user
-     */
-
-    @Schema(description = "The genre of the user", examples = "M, F, NB, NP")
-    private GenreEnum genre;
-
-    /**
-     * The url of the profile picture of the user
-     */
-
-    @Schema(description = "The profile picture url of the user", examples = "pp.png")
-    private String profilePictureURL;
+        @Schema(description = "The profile picture url of the user", example = "pp.png")
+        String profilePictureURL
+) {
 }

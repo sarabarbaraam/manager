@@ -1,15 +1,11 @@
-package com.sarabarbara.manager.users.service;
+package com.sarabarbara.manager.users;
 
 import com.sarabarbara.manager.infrastructure.external.zerobounce.ZeroBounceClient;
-import com.sarabarbara.manager.users.dtos.UsersDTO;
+import com.sarabarbara.manager.security.AuthService;
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
-import com.sarabarbara.manager.users.Users;
+import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.users.exceptions.UserValidateException;
-import com.sarabarbara.manager.users.UsersRepository;
-import com.sarabarbara.manager.users.UserRequest;
-import com.sarabarbara.manager.users.UsersMapper;
-import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static com.sarabarbara.manager.users.UsersConstants.PASSWORD_PATTERN;
-
+import static com.sarabarbara.manager.shared.constants.UsersConstants.PASSWORD_PATTERN;
 
 /**
  * UsersServiceImpl class.
@@ -43,6 +40,7 @@ public class UsersServiceImpl implements UsersService {
     private final ZeroBounceClient zeroBounceClient;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UsersMapper usersMapper;
+    private final AuthService authService;
 
     /**
      * Create a new user.
@@ -64,6 +62,9 @@ public class UsersServiceImpl implements UsersService {
         log.debug("Encoding password...");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        log.debug("Assigning USER role to the new user...");
+        user.setRole(Collections.singleton(RolesEnum.USER));
+
         log.info("User created successfully: {}", user);
         userRepository.save(user);
 
@@ -71,6 +72,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UsersDTO> getUsers() {
 
         log.info("UsersServiceImpl - getUsers called");
@@ -82,6 +84,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UsersDTO> getUserByUsername(String username, int page, int size) throws UserNotFoundException {
 
         log.info("UsersServiceImpl - getUserByUsername called");
@@ -89,7 +92,7 @@ public class UsersServiceImpl implements UsersService {
         log.debug("Searching users with username: {}", username);
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Users> searchedUser = userRepository.findAllByUsernameContainingIgnoreCase(username, pageRequest);
+        Page<Users> searchedUser = userRepository.findByUsernameIgnoreCaseAndActiveTrue(username, pageRequest);
 
         if (searchedUser.isEmpty()) {
 
@@ -110,7 +113,18 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public void deleteUser() {
 
+        log.info("UsersServiceImpl - deleteUser called");
+        log.debug("Deleting user");
 
+        Long userId = authService.getCurrentUserId();
+
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User with id " + userId + " not found."));
+
+        user.setActive(false);
+
+        log.info("User deactivated successfully");
 
     }
 
@@ -125,16 +139,16 @@ public class UsersServiceImpl implements UsersService {
      * @throws UserValidateException the {@link UserValidateException}
      */
 
-    private void newUserValidator(@NonNull UserRequest user) {
+    private void newUserValidator(@NonNull UserRequest user) throws UserValidateException {
 
         log.debug("Validating username...");
-        usernameValidator(user.getUsername());
+        usernameValidator(user.username());
 
         log.debug("Validating email...");
-        emailValidator(user.getEmail());
+        emailValidator(user.email());
 
         log.debug("Validating password...");
-        if (!isFormatPasswordCorrect(user.getPassword())) {
+        if (!isFormatPasswordCorrect(user.password())) {
 
             log.error(PASSWORD_PATTERN);
             throw new UserValidateException(PASSWORD_PATTERN);
@@ -160,7 +174,7 @@ public class UsersServiceImpl implements UsersService {
      * @param email the email
      */
 
-    public void emailValidator(String email) {
+    public void emailValidator(String email) throws UserValidateException {
 
         Optional<Users> optionalEmail = userRepository.findByEmail(email);
 
