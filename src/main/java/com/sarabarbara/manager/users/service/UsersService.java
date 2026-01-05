@@ -1,0 +1,28 @@
+package com.sarabarbara.manager.users.service;
+
+
+import com.sarabarbara.manager.users.dtos.CreateUserDTO;
+import com.sarabarbara.manager.users.dtos.UsersDTO;
+import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
+import com.sarabarbara.manager.users.UserRequest;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
+
+/**
+ * UsersService class.
+ *
+ * @author sarabarbaraam
+ * @version 1.0
+ * @since 30/12/2025
+ */
+
+@Schema(name = "Users Service", description = "Service for managing users")
+public interface UsersService {
+
+    CreateUserDTO createUser(UserRequest request);
+    List<UsersDTO> getUsers();
+    List<UsersDTO> getUserByUsername(String username, int page, int size) throws UserNotFoundException;
+    UsersDTO updateUser(Long idUser, UserRequest request) throws UserNotFoundException;
+    void deleteUser();
+}

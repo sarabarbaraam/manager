@@ -1,10 +1,10 @@
 package com.sarabarbara.manager.config;
 
 
-import com.sarabarbara.manager.exceptions.UserNotFoundException;
-import com.sarabarbara.manager.exceptions.UserValidateException;
-import com.sarabarbara.manager.exceptions.UsersException;
-import com.sarabarbara.manager.responses.ErrorResponse;
+import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
+import com.sarabarbara.manager.users.exceptions.UserValidateException;
+import com.sarabarbara.manager.users.exceptions.UsersException;
+import com.sarabarbara.manager.shared.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
