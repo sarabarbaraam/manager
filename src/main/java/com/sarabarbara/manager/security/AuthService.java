@@ -12,6 +12,5 @@ package com.sarabarbara.manager.security;
 public interface AuthService {
 
     Long getCurrentUserId();
-
     AuthResponse login(LoginRequest request);
 }

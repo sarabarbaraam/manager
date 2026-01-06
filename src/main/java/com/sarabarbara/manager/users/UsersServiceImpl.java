@@ -2,6 +2,10 @@ package com.sarabarbara.manager.users;
 
 import com.sarabarbara.manager.infrastructure.external.zerobounce.ZeroBounceClient;
 import com.sarabarbara.manager.security.AuthService;
+import com.sarabarbara.manager.subscriptions.SubscriptionsPlan;
+import com.sarabarbara.manager.subscriptions.SubscriptionsPlanEnum;
+import com.sarabarbara.manager.subscriptions.SubscriptionsPlanRepository;
+import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionPlanNotFoundException;
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
@@ -15,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -37,17 +40,11 @@ import static com.sarabarbara.manager.shared.constants.UsersConstants.PASSWORD_P
 public class UsersServiceImpl implements UsersService {
 
     private final UsersRepository userRepository;
+    private final SubscriptionsPlanRepository subscriptionsPlanRepository;
     private final ZeroBounceClient zeroBounceClient;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UsersMapper usersMapper;
     private final AuthService authService;
-
-    /**
-     * Create a new user.
-     *
-     * @param request the user request
-     * @return the created user data
-     */
 
     @Override
     public CreateUserDTO createUser(UserRequest request) {
@@ -63,7 +60,14 @@ public class UsersServiceImpl implements UsersService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         log.debug("Assigning USER role to the new user...");
-        user.setRole(Collections.singleton(RolesEnum.USER));
+        user.setRole(RolesEnum.USER);
+
+        log.debug("Assigning FREE subscription plan to the new user...");
+        SubscriptionsPlan freePlan = subscriptionsPlanRepository
+                .findByName(SubscriptionsPlanEnum.FREE)
+                .orElseThrow(() -> new SubscriptionPlanNotFoundException("FREE plan not found"));
+
+        user.setCurrentPlan(freePlan);
 
         log.info("User created successfully: {}", user);
         userRepository.save(user);
@@ -73,14 +77,15 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UsersDTO> getUsers() {
+    public List<UsersDTO> getUsers(int page, int size) {
 
         log.info("UsersServiceImpl - getUsers called");
         log.debug("Fetching all users from the database...");
 
-        List<Users> user = userRepository.findAll();
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Users> users = userRepository.findAll(pageRequest);
 
-        return usersMapper.toDTOList(user);
+        return usersMapper.toDTOList(users.getContent());
     }
 
     @Override
@@ -114,7 +119,7 @@ public class UsersServiceImpl implements UsersService {
     public void deleteUser() {
 
         log.info("UsersServiceImpl - deleteUser called");
-        log.debug("Deleting user");
+        log.debug("Deactivating user");
 
         Long userId = authService.getCurrentUserId();
 
@@ -131,13 +136,6 @@ public class UsersServiceImpl implements UsersService {
     // ----------------------------------- Complementary methods -----------------------------------
 
     // ============ VALIDATIONS ============
-
-    /**
-     * Validate if the new user data is correct
-     *
-     * @param user the user's data
-     * @throws UserValidateException the {@link UserValidateException}
-     */
 
     private void newUserValidator(@NonNull UserRequest user) throws UserValidateException {
 
@@ -168,12 +166,6 @@ public class UsersServiceImpl implements UsersService {
         log.info("The username {} is available", username);
     }
 
-    /**
-     * Validates if the email is taken or not
-     *
-     * @param email the email
-     */
-
     public void emailValidator(String email) throws UserValidateException {
 
         Optional<Users> optionalEmail = userRepository.findByEmail(email);
@@ -187,13 +179,6 @@ public class UsersServiceImpl implements UsersService {
         log.debug("The email {} is available", email);
         zeroBounceClient.emailIsReal(email);
     }
-
-    /**
-     * Validates if the password format is correct
-     *
-     * @param password the password
-     * @return true if the password format is correct, false otherwise
-     */
 
     public static boolean isFormatPasswordCorrect(String password) {
 

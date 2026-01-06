@@ -20,7 +20,7 @@ import java.util.List;
 public interface UsersService {
 
     CreateUserDTO createUser(UserRequest request);
-    List<UsersDTO> getUsers();
+    List<UsersDTO> getUsers(int page, int size);
     List<UsersDTO> getUserByUsername(String username, int page, int size) throws UserNotFoundException;
     UsersDTO updateUser(Long idUser, UserRequest request) throws UserNotFoundException;
     void deleteUser();

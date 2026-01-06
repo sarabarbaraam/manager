@@ -2,11 +2,12 @@ package com.sarabarbara.manager.users;
 
 
 import com.sarabarbara.manager.shared.GenreEnum;
+import com.sarabarbara.manager.subscriptions.SubscriptionsPlan;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.Set;
+import lombok.Builder;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * Users class.
@@ -25,7 +26,8 @@ public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idUser;
+    @Column(name = "id_user", nullable = false)
+    private Long id;
 
     @Column(nullable = false, length = 45)
     private String name;
@@ -41,7 +43,7 @@ public class Users {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 1)
+    @Column(length = 2)
     private GenreEnum genre;
 
     @Column(name = "profile_picture_url", length = 500)
@@ -49,8 +51,11 @@ public class Users {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    private Set<RolesEnum> role;
+    private RolesEnum role;
+
+    @ManyToOne
+    @JoinColumn(name = "name", nullable = false)
+    private SubscriptionsPlan currentPlan;
 
     private Boolean active;
 

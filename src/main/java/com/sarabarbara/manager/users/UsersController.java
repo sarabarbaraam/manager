@@ -109,7 +109,7 @@ public class UsersController {
         return BaseResponse
                 .<List<UsersDTO>>builder()
                 .success(true)
-                .data(usersService.getUsers())
+                .data(usersService.getUsers(page - 1, size))
                 .message("Users retrieved successfully")
                 .build();
 
@@ -162,7 +162,7 @@ public class UsersController {
                 .build();
     }
 
-    // todo: updatecontroller
+    // todo: update controller
 
     @Operation(summary = "Delete an user",
             description = "Delete an user by the id from the authentication token")

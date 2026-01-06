@@ -1,10 +1,11 @@
 package com.sarabarbara.manager.config;
 
 
+import com.sarabarbara.manager.shared.ErrorResponse;
+import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionPlanNotFoundException;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.users.exceptions.UserValidateException;
 import com.sarabarbara.manager.users.exceptions.UsersException;
-import com.sarabarbara.manager.shared.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserException(UsersException e) {
 
         log.error("Internal server error: {}", e.getMessage(), e);
-
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(
@@ -53,7 +53,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
 
         log.error("User not found: {}", e.getMessage(), e);
-
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(
@@ -70,16 +69,32 @@ public class GlobalExceptionHandler {
     @Schema(name = "Handle User Validate Exception", description = "Handles UserValidateException and returns appropriate error response")
     public ResponseEntity<ErrorResponse> handleUserValidateException(@NonNull UserValidateException e) {
 
-        log.warn("Validation failed: {}", e.getMessage());
-
-        return ResponseEntity.badRequest().body(
-                new ErrorResponse(
+        log.error("Validation failed: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
                         false,
                         e.getMessage(),
                         HttpStatus.BAD_REQUEST.value(),
                         LocalDateTime.now()
-                )
-        );
+                ));
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(SubscriptionPlanNotFoundException.class)
+    @Schema(name = "Handle Subscription Plan Not Found Exception",
+            description = "Handles SubscriptionPlanNotFoundException and returns appropriate error response")
+    public ResponseEntity<ErrorResponse> handleSubscriptionPlanNotFoundException(SubscriptionPlanNotFoundException e) {
+
+        log.error("Subscription plan not found: {}", e.getMessage(), e);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        false,
+                        e.getMessage(),
+                        HttpStatus.NOT_FOUND.value(),
+                        LocalDateTime.now()
+                ));
     }
 
 }
