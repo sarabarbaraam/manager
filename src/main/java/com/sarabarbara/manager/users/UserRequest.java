@@ -44,7 +44,7 @@ public record UserRequest(
         @Schema(description = "The password of the user", example = "Testpassword123!")
         String password,
 
-        @Schema(description = "The genre of the user", example = "M, F, NB, NP")
+        @Schema(description = "The genre of the user", example = "M")
         GenreEnum genre,
 
         @Schema(description = "The profile picture url of the user", example = "pp.png")

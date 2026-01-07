@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static com.sarabarbara.manager.shared.constants.UsersConstants.PASSWORD_PATTERN;
+import static com.sarabarbara.manager.shared.constants.UsersConstants.PASSWORD_REGEX;
 
 /**
  * UsersServiceImpl class.
@@ -190,10 +191,7 @@ public class UsersServiceImpl implements UsersService {
 
     public static void passwordValidator(String password) {
 
-        final Pattern pattern = Pattern.compile(
-                "^(?=.*?[A-Z].*?)(?=.*?[a-z].*?)(?=.*?\\d.*?)(?=.*?[!?/@#$%^&*()_+=-].*?)[A-Za-z\\d!?/@#$%^&*()" +
-                        "_+=-]{8,70}$"
-        );
+        final Pattern pattern = Pattern.compile(PASSWORD_REGEX);
 
         if (!pattern.matcher(password).matches()) {
 

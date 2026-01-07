@@ -13,9 +13,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * JwtAuthenticationFilter class.
@@ -32,18 +34,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtilServiceImpl jwtUtilServiceImpl;
     private final UserDetailsService userDetailsService;
 
+    private static final List<String> EXCLUDED_PATHS = List.of(
+            "/api/v1/users/register",
+            "/auth/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+    );
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        System.out.println("PATH = " + request.getServletPath());
-
-        // Exclude Swagger paths from JWT authentication
         String path = request.getServletPath();
+        System.out.println("PATH = " + path);
 
-        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
+        boolean isExcluded = EXCLUDED_PATHS.stream()
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
 
+        if (isExcluded) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -81,5 +91,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }

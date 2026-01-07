@@ -23,12 +23,13 @@ public class UsersConstants {
     public static final String USERNAME_PATTERN = "The user name must not have two consecutive underscores or periods, " +
             "ensure that the string does not end in a period or underscore.";
 
-    public static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#._-])[A-Za-z\\d@$!%*?&#._-]{8,70}$\n";
+    public static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#._-])[A-Za-z\\d@$!%*?&#._-]{8,70}$";
 
     public static final String PASSWORD_CHARACTERS_LIMIT = "The password must be between 8 and 70 characters";
 
-    public static final String PASSWORD_PATTERN = "The password must contain at least one uppercase letter, " +
-            "one lowercase letter, one number, and one special character. Special characters allowed: !?/@#$%^&*()_+=-";
+    public static final String PASSWORD_PATTERN =
+            "The password must contain at least 8 character and one uppercase letter, one lowercase letter, one number, "
+                    + "and one special character. Allowed: @$!%*?&#._-";
 
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
