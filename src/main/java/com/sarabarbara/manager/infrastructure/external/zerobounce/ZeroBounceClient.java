@@ -1,8 +1,6 @@
 package com.sarabarbara.manager.infrastructure.external.zerobounce;
 
 
-import com.sarabarbara.manager.shared.EmailValidationResponse;
-import com.sarabarbara.manager.users.exceptions.UserValidateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,31 +24,36 @@ public class ZeroBounceClient {
     private final ZeroBounceConfig zeroBounceConfig;
     private final RestTemplate restTemplate;
 
-    public void emailIsReal(String email) {
+    public EmailValidationResult emailIsReal(String email) {
 
         log.info("Checking if the email {} is real, disposable or spam trap...", email);
 
         String apiKey = zeroBounceConfig.getApiKey();
         String url = ZERO_BOUNCE_URL + "?email=" + email + "&api_key=" + apiKey;
 
-        EmailValidationResponse response = restTemplate.getForObject(url, EmailValidationResponse.class);
+        try {
+            EmailValidationResponse response =
+                    restTemplate.getForObject(url, EmailValidationResponse.class);
 
-        if (response != null) {
+            if (response == null) {
+                log.warn("ZeroBounce returned null. Falling back to unverified registration.");
+                return EmailValidationResult.unverified();
+            }
 
             if ("valid".equals(response.status())
                     && !"disposable".equals(response.subStatus())
                     && !"spam trap".equals(response.subStatus())) {
 
-                log.info("It's a real email. Proceeding with registration...");
-
-            } else {
-
-                throw new UserValidateException("The email " + email + " is not acceptable: " + response.subStatus());
+                log.info("Email {} is valid.", email);
+                return EmailValidationResult.success();
             }
 
+            log.warn("Email {} is not acceptable: {}", email, response.subStatus());
+            return EmailValidationResult.invalid(response.subStatus());
+
+        } catch (Exception e) {
+            log.error("ZeroBounce API failed: {}. Falling back to unverified registration.", e.getMessage());
+            return EmailValidationResult.unverified();
         }
-
-        throw new UserValidateException("Email validation service returned a null response");
     }
-
 }

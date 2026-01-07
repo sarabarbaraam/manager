@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.shared;
+package com.sarabarbara.manager.infrastructure.external.zerobounce;
 
 
 /**

@@ -36,6 +36,9 @@ public class Users {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    private boolean emailVerified;
+
     @ToString.Exclude
     @Column(nullable = false, length = 70)
     private String password;

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.Period;
+import java.time.Duration;
 
 /**
  * SubscriptionPlan class.
@@ -35,7 +35,7 @@ public class SubscriptionsPlan {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private Period duration;
+    private Duration duration;
 
     @Column(nullable = false)
     private String description;

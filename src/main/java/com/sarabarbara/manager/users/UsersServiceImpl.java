@@ -1,5 +1,6 @@
 package com.sarabarbara.manager.users;
 
+import com.sarabarbara.manager.infrastructure.external.zerobounce.EmailValidationResult;
 import com.sarabarbara.manager.infrastructure.external.zerobounce.ZeroBounceClient;
 import com.sarabarbara.manager.security.AuthService;
 import com.sarabarbara.manager.subscriptions.SubscriptionsPlan;
@@ -52,9 +53,16 @@ public class UsersServiceImpl implements UsersService {
         log.info("UsersServiceImpl - createUser called");
         log.debug("Creating the user with the following data: {}", request);
 
+        log.debug("Validating new user data...");
         newUserValidator(request);
 
+        log.debug("Validating email...");
+        EmailValidationResult emailResult = emailValidator(request.email());
+
         Users user = usersMapper.toEntity(request);
+
+        log.debug("Setting email as verified...");
+        user.setEmailVerified(emailResult.verified());
 
         log.debug("Encoding password...");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -142,15 +150,8 @@ public class UsersServiceImpl implements UsersService {
         log.debug("Validating username...");
         usernameValidator(user.username());
 
-        log.debug("Validating email...");
-        emailValidator(user.email());
-
         log.debug("Validating password...");
-        if (!isFormatPasswordCorrect(user.password())) {
-
-            log.error(PASSWORD_PATTERN);
-            throw new UserValidateException(PASSWORD_PATTERN);
-        }
+        passwordValidator(user.password());
     }
 
     public void usernameValidator(String username) throws UserValidateException {
@@ -166,7 +167,7 @@ public class UsersServiceImpl implements UsersService {
         log.info("The username {} is available", username);
     }
 
-    public void emailValidator(String email) throws UserValidateException {
+    public EmailValidationResult emailValidator(String email) throws UserValidateException {
 
         Optional<Users> optionalEmail = userRepository.findByEmail(email);
 
@@ -176,11 +177,18 @@ public class UsersServiceImpl implements UsersService {
             throw new UserValidateException("The email " + email + " is already taken.");
         }
 
-        log.debug("The email {} is available", email);
-        zeroBounceClient.emailIsReal(email);
+        EmailValidationResult result = zeroBounceClient.emailIsReal(email);
+
+        if (!result.valid()) {
+
+            log.error("Email not acceptable: {}", result.reason());
+            throw new UserValidateException("Email not acceptable: " + result.reason());
+        }
+
+        return result;
     }
 
-    public static boolean isFormatPasswordCorrect(String password) {
+    public static void passwordValidator(String password) {
 
         final Pattern pattern = Pattern.compile(
                 "^(?=.*?[A-Z].*?)(?=.*?[a-z].*?)(?=.*?\\d.*?)(?=.*?[!?/@#$%^&*()_+=-].*?)[A-Za-z\\d!?/@#$%^&*()" +
@@ -189,11 +197,10 @@ public class UsersServiceImpl implements UsersService {
 
         if (!pattern.matcher(password).matches()) {
 
-            log.info("Password doesn't match pattern");
-            return false;
+            log.error("Password doesn't match pattern");
+            throw new UserValidateException(PASSWORD_PATTERN);
         }
 
         log.debug("The password's format is correct");
-        return true;
     }
 }
