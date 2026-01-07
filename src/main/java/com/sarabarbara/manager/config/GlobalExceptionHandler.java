@@ -6,7 +6,6 @@ import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionPlanNotFound
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.users.exceptions.UserValidateException;
 import com.sarabarbara.manager.users.exceptions.UsersException;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,12 +26,10 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @RestControllerAdvice
-@Schema(name = "Global Exception Handler", description = "Handles exceptions globally across the application")
 public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(UsersException.class)
-    @Schema(name = "Handle Users Exception", description = "Handles UsersException and returns appropriate error response")
     public ResponseEntity<ErrorResponse> handleUserException(UsersException e) {
 
         log.error("Internal server error: {}", e.getMessage(), e);
@@ -49,7 +46,6 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotFoundException.class)
-    @Schema(name = "Handle User Not Found Exception", description = "Handles UserNotFoundException and returns appropriate error response")
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
 
         log.error("User not found: {}", e.getMessage(), e);
@@ -66,7 +62,6 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserValidateException.class)
-    @Schema(name = "Handle User Validate Exception", description = "Handles UserValidateException and returns appropriate error response")
     public ResponseEntity<ErrorResponse> handleUserValidateException(@NonNull UserValidateException e) {
 
         log.error("Validation failed: {}", e.getMessage());
@@ -82,8 +77,6 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(SubscriptionPlanNotFoundException.class)
-    @Schema(name = "Handle Subscription Plan Not Found Exception",
-            description = "Handles SubscriptionPlanNotFoundException and returns appropriate error response")
     public ResponseEntity<ErrorResponse> handleSubscriptionPlanNotFoundException(SubscriptionPlanNotFoundException e) {
 
         log.error("Subscription plan not found: {}", e.getMessage(), e);

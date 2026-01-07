@@ -2,7 +2,6 @@ package com.sarabarbara.manager.subscriptions;
 
 
 import com.sarabarbara.manager.users.Users;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +21,6 @@ import java.time.Instant;
 @Builder
 @Entity
 @Table(name = "subscriptions_history")
-@Schema(name = "Subscriptions history Entity", description = "Entity representing a subscription history in the system")
 public class SubscriptionsPlanHistory {
 
     @Id
@@ -35,7 +33,7 @@ public class SubscriptionsPlanHistory {
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name = "name")
+    @JoinColumn(name = "current_plan_name")
     private SubscriptionsPlan planType;
 
     @Column(name = "start_date", nullable = false)

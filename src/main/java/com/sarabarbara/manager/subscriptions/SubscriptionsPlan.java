@@ -1,7 +1,6 @@
 package com.sarabarbara.manager.subscriptions;
 
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +20,6 @@ import java.time.Period;
 @Builder
 @Entity
 @Table(name = "subscriptions_plans")
-@Schema(name = "Subscriptions Plans Entity", description = "Entity representing a subscription plan in the system")
 public class SubscriptionsPlan {
 
     @Id
@@ -30,7 +28,7 @@ public class SubscriptionsPlan {
     private Long idPlan;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20, nullable = false)
+    @Column(name = "current_plan_name", length = 20, nullable = false)
     private SubscriptionsPlanEnum name;
 
     @Column(nullable = false)

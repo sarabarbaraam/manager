@@ -1,8 +1,6 @@
 package com.sarabarbara.manager.shared.constants;
 
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * Constants class.
  *
@@ -11,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 30/12/2025
  */
 
-@Schema(name = "Users Constants", description = "Constants for user validations")
 public class UsersConstants {
 
     private UsersConstants() {

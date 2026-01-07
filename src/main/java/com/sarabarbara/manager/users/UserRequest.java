@@ -33,16 +33,16 @@ public record UserRequest(
         String username,
 
         @NotBlank
-        @Size(min = 8, max = 70, message = PASSWORD_CHARACTERS_LIMIT)
-        @Pattern(regexp = PASSWORD_REGEX, message = PASSWORD_PATTERN)
-        @Schema(description = "The password of the user", example = "Testpassword123!")
-        String password,
-
-        @NotBlank
         @Email(message = EMAIL_MUST_BE_VALID)
         @Pattern(regexp = EMAIL_REGEX)
         @Schema(description = "The email of the user", example = "johnsmith@example.com")
         String email,
+
+        @NotBlank
+        @Size(min = 8, max = 70, message = PASSWORD_CHARACTERS_LIMIT)
+        @Pattern(regexp = PASSWORD_REGEX, message = PASSWORD_PATTERN)
+        @Schema(description = "The password of the user", example = "Testpassword123!")
+        String password,
 
         @Schema(description = "The genre of the user", example = "M, F, NB, NP")
         GenreEnum genre,

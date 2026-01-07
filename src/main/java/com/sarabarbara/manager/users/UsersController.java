@@ -7,7 +7,6 @@ import com.sarabarbara.manager.users.dtos.UsersDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -32,7 +31,6 @@ import static com.sarabarbara.manager.shared.constants.SwaggerUsersExamplesConst
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/users")
-@Schema(name = "Users Controller", description = "Controller for managing users")
 public class UsersController {
 
     private final UsersService usersService;
@@ -115,8 +113,8 @@ public class UsersController {
 
     }
 
-    @Operation(summary = "Searches an user",
-            description = "Searches an user for their username")
+    @Operation(summary = "Searches an user by username",
+            description = "Searches an user for their username. Supports pagination and partial matches.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,

@@ -1,8 +1,6 @@
 package com.sarabarbara.manager.users.exceptions;
 
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * UserNotFoundException class.
  *
@@ -11,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 30/12/2025
  */
 
-@Schema(name = "User Not Found Exception", description = "Exception thrown when a user is not found")
 public class UserNotFoundException extends RuntimeException {
 
     public UserNotFoundException(String message) {

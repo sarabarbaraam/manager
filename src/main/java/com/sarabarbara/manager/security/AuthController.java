@@ -1,7 +1,6 @@
 package com.sarabarbara.manager.security;
 
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/users")
-@Schema(name = "Authentification Controller", description = "Controller for user authentification")
 public class AuthController {
 
     private final AuthService authService;

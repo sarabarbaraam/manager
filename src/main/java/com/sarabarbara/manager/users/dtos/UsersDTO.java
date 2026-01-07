@@ -35,7 +35,7 @@ public record UsersDTO(
         String email,
 
         @Enumerated(EnumType.STRING)
-        @Schema(description = "The genre of the user", examples = "M, F, NB, PNTS")
+        @Schema(description = "The genre of the user", examples = "M, F, NB, NP")
         GenreEnum userGenre,
 
         @Schema(description = "The profile picture url of the user", examples = "pp.png")

@@ -4,7 +4,6 @@ package com.sarabarbara.manager.users;
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -16,7 +15,6 @@ import java.util.List;
  * @since 30/12/2025
  */
 
-@Schema(name = "Users Service", description = "Service for managing users")
 public interface UsersService {
 
     CreateUserDTO createUser(UserRequest request);

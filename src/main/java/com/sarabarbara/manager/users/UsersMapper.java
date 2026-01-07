@@ -4,6 +4,7 @@ package com.sarabarbara.manager.users;
 import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -17,6 +18,11 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UsersMapper {
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "currentPlan", ignore = true)
+    @Mapping(target = "active", ignore = true)
 
     Users toEntity(UserRequest request);
     UsersDTO toDTO(Users user);

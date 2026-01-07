@@ -3,7 +3,7 @@ package com.sarabarbara.manager.infrastructure.external.zerobounce;
 
 import com.sarabarbara.manager.shared.EmailValidationResponse;
 import com.sarabarbara.manager.users.exceptions.UserValidateException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -20,7 +20,7 @@ import static com.sarabarbara.manager.infrastructure.external.zerobounce.ZeroBou
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ZeroBounceClient {
 
     private final ZeroBounceConfig zeroBounceConfig;

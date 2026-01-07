@@ -29,7 +29,7 @@ import java.util.Objects;
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtUtilServiceImpl jwtUtilServiceImpl;
 
     @Override
     public Long getCurrentUserId() {
@@ -76,13 +76,13 @@ public class AuthServiceImpl implements AuthService {
             throw new DisabledException("User account is inactive");
         }
 
-        String token = jwtUtil.generateToken(userDetails);
+        String token = jwtUtilServiceImpl.generateToken(userDetails);
 
         if (token == null || token.isBlank()) {
             throw new IllegalStateException("Failed to generate JWT token");
         }
 
-        Date expiration = jwtUtil.extractExpiration(token);
+        Date expiration = jwtUtilServiceImpl.extractExpiration(token);
 
         return new AuthResponse(
                 token,

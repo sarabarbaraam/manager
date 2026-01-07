@@ -1,8 +1,6 @@
 package com.sarabarbara.manager.shared.constants;
 
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * SwaggerConstants class.
  *
@@ -11,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 30/12/2025
  */
 
-@Schema(name = "Swagger Constants", description = "Constants used for Swagger documentation")
 public class SwaggerUsersExamplesConstants {
 
     private SwaggerUsersExamplesConstants() {

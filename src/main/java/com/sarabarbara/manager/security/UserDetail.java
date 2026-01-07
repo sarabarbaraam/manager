@@ -2,12 +2,15 @@ package com.sarabarbara.manager.security;
 
 
 import com.sarabarbara.manager.users.Users;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * UserDetails class.
@@ -22,20 +25,18 @@ public record UserDetail(Users user) implements UserDetails {
     /**
      * Get roles/authorities of the user.
      *
-     * @return an empty list as no roles are defined
+     * @return a collection of granted authorities
      */
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        return user.getRole()
-                .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                .collect(Collectors.toList());
+    @Contract(" -> new")
+    @Override
+    public @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     public Long getId() {
-        return user.getIdUser();
+        return user.getId();
     }
 
     @Override

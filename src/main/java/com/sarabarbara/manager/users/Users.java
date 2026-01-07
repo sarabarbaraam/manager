@@ -3,7 +3,6 @@ package com.sarabarbara.manager.users;
 
 import com.sarabarbara.manager.shared.GenreEnum;
 import com.sarabarbara.manager.subscriptions.SubscriptionsPlan;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +20,6 @@ import lombok.ToString;
 @Builder
 @Entity
 @Table(name = "users")
-@Schema(name = "Users Entity", description = "Entity representing a user in the system")
 public class Users {
 
     @Id
@@ -49,12 +47,11 @@ public class Users {
     @Column(name = "profile_picture_url", length = 500)
     private String profilePictureURL;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private RolesEnum role;
 
     @ManyToOne
-    @JoinColumn(name = "name", nullable = false)
+    @JoinColumn(name = "current_plan_name", nullable = false)
     private SubscriptionsPlan currentPlan;
 
     private Boolean active;

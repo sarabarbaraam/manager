@@ -1,8 +1,6 @@
 package com.sarabarbara.manager.infrastructure.external.zerobounce;
 
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * ZeroBounceConstants class.
  *
@@ -11,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 30/12/2025
  */
 
-@Schema(name = "ZeroBounce Constants", description = "Constants used for ZeroBounce API integration")
 public class ZeroBounceConstants {
 
     private ZeroBounceConstants() {
