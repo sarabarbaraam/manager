@@ -18,7 +18,8 @@ public enum SubscriptionsPlanEnum {
     PREMIUM_MONTHLY("Premium Monthly Plan"),
     PREMIUM_TRIMESTRAL ("Premium Trimestral Plan"),
     PREMIUM_YEARLY ("Premium Yearly Plan"),
-    FAMILY("Family Plan");
+    FAMILY("Family Plan"),
+    LIFETIME("Lifetime Plan");
 
     private final String description;
 }
