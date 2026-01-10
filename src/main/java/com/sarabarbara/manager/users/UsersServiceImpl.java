@@ -11,6 +11,7 @@ import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.users.exceptions.UserValidateException;
+import com.sarabarbara.manager.users.exceptions.UsersException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,7 @@ public class UsersServiceImpl implements UsersService {
     private final UsersMapper usersMapper;
     private final AuthService authService;
 
+    // todo: send verification email after user creation
     @Override
     public CreateUserDTO createUser(UserRequest request) {
 
@@ -94,6 +96,12 @@ public class UsersServiceImpl implements UsersService {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Users> users = userRepository.findAll(pageRequest);
 
+        if (users.isEmpty()) {
+
+            log.error("No users found in the database.");
+            throw new UsersException("No users found in the database.");
+        }
+
         return usersMapper.toDTOList(users.getContent());
     }
 
@@ -137,6 +145,7 @@ public class UsersServiceImpl implements UsersService {
                         new UserNotFoundException("User with id " + userId + " not found."));
 
         user.setActive(false);
+        userRepository.save(user);
 
         log.info("User deactivated successfully");
 

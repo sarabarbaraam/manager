@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 import static com.sarabarbara.manager.shared.constants.UsersConstants.*;
 
@@ -18,11 +19,12 @@ import static com.sarabarbara.manager.shared.constants.UsersConstants.*;
  * @since 30/12/2025
  */
 
+@Builder
 @Schema(name = "User Request", description = "Request object for creating or updating a user")
 public record UserRequest(
 
         @NotBlank
-        @Size(min = 3, max = 45, message = NAME_CHARACTERS_LIMIT)
+        @Size(min = 3, max = 45, message = USER_NAME_CHARACTERS_LIMIT)
         @Schema(description = "The name of the user", example = "John")
         String name,
 

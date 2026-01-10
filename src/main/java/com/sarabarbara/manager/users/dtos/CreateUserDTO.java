@@ -28,9 +28,6 @@ public record CreateUserDTO(
     @Schema(description = "The email of the user", examples = "johnsmith@example.com")
     String email,
 
-    @Schema(description = "The password of the user", examples = "Testpassword123!")
-    String password,
-
     @Enumerated(EnumType.STRING)
     @Schema(description = "The genre of the user", examples = "M, F, NB, NP")
     GenreEnum genre,

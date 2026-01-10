@@ -63,8 +63,8 @@ public class UsersController {
     @PostMapping("/register")
     public BaseResponse<CreateUserDTO> registerUser(@Valid @RequestBody UserRequest request) {
 
-        log.info("UsersController - createUser called");
-        log.info("UsersController - createUser finished with data: {}", request);
+        log.info("UsersController - registerUser called");
+        log.info("UsersController - registerUser finished with data: {}", request);
         return BaseResponse
                 .<CreateUserDTO>builder()
                 .success(true)
@@ -74,7 +74,7 @@ public class UsersController {
     }
 
     @Operation(summary = "Search users",
-            description = "Search all users with pagination")
+            description = "Search all users with pagination support")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
@@ -98,7 +98,7 @@ public class UsersController {
                                     value = SEARCH_USER_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
     })
-    @GetMapping
+    @GetMapping("/get-all")
     public BaseResponse<List<UsersDTO>> getUsers(@RequestParam(defaultValue = "1") int page,
                                                  @RequestParam(defaultValue = "10") int size) {
 
@@ -145,7 +145,7 @@ public class UsersController {
                                     value = SEARCH_USER_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
     })
-    @GetMapping("/search/users/{username}")
+    @GetMapping("/search/{username}")
     public BaseResponse<List<UsersDTO>> searchUser(@PathVariable String username,
                                                    @RequestParam(defaultValue = "1") int page,
                                                    @RequestParam(defaultValue = "10") int size) {

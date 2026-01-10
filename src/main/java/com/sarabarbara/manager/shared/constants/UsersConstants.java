@@ -14,7 +14,7 @@ public class UsersConstants {
     private UsersConstants() {
     }
 
-    public static final String NAME_CHARACTERS_LIMIT = "The name must be between 3 and 45 characters";
+    public static final String USER_NAME_CHARACTERS_LIMIT = "The name must be between 3 and 45 characters";
 
     public static final String USERNAME_REGEX = "^\\w{3,20}$";
 

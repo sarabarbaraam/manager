@@ -1,12 +1,13 @@
 package com.sarabarbara.manager.subscriptions;
 
 
+import com.sarabarbara.manager.subscriptions.utils.PeriodToBigIntegerMonthsConverter;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.Duration;
+import java.time.Period;
 
 /**
  * SubscriptionPlan class.
@@ -34,10 +35,16 @@ public class SubscriptionsPlan {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @Convert(converter = PeriodToBigIntegerMonthsConverter.class)
     @Column(nullable = false)
-    private Duration duration;
+    private Period duration;
 
     @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
+    private String features;
+
+    private Boolean active;
 
 }
