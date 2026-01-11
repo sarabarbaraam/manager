@@ -26,7 +26,7 @@ public class SubscriptionsPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_subscription_plan", nullable = false)
-    private Long idPlan;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "current_plan_name", length = 20, nullable = false)

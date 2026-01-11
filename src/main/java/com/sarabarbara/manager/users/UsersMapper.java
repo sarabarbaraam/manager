@@ -1,10 +1,12 @@
 package com.sarabarbara.manager.users;
 
 
-import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
+import com.sarabarbara.manager.users.dtos.UsersDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -16,16 +18,21 @@ import java.util.List;
  * @since 30/12/2025
  */
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UsersMapper {
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "role", ignore = true)
-    @Mapping(target = "currentPlan", ignore = true)
-    @Mapping(target = "active", ignore = true)
 
     Users toEntity(UserRequest request);
     UsersDTO toDTO(Users user);
     List<UsersDTO> toDTOList(List<Users> user);
     CreateUserDTO toCreateUserDTO(Users user);
+
+    @Mapping(target = "name", source = "request.name")
+    @Mapping(target = "username", source = "request.username")
+    @Mapping(target = "email", source = "request.email")
+    @Mapping(target = "password", source = "request.password")
+    @Mapping(target = "genre", source = "request.genre")
+    @Mapping(target = "profilePictureURL", source = "request.profilePictureURL")
+    Users updateEntityFromRequest(UserRequest request, Users existingUser);
 }

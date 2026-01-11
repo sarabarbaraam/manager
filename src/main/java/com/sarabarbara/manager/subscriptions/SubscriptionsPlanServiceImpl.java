@@ -83,9 +83,8 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
         SubscriptionsPlan existingPlan = subscriptionsPlanRepository.findById(id)
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("Subscription plan with id " + id + " not found"));
 
-        subscriptionsPlanMapper.updateEntityFromRequest(request, existingPlan);
-
-        SubscriptionsPlan updatedPlan = subscriptionsPlanRepository.save(existingPlan);
+        SubscriptionsPlan updatedPlan =
+                subscriptionsPlanRepository.save(subscriptionsPlanMapper.updateEntityFromRequest(request, existingPlan));
 
         return subscriptionsPlanMapper.toDTO(updatedPlan);
     }

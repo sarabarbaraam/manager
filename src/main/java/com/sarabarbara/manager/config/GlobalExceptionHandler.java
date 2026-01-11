@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -149,6 +150,21 @@ public class GlobalExceptionHandler {
                         false,
                         e.getMessage(),
                         HttpStatus.BAD_REQUEST.value(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabledAccountException(DisabledException e) {
+
+        log.error("Disabled account access attempt: {}", e.getMessage(), e);
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        false,
+                        "User account is inactive",
+                        HttpStatus.FORBIDDEN.value(),
                         LocalDateTime.now()
                 ));
     }

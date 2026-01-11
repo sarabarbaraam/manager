@@ -3,8 +3,7 @@ package com.sarabarbara.manager.subscriptions;
 
 import com.sarabarbara.manager.subscriptions.dtos.CreateSubscriptionsPlanDTO;
 import com.sarabarbara.manager.subscriptions.dtos.SubscriptionsPlanDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -16,14 +15,20 @@ import java.util.List;
  * @since 10/01/2026
  */
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SubscriptionsPlanMapper {
-
-    @Mapping(target = "id", ignore = true)
 
     SubscriptionsPlan toEntity(SubscriptionsPlanRequest request);
     SubscriptionsPlanDTO toDTO(SubscriptionsPlan subscriptionPlan);
     List<SubscriptionsPlanDTO> toDTOList(List<SubscriptionsPlan> subscriptionPlans);
     CreateSubscriptionsPlanDTO toCreateSubscriptionsPlanDTO(SubscriptionsPlan subscriptionPlan);
-    void updateEntityFromRequest(SubscriptionsPlanRequest request, SubscriptionsPlan existingPlan);
+
+    @Mapping(target = "name", source = "request.name")
+    @Mapping(target = "price", source = "request.price")
+    @Mapping(target = "duration", source = "request.duration")
+    @Mapping(target = "description", source = "request.description")
+    @Mapping(target = "features", source = "request.features")
+    SubscriptionsPlan updateEntityFromRequest(SubscriptionsPlanRequest request, @MappingTarget SubscriptionsPlan existingPlan);
 }

@@ -20,7 +20,7 @@ import java.time.Period;
 public record SubscriptionsPlanDTO(
 
         @Schema(description = "The unique identifier of the subscription plan", example = "1")
-        Long idPlan,
+        Long id,
 
         @Enumerated(EnumType.STRING)
         @Schema(description = "The name of the subscription plan", example = "FREE PLAN")

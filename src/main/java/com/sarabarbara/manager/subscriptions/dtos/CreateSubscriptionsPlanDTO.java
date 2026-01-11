@@ -4,6 +4,8 @@ package com.sarabarbara.manager.subscriptions.dtos;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
+import java.time.Period;
+
 /**
  * CreateSubscriptionsPlanDTO class.
  *
@@ -23,7 +25,7 @@ public record CreateSubscriptionsPlanDTO(
         Double price,
 
         @Schema(description = "The duration of the subscription plan in months", examples = "1")
-        Integer durationInMonths,
+        Period duration,
 
         @Schema(description = "The description of the subscription plan", examples = "Access to all premium features")
         String description,
