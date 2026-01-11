@@ -3,10 +3,7 @@ package com.sarabarbara.manager.users;
 
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import com.sarabarbara.manager.users.dtos.UsersDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -24,8 +21,11 @@ import java.util.List;
 public interface UsersMapper {
 
     Users toEntity(UserRequest request);
+
     UsersDTO toDTO(Users user);
+
     List<UsersDTO> toDTOList(List<Users> user);
+
     CreateUserDTO toCreateUserDTO(Users user);
 
     @Mapping(target = "name", source = "request.name")
@@ -34,5 +34,5 @@ public interface UsersMapper {
     @Mapping(target = "password", source = "request.password")
     @Mapping(target = "genre", source = "request.genre")
     @Mapping(target = "profilePictureURL", source = "request.profilePictureURL")
-    Users updateEntityFromRequest(UserRequest request, Users existingUser);
+    Users updateEntityFromRequest(UserRequest request, @MappingTarget Users existingUser);
 }
