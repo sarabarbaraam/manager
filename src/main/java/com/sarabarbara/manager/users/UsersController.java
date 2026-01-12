@@ -4,6 +4,8 @@ package com.sarabarbara.manager.users;
 import com.sarabarbara.manager.shared.BaseResponse;
 import com.sarabarbara.manager.users.dtos.CreateUserDTO;
 import com.sarabarbara.manager.users.dtos.UsersDTO;
+import com.sarabarbara.manager.users.requestes.UpdateUserRequest;
+import com.sarabarbara.manager.users.requestes.UserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -160,7 +162,50 @@ public class UsersController {
                 .build();
     }
 
-    // todo: update controller
+    @Operation(summary = "Update an user",
+            description = "Update an user by the id from the authentication token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = SUCCESS_SUMMARY,
+                                    summary = SUCCESS,
+                                    value = UPDATE_USER_SUCCESSFUL_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = BAD_REQUEST_SUMMARY,
+                                    summary = BAD_REQUEST,
+                                    value = UPDATE_USER_BAD_REQUEST_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "404", description = NOT_FOUND,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = NOT_FOUND_SUMMARY,
+                                    summary = NOT_FOUND,
+                                    value = UPDATE_USER_NOT_FOUND_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
+                                    summary = INTERNAL_SERVER_ERROR,
+                                    value = UPDATE_USER_INTERNAL_SERVER_ERROR_RESPONSE
+                            )))
+    })
+    @PatchMapping("/settings")
+    public BaseResponse<UsersDTO> updateUser(@Valid @RequestBody UpdateUserRequest request) {
+
+        log.info("UsersController - updateUser called");
+        log.info("UsersController - updateUser finished with data: {}", request);
+        return BaseResponse
+                .<UsersDTO>builder()
+                .success(true)
+                .data(usersService.updateUser(request))
+                .message("User updated successfully")
+                .build();
+    }
 
     @Operation(summary = "Delete an user",
             description = "Delete an user by the id from the authentication token")

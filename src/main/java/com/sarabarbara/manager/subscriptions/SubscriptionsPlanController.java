@@ -4,6 +4,8 @@ package com.sarabarbara.manager.subscriptions;
 import com.sarabarbara.manager.shared.BaseResponse;
 import com.sarabarbara.manager.subscriptions.dtos.CreateSubscriptionsPlanDTO;
 import com.sarabarbara.manager.subscriptions.dtos.SubscriptionsPlanDTO;
+import com.sarabarbara.manager.subscriptions.requestes.SubscriptionsPlanRequest;
+import com.sarabarbara.manager.subscriptions.requestes.UpdateSubscriptionsPlanRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -212,7 +214,7 @@ public class SubscriptionsPlanController {
     })
     @PatchMapping("/update/{id}")
     public BaseResponse<SubscriptionsPlanDTO> updateSubscriptionPlan(@PathVariable Long id,
-                                                                     @Valid @RequestBody SubscriptionsPlanRequest request) {
+                                                                     @Valid @RequestBody UpdateSubscriptionsPlanRequest request) {
 
         log.info("SubscriptionsPlanController - updateSubscriptionPlan called");
         log.info("SubscriptionsPlanController - updateSubscriptionPlan finished with data: {}", request);

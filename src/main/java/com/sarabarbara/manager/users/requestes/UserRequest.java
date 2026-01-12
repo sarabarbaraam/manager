@@ -1,4 +1,4 @@
-package com.sarabarbara.manager.users;
+package com.sarabarbara.manager.users.requestes;
 
 
 import com.sarabarbara.manager.shared.GenreEnum;

@@ -3,6 +3,8 @@ package com.sarabarbara.manager.subscriptions;
 
 import com.sarabarbara.manager.subscriptions.dtos.CreateSubscriptionsPlanDTO;
 import com.sarabarbara.manager.subscriptions.dtos.SubscriptionsPlanDTO;
+import com.sarabarbara.manager.subscriptions.requestes.SubscriptionsPlanRequest;
+import com.sarabarbara.manager.subscriptions.requestes.UpdateSubscriptionsPlanRequest;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -31,5 +33,5 @@ public interface SubscriptionsPlanMapper {
     @Mapping(target = "description", source = "request.description")
     @Mapping(target = "features", source = "request.features")
     @Mapping(target = "active", source = "request.active")
-    SubscriptionsPlan updateEntityFromRequest(SubscriptionsPlanRequest request, @MappingTarget SubscriptionsPlan existingPlan);
+    SubscriptionsPlan updateEntityFromRequest(UpdateSubscriptionsPlanRequest request, @MappingTarget SubscriptionsPlan existingPlan);
 }

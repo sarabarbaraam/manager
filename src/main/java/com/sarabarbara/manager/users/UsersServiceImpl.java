@@ -12,9 +12,12 @@ import com.sarabarbara.manager.users.dtos.UsersDTO;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.users.exceptions.UserValidateException;
 import com.sarabarbara.manager.users.exceptions.UsersException;
+import com.sarabarbara.manager.users.requestes.UpdateUserRequest;
+import com.sarabarbara.manager.users.requestes.UserRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -133,8 +136,48 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public UsersDTO updateUser(Long idUser, UserRequest request) throws UserNotFoundException {
-        return null;
+    public UsersDTO updateUser(@NotNull UpdateUserRequest request) throws UserNotFoundException {
+
+        log.info("UsersServiceImpl - updateUser called");
+
+        Long id = authService.getCurrentUserId();
+        log.debug("Updating user with id: {}", id);
+
+        Users existingUser = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User with id " + id + " not found."));
+
+        log.debug("Existing user data: {}", existingUser);
+
+        if (request.username() != null && !request.username().equalsIgnoreCase(existingUser.getUsername())) {
+
+            log.debug("Validating new username: {}", request.username());
+            usernameValidator(request.username());
+
+            existingUser.setUsername(request.username());
+        }
+
+        if (request.email() != null && !request.email().equalsIgnoreCase(existingUser.getEmail())) {
+
+            log.debug("Validating new email: {}", request.email());
+            emailValidator(request.email());
+
+            existingUser.setEmail(request.email());
+        }
+
+        if (request.password() != null) {
+
+            log.debug("Validating and encoding new password");
+            passwordValidator(request.password());
+
+            existingUser.setPassword(passwordEncoder.encode(request.password()));
+        }
+
+        log.debug("Saving updated user data...");
+        userRepository.save(usersMapper.updateEntityFromRequest(request, existingUser));
+
+        log.info("User updated successfully: {}", existingUser);
+        return usersMapper.toDTO(existingUser);
     }
 
     @Override

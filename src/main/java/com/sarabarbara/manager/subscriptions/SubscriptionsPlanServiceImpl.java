@@ -4,6 +4,8 @@ package com.sarabarbara.manager.subscriptions;
 import com.sarabarbara.manager.subscriptions.dtos.CreateSubscriptionsPlanDTO;
 import com.sarabarbara.manager.subscriptions.dtos.SubscriptionsPlanDTO;
 import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionPlanNotFoundException;
+import com.sarabarbara.manager.subscriptions.requestes.SubscriptionsPlanRequest;
+import com.sarabarbara.manager.subscriptions.requestes.UpdateSubscriptionsPlanRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -75,7 +77,7 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
     }
 
     @Override
-    public SubscriptionsPlanDTO updateSubscriptionPlan(Long id, SubscriptionsPlanRequest request) {
+    public SubscriptionsPlanDTO updateSubscriptionPlan(Long id, UpdateSubscriptionsPlanRequest request) {
 
         log.info("SubscriptionsPlanServiceImpl - updateSubscriptionPlan called");
         log.debug("Updating subscription plan with id: {} with the following data: {}", id, request);
