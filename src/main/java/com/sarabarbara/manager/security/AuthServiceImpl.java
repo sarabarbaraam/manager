@@ -57,6 +57,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(@NotNull LoginRequest request) {
 
+        log.info("AuthService - login attempt for user {}", request.username());
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.username(),
@@ -69,27 +71,29 @@ public class AuthServiceImpl implements AuthService {
                 "UserDetails cannot be null"
         );
 
+        // todo: log inactive account login attempt. implement account activation flow
         if (!userDetails.isEnabled()) {
 
-            // todo log inactive account login attempt. implement account activation flow
             log.warn("Attempt to login with inactive account: {}", userDetails.getUsername());
             throw new DisabledException("User account is inactive");
         }
 
         String token = jwtUtilServiceImpl.generateToken(userDetails);
-
         if (token == null || token.isBlank()) {
+
             throw new IllegalStateException("Failed to generate JWT token");
         }
 
         Date expiration = jwtUtilServiceImpl.extractExpiration(token);
+
+        log.info("AuthService - login successful for user {}", userDetails.getUsername());
 
         return new AuthResponse(
                 token,
                 "Bearer ",
                 expiration.getTime()
         );
-
     }
+
 }
 

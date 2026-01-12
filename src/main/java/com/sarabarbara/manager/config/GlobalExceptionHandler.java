@@ -4,14 +4,18 @@ package com.sarabarbara.manager.config;
 import com.sarabarbara.manager.shared.ErrorResponse;
 import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionPlanNotFoundException;
 import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionsPlanException;
+import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionsPlanNoContentException;
+import com.sarabarbara.manager.subscriptions.exceptions.SubscriptionsPlanValidateException;
 import com.sarabarbara.manager.users.exceptions.UserNotFoundException;
 import com.sarabarbara.manager.users.exceptions.UserValidateException;
 import com.sarabarbara.manager.users.exceptions.UsersException;
+import com.sarabarbara.manager.users.exceptions.UsersNoContentException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -30,6 +34,22 @@ import java.time.LocalDateTime;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
+        log.error("Access denied: {}", e.getMessage(), e);
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        false,
+                        "You do not have permission to perform this action",
+                        HttpStatus.FORBIDDEN.value(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    // ================ Users Exceptions Handlers ================= //
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(UsersException.class)
@@ -64,8 +84,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ExceptionHandler(UsersException.class)
-    public ResponseEntity<ErrorResponse> handleUsersNoContentException(@NotNull UsersException e) {
+    @ExceptionHandler(UsersNoContentException.class)
+    public ResponseEntity<ErrorResponse> handleUsersNoContentException(@NotNull UsersNoContentException e) {
 
         log.error("No content: {}", e.getMessage());
         return ResponseEntity
@@ -93,9 +113,11 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    // ================ Subscriptions Plans Exceptions Handlers ================= //
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(SubscriptionsPlanException.class)
-    public ResponseEntity<ErrorResponse> handleSubscriptionsPlanInternalServerErrorException(UsersException e) {
+    public ResponseEntity<ErrorResponse> handleSubscriptionsPlanInternalServerErrorException(SubscriptionsPlanException e) {
 
         log.error("Internal server error: {}", e.getMessage(), e);
         return ResponseEntity
@@ -125,8 +147,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ExceptionHandler(SubscriptionsPlanException.class)
-    public ResponseEntity<ErrorResponse> handleSubscriptionsPlanNoContentException(@NotNull UsersException e) {
+    @ExceptionHandler(SubscriptionsPlanNoContentException.class)
+    public ResponseEntity<ErrorResponse> handleSubscriptionsPlanNoContentException(@NotNull SubscriptionsPlanNoContentException e) {
 
         log.error("No content: {}", e.getMessage());
         return ResponseEntity
@@ -140,8 +162,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UserValidateException.class)
-    public ResponseEntity<ErrorResponse> handleSubscriptionsPlanBadRequestException(@NonNull UserValidateException e) {
+    @ExceptionHandler(SubscriptionsPlanValidateException.class)
+    public ResponseEntity<ErrorResponse> handleSubscriptionsPlanBadRequestException(@NonNull SubscriptionsPlanValidateException e) {
 
         log.error("Validation failed: {}", e.getMessage());
         return ResponseEntity

@@ -4,9 +4,7 @@ package com.sarabarbara.manager.users;
 import com.sarabarbara.manager.shared.GenreEnum;
 import com.sarabarbara.manager.subscriptions.SubscriptionsPlan;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Users class.
@@ -17,6 +15,8 @@ import lombok.ToString;
  */
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "users")
@@ -54,7 +54,7 @@ public class Users {
     private RolesEnum role;
 
     @ManyToOne
-    @JoinColumn(name = "current_plan_name", nullable = false)
+    @JoinColumn(name = "current_plan", nullable = false)
     private SubscriptionsPlan currentPlan;
 
     private Boolean active;

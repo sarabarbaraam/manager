@@ -30,5 +30,6 @@ public interface SubscriptionsPlanMapper {
     @Mapping(target = "duration", source = "request.duration")
     @Mapping(target = "description", source = "request.description")
     @Mapping(target = "features", source = "request.features")
+    @Mapping(target = "active", source = "request.active")
     SubscriptionsPlan updateEntityFromRequest(SubscriptionsPlanRequest request, @MappingTarget SubscriptionsPlan existingPlan);
 }

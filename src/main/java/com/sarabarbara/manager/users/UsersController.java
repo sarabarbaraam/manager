@@ -41,21 +41,21 @@ public class UsersController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = REGISTER_USER_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = BAD_REQUEST_RESPONSE,
+                                    name = BAD_REQUEST_SUMMARY,
                                     summary = BAD_REQUEST,
                                     value = REGISTER_USER_BAD_REQUEST_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = REGISTER_USER_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
@@ -79,21 +79,21 @@ public class UsersController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = SEARCH_USER_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = BAD_REQUEST_RESPONSE,
+                                    name = BAD_REQUEST_SUMMARY,
                                     summary = BAD_REQUEST,
                                     value = SEARCH_USER_BAD_REQUEST_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = SEARCH_USER_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
@@ -119,28 +119,28 @@ public class UsersController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = SEARCH_USER_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = BAD_REQUEST_RESPONSE,
+                                    name = BAD_REQUEST_SUMMARY,
                                     summary = BAD_REQUEST,
                                     value = SEARCH_USER_BAD_REQUEST_RESPONSE
                             ))),
             @ApiResponse(responseCode = "404", description = NOT_FOUND,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = NOT_FOUND_RESPONSE,
+                                    name = NOT_FOUND_SUMMARY,
                                     summary = NOT_FOUND,
                                     value = SEARCH_USER_NOT_FOUND_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = SEARCH_USER_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
@@ -168,21 +168,21 @@ public class UsersController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = DELETE_USER_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "404", description = NOT_FOUND,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = NOT_FOUND_RESPONSE,
+                                    name = NOT_FOUND_SUMMARY,
                                     summary = NOT_FOUND,
                                     value = DELETE_USER_NOT_FOUND_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = DELETE_USER_INTERNAL_SERVER_ERROR_RESPONSE
                             )))

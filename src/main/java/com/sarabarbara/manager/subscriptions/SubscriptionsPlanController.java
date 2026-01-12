@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.sarabarbara.manager.shared.constants.APIConstants.*;
-import static com.sarabarbara.manager.shared.constants.SwaggerSubscriptionsPlanExamplesconstants.*;
+import static com.sarabarbara.manager.shared.constants.SwaggerSubscriptionsPlanExamplesConstants.*;
 
 /**
  * SubscriptionsPlanController class.
@@ -35,28 +36,46 @@ public class SubscriptionsPlanController {
 
     private final SubscriptionsPlanService subscriptionsPlanService;
 
-    @Operation(summary = "Register a subscriptions plan",
-            description = "Register a subscriptions plan for their name, price, duration and features")
+    @Operation(
+            summary = "Register a subscriptions plan",
+            description = "Register a subscriptions plan for their name, price, duration and features. " +
+                    "Only ADMIN users can access this endpoint.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
-                                    summary = SUCCESS,
+                                    name = SUCCESS,
+                                    summary = SUCCESS_SUMMARY,
                                     value = REGISTER_SUBSCRIPTION_PLAN_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = BAD_REQUEST_RESPONSE,
-                                    summary = BAD_REQUEST,
+                                    name = BAD_REQUEST,
+                                    summary = BAD_REQUEST_SUMMARY,
                                     value = REGISTER_SUBSCRIPTION_PLAN_BAD_REQUEST_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = UNAUTHORIZED,
+                                    summary = UNAUTHORIZED_SUMMARY,
+                                    value = REGISTER_SUBSCRIPTION_PLAN_UNAUTHORIZED_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "403", description = FORBIDDEN,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = FORBIDDEN,
+                                    summary = FORBIDDEN_SUMMARY,
+                                    value = REGISTER_SUBSCRIPTION_PLAN_FORBIDDEN_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
-                                    summary = INTERNAL_SERVER_ERROR,
+                                    name = INTERNAL_SERVER_ERROR,
+                                    summary = INTERNAL_SERVER_ERROR_SUMMARY,
                                     value = REGISTER_SUBSCRIPTION_PLAN_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
     })
@@ -79,28 +98,28 @@ public class SubscriptionsPlanController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = SEARCH_SUBSCRIPTION_PLAN_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = BAD_REQUEST_RESPONSE,
+                                    name = BAD_REQUEST_SUMMARY,
                                     summary = BAD_REQUEST,
                                     value = SEARCH_SUBSCRIPTION_PLAN_BAD_REQUEST_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = SEARCH_SUBSCRIPTION_PLAN_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
     })
     @GetMapping("get-all")
     public BaseResponse<List<SubscriptionsPlanDTO>> getSubscriptionsPlan(@RequestParam(defaultValue = "1") int page,
-                                                                        @RequestParam(defaultValue = "10") int size) {
+                                                                         @RequestParam(defaultValue = "10") int size) {
 
         log.info("SubscriptionsPlanController - getSubscriptionPlan called");
         log.info("SubscriptionsPlanController - getSubscriptionPlan finished");
@@ -119,28 +138,28 @@ public class SubscriptionsPlanController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = SEARCH_SUBSCRIPTION_PLAN_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = BAD_REQUEST_RESPONSE,
+                                    name = BAD_REQUEST_SUMMARY,
                                     summary = BAD_REQUEST,
                                     value = SEARCH_SUBSCRIPTION_PLAN_BAD_REQUEST_RESPONSE
                             ))),
             @ApiResponse(responseCode = "404", description = NOT_FOUND,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = NOT_FOUND_RESPONSE,
+                                    name = NOT_FOUND_SUMMARY,
                                     summary = NOT_FOUND,
                                     value = SEARCH_SUBSCRIPTION_PLAN_NOT_FOUND_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = SEARCH_SUBSCRIPTION_PLAN_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
@@ -166,27 +185,27 @@ public class SubscriptionsPlanController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = UPDATE_SUBSCRIPTION_PLAN_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = BAD_REQUEST_RESPONSE,
+                                    name = BAD_REQUEST_SUMMARY,
                                     summary = BAD_REQUEST,
                                     value = UPDATE_SUBSCRIPTION_PLAN_BAD_REQUEST_RESPONSE
                             ))),
             @ApiResponse(responseCode = "404", description = NOT_FOUND,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = NOT_FOUND_RESPONSE,
+                                    name = NOT_FOUND_SUMMARY,
                                     summary = NOT_FOUND,
                                     value = UPDATE_SUBSCRIPTION_PLAN_NOT_FOUND_RESPONSE))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = UPDATE_SUBSCRIPTION_PLAN_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
@@ -211,21 +230,21 @@ public class SubscriptionsPlanController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = SUCCESS_RESPONSE,
+                                    name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = DELETE_SUBSCRIPTION_PLAN_SUCCESSFUL_RESPONSE
                             ))),
             @ApiResponse(responseCode = "404", description = NOT_FOUND,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = NOT_FOUND_RESPONSE,
+                                    name = NOT_FOUND_SUMMARY,
                                     summary = NOT_FOUND,
                                     value = DELETE_SUBSCRIPTION_PLAN_NOT_FOUND_RESPONSE
                             ))),
             @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
-                                    name = INTERNAL_SERVER_ERROR_RESPONSE,
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
                                     summary = INTERNAL_SERVER_ERROR,
                                     value = DELETE_SUBSCRIPTION_PLAN_INTERNAL_SERVER_ERROR_RESPONSE
                             )))

@@ -29,9 +29,6 @@ public record UsersDTO(
         @Schema(description = "The username of the user", examples = "johnsmith")
         String username,
 
-        @Schema(description = "The password of the user", examples = "Testpassword123!")
-        String password,
-
         @Schema(description = "The email of the user", examples = "johnsmith@example.com")
         String email,
 

@@ -10,7 +10,8 @@ import lombok.Builder;
 import java.math.BigDecimal;
 import java.time.Period;
 
-import static com.sarabarbara.manager.subscriptions.SubscriptionsPlanConstants.*;
+import static com.sarabarbara.manager.subscriptions.SubscriptionsPlanConstants.SUBSCRIPTION_PLAN_DESCRIPTION_CHARACTERS_LIMIT;
+import static com.sarabarbara.manager.subscriptions.SubscriptionsPlanConstants.SUBSCRIPTION_PLAN_FEATURES_CHARACTERS_LIMIT;
 
 /**
  * SubscriptionsPlanRequest class.
@@ -25,14 +26,13 @@ import static com.sarabarbara.manager.subscriptions.SubscriptionsPlanConstants.*
 public record SubscriptionsPlanRequest(
 
         @Enumerated(EnumType.STRING)
-        @Size(min = 4, max = 20, message = SUBSCRIPTION_PLAN_NAME_CHARACTERS_LIMIT)
-        @Schema(description = "The name of the subscription plan", example = "FREE PLAN")
+        @Schema(description = "The name of the subscription plan", example = "FREE")
         SubscriptionsPlanEnum name,
 
         @Schema(description = "The price of the subscription plan", example = "0.00")
         BigDecimal price,
 
-        @Schema(description = "The duration of the subscription plan in months", example = "12", type = "integer")
+        @Schema(description = "The duration of the subscription plan in months", example = "P1M", type = "integer")
         Period duration,
 
         @Size(min = 40, max = 255, message = SUBSCRIPTION_PLAN_DESCRIPTION_CHARACTERS_LIMIT)
@@ -41,7 +41,10 @@ public record SubscriptionsPlanRequest(
 
         @Size(min = 10, max = 255, message = SUBSCRIPTION_PLAN_FEATURES_CHARACTERS_LIMIT)
         @Schema(description = "The features included in the subscription plan", example = "Mark as favorite, create lists")
-        String features
+        String features,
+
+        @Schema(description = "Indicates whether the subscription plan is active", example = "true")
+        Boolean active
 
 ) {
 }

@@ -15,7 +15,8 @@ import lombok.RequiredArgsConstructor;
 public enum RolesEnum {
 
     USER("USER"),
-    PREMIUM("PREMIUM");
+    PREMIUM("PREMIUM"),
+    ADMIN("ADMIN");
 
     private final String description;
 }

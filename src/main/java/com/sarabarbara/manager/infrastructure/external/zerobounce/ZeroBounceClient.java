@@ -24,6 +24,7 @@ public class ZeroBounceClient {
     private final ZeroBounceConfig zeroBounceConfig;
     private final RestTemplate restTemplate;
 
+    // todo: mirar por qué me devuelve error 403 forbidden 1020
     public EmailValidationResult emailIsReal(String email) {
 
         log.info("Checking if the email {} is real, disposable or spam trap...", email);

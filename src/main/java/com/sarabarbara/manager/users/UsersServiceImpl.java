@@ -79,6 +79,11 @@ public class UsersServiceImpl implements UsersService {
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("FREE plan not found"));
 
         user.setCurrentPlan(freePlan);
+        user.setActive(true);
+
+        log.debug("Usuario antes de guardar: {}", user);
+        log.debug("Plan asignado: {}", user.getCurrentPlan());
+        log.debug("Plan ID: {}", user.getCurrentPlan() != null ? user.getCurrentPlan().getId() : null);
 
         log.info("User created successfully: {}", user);
         userRepository.save(user);

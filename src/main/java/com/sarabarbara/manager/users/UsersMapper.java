@@ -21,11 +21,8 @@ import java.util.List;
 public interface UsersMapper {
 
     Users toEntity(UserRequest request);
-
     UsersDTO toDTO(Users user);
-
     List<UsersDTO> toDTOList(List<Users> user);
-
     CreateUserDTO toCreateUserDTO(Users user);
 
     @Mapping(target = "name", source = "request.name")

@@ -9,9 +9,9 @@ package com.sarabarbara.manager.shared.constants;
  * @since 08/01/2026
  */
 
-public class SwaggerSubscriptionsPlanExamplesconstants {
+public class SwaggerSubscriptionsPlanExamplesConstants {
 
-    private SwaggerSubscriptionsPlanExamplesconstants() {
+    private SwaggerSubscriptionsPlanExamplesConstants() {
     }
 
     // ==================================== REGISTER ====================================
@@ -28,6 +28,14 @@ public class SwaggerSubscriptionsPlanExamplesconstants {
             
             """;
 
+    public static final String REGISTER_SUBSCRIPTION_PLAN_FORBIDDEN_RESPONSE = """
+            
+            """;
+
+    public static final String REGISTER_SUBSCRIPTION_PLAN_UNAUTHORIZED_RESPONSE = """
+            
+            """;
+
     // ==================================== SEARCH ====================================
 
     public static final String SEARCH_SUBSCRIPTION_PLAN_SUCCESSFUL_RESPONSE = """
@@ -35,7 +43,7 @@ public class SwaggerSubscriptionsPlanExamplesconstants {
             """;
 
     public static final String SEARCH_SUBSCRIPTION_PLAN_BAD_REQUEST_RESPONSE = """
-
+            
             """;
 
     public static final String SEARCH_SUBSCRIPTION_PLAN_NOT_FOUND_RESPONSE = """
