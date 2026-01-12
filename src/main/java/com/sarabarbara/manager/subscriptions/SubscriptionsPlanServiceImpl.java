@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Period;
 import java.util.List;
 
 /**
@@ -39,6 +40,10 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
 
         log.debug("Creating the subscription plan with the following data: {}", request);
         SubscriptionsPlan subscriptionPlan = subscriptionsPlanMapper.toEntity(request);
+
+        Period duration = Period.parse(request.duration());
+        subscriptionPlan.setDuration(duration);
+
         SubscriptionsPlan savedPlan = subscriptionsPlanRepository.save(subscriptionPlan);
 
         return subscriptionsPlanMapper.toCreateSubscriptionsPlanDTO(savedPlan);
@@ -84,6 +89,9 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
 
         SubscriptionsPlan existingPlan = subscriptionsPlanRepository.findById(id)
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("Subscription plan with id " + id + " not found"));
+
+        Period duration = Period.parse(request.duration());
+        existingPlan.setDuration(duration);
 
         SubscriptionsPlan updatedPlan =
                 subscriptionsPlanRepository.save(subscriptionsPlanMapper.updateEntityFromRequest(request, existingPlan));

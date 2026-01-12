@@ -23,7 +23,7 @@ public record SubscriptionsPlanDTO(
         Long id,
 
         @Enumerated(EnumType.STRING)
-        @Schema(description = "The name of the subscription plan", example = "FREE PLAN")
+        @Schema(description = "The name of the subscription plan", example = "Free Plan")
         SubscriptionsPlanEnum name,
 
         @Schema(description = "The price of the subscription plan", example = "0.00")

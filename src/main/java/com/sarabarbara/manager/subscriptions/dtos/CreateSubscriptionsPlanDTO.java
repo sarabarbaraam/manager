@@ -18,7 +18,7 @@ import java.time.Period;
 @Schema(description = "DTO for creating a new subscription plan")
 public record CreateSubscriptionsPlanDTO(
 
-        @Schema(description = "The name of the subscription plan", examples = "Premium")
+        @Schema(description = "The name of the subscription plan", example = "Free Plan")
         String name,
 
         @Schema(description = "The price of the subscription plan", examples = "9.99")
