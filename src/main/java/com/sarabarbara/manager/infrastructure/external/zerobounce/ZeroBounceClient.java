@@ -4,9 +4,7 @@ package com.sarabarbara.manager.infrastructure.external.zerobounce;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
-import static com.sarabarbara.manager.infrastructure.external.zerobounce.ZeroBounceConstants.ZERO_BOUNCE_URL;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * ZeroBounceAPI class.
@@ -21,40 +19,35 @@ import static com.sarabarbara.manager.infrastructure.external.zerobounce.ZeroBou
 @RequiredArgsConstructor
 public class ZeroBounceClient {
 
+    private final WebClient zeroBounceWebClient;
     private final ZeroBounceConfig zeroBounceConfig;
-    private final RestTemplate restTemplate;
 
-    // todo: mirar por qué me devuelve error 403 forbidden 1020
+
     public EmailValidationResult emailIsReal(String email) {
 
         log.info("Checking if the email {} is real, disposable or spam trap...", email);
 
-        String apiKey = zeroBounceConfig.getApiKey();
-        String url = ZERO_BOUNCE_URL + "?email=" + email + "&api_key=" + apiKey;
+        EmailValidationResponse response = zeroBounceWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("https")
+                        .host("api.zerobounce.net")
+                        .path("/v2/validate")
+                        .queryParam("email", email)
+                        .queryParam("api_key", zeroBounceConfig.getApiKey())
+                        .build())
+                .retrieve()
+                .bodyToMono(EmailValidationResponse.class)
+                .block();
 
-        try {
-            EmailValidationResponse response =
-                    restTemplate.getForObject(url, EmailValidationResponse.class);
-
-            if (response == null) {
-                log.warn("ZeroBounce returned null. Falling back to unverified registration.");
-                return EmailValidationResult.unverified();
-            }
-
-            if ("valid".equals(response.status())
-                    && !"disposable".equals(response.subStatus())
-                    && !"spam trap".equals(response.subStatus())) {
-
-                log.info("Email {} is valid.", email);
-                return EmailValidationResult.success();
-            }
-
-            log.warn("Email {} is not acceptable: {}", email, response.subStatus());
-            return EmailValidationResult.invalid(response.subStatus());
-
-        } catch (Exception e) {
-            log.error("ZeroBounce API failed: {}. Falling back to unverified registration.", e.getMessage());
+        if (response == null) {
             return EmailValidationResult.unverified();
         }
+
+        if ("valid".equalsIgnoreCase(response.status())) {
+            return EmailValidationResult.success();
+        }
+
+        return EmailValidationResult.invalid(response.subStatus());
+
     }
 }

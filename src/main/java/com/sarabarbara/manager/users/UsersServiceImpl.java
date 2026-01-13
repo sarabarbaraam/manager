@@ -84,10 +84,6 @@ public class UsersServiceImpl implements UsersService {
         user.setCurrentPlan(freePlan);
         user.setActive(true);
 
-        log.debug("Usuario antes de guardar: {}", user);
-        log.debug("Plan asignado: {}", user.getCurrentPlan());
-        log.debug("Plan ID: {}", user.getCurrentPlan() != null ? user.getCurrentPlan().getId() : null);
-
         log.info("User created successfully: {}", user);
         userRepository.save(user);
 

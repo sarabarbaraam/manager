@@ -122,6 +122,12 @@
             <version>24.0.0</version>
         </dependency>
 
+        <!-- WebFlux (for WebClient) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
         <!-- ========================= -->
         <!-- TESTING -->
         <!-- ========================= -->

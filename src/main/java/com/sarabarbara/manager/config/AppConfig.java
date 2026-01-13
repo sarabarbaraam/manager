@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * AppConfig class.
@@ -86,6 +89,20 @@ public class AppConfig {
     @Bean
     public AuthenticationManager authenticationManager(@NotNull AuthenticationProvider provider) {
         return provider::authenticate;
+    }
+
+    @Bean
+    public WebClient zeroBounceWebClient() {
+
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector())
+                .defaultHeader(HttpHeaders.USER_AGENT,
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                                + "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .defaultHeader(HttpHeaders.ACCEPT, "application/json")
+                .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
+                .defaultHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate, br")
+                .build();
     }
 
 }
