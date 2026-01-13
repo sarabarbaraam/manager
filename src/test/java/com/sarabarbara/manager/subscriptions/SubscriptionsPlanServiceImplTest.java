@@ -23,13 +23,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
 
 /**
  * SubscriptionsPlanServiceImplTest class.
@@ -43,14 +39,14 @@ import static org.mockito.Mockito.never;
 @ActiveProfiles("test")
 public class SubscriptionsPlanServiceImplTest {
 
+    @InjectMocks
+    private SubscriptionsPlanServiceImpl service;
+
     @Mock
     private SubscriptionsPlanRepository subscriptionsPlanRepository;
 
     @Mock
     private SubscriptionsPlanMapper subscriptionsPlanMapper;
-
-    @InjectMocks
-    private SubscriptionsPlanServiceImpl service;
 
     private SubscriptionsPlan sampleEntity;
     private SubscriptionsPlan savedEntity;

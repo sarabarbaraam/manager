@@ -198,6 +198,20 @@ public class SubscriptionsPlanController {
                                     summary = BAD_REQUEST,
                                     value = UPDATE_SUBSCRIPTION_PLAN_BAD_REQUEST_RESPONSE
                             ))),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = UNAUTHORIZED,
+                                    summary = UNAUTHORIZED_SUMMARY,
+                                    value = REGISTER_SUBSCRIPTION_PLAN_UNAUTHORIZED_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "403", description = FORBIDDEN,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = FORBIDDEN,
+                                    summary = FORBIDDEN_SUMMARY,
+                                    value = REGISTER_SUBSCRIPTION_PLAN_FORBIDDEN_RESPONSE
+                            ))),
             @ApiResponse(responseCode = "404", description = NOT_FOUND,
                     content = @Content(mediaType = APPLICATION_JSON,
                             examples = @ExampleObject(
@@ -235,6 +249,20 @@ public class SubscriptionsPlanController {
                                     name = SUCCESS_SUMMARY,
                                     summary = SUCCESS,
                                     value = DELETE_SUBSCRIPTION_PLAN_SUCCESSFUL_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = UNAUTHORIZED,
+                                    summary = UNAUTHORIZED_SUMMARY,
+                                    value = REGISTER_SUBSCRIPTION_PLAN_UNAUTHORIZED_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "403", description = FORBIDDEN,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = FORBIDDEN,
+                                    summary = FORBIDDEN_SUMMARY,
+                                    value = REGISTER_SUBSCRIPTION_PLAN_FORBIDDEN_RESPONSE
                             ))),
             @ApiResponse(responseCode = "404", description = NOT_FOUND,
                     content = @Content(mediaType = APPLICATION_JSON,

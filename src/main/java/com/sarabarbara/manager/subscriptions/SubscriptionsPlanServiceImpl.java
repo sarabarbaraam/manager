@@ -90,9 +90,6 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
         SubscriptionsPlan existingPlan = subscriptionsPlanRepository.findById(id)
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("Subscription plan with id " + id + " not found"));
 
-        Period duration = Period.parse(request.duration());
-        existingPlan.setDuration(duration);
-
         SubscriptionsPlan updatedPlan =
                 subscriptionsPlanRepository.save(subscriptionsPlanMapper.updateEntityFromRequest(request, existingPlan));
 

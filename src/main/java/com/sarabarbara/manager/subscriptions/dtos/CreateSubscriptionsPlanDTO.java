@@ -4,7 +4,7 @@ package com.sarabarbara.manager.subscriptions.dtos;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
-import java.time.Period;
+import java.math.BigDecimal;
 
 /**
  * CreateSubscriptionsPlanDTO class.
@@ -22,10 +22,10 @@ public record CreateSubscriptionsPlanDTO(
         String name,
 
         @Schema(description = "The price of the subscription plan", examples = "9.99")
-        Double price,
+        BigDecimal price,
 
         @Schema(description = "The duration of the subscription plan in months", examples = "1")
-        Period duration,
+        String duration,
 
         @Schema(description = "The description of the subscription plan", examples = "Access to all premium features")
         String description,
