@@ -122,7 +122,7 @@ public class UsersServiceImpl implements UsersService {
         log.debug("Searching users with username: {}", username);
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Users> searchedUser = userRepository.findByUsernameIgnoreCaseAndActiveTrue(username, pageRequest);
+        Page<Users> searchedUser = userRepository.findByUsernameContainingIgnoreCaseAndActiveTrue(username, pageRequest);
 
         if (searchedUser.isEmpty()) {
 

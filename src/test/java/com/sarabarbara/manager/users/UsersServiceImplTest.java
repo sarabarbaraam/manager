@@ -207,7 +207,7 @@ public class UsersServiceImplTest {
         List<Users> list = Collections.singletonList(existingUser);
         Page<Users> page = new PageImpl<>(list, pageRequest, list.size());
 
-        when(userRepository.findByUsernameIgnoreCaseAndActiveTrue("existing", pageRequest)).thenReturn(page);
+        when(userRepository.findByUsernameContainingIgnoreCaseAndActiveTrue("existing", pageRequest)).thenReturn(page);
 
         UsersDTO dto = mock(UsersDTO.class);
         when(dto.username()).thenReturn("existing");
@@ -222,7 +222,7 @@ public class UsersServiceImplTest {
     @Test
     void getUserByUsername_notFound_throws() {
         Page<Users> emptyPage = new PageImpl<>(Collections.emptyList(), pageRequest, 0);
-        when(userRepository.findByUsernameIgnoreCaseAndActiveTrue("nope", pageRequest)).thenReturn(emptyPage);
+        when(userRepository.findByUsernameContainingIgnoreCaseAndActiveTrue("nope", pageRequest)).thenReturn(emptyPage);
 
         assertThrows(UserNotFoundException.class, () -> usersService.getUserByUsername("nope", 0, 10));
     }
