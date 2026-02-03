@@ -25,6 +25,7 @@ public interface SubscriptionsPlanMapper {
 
     SubscriptionsPlan toEntity(SubscriptionsPlanRequest request);
 
+    @Mapping(target = "formattedDuration", source = "formattedDuration")
     SubscriptionsPlanDTO toDTO(SubscriptionsPlan subscriptionPlan);
 
     List<SubscriptionsPlanDTO> toDTOList(List<SubscriptionsPlan> subscriptionPlans);

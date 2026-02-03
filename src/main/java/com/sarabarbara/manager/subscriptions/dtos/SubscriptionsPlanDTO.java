@@ -7,7 +7,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 import java.math.BigDecimal;
-import java.time.Period;
 
 /**
  * SubscriptionsPlanDTO class.
@@ -29,8 +28,8 @@ public record SubscriptionsPlanDTO(
         @Schema(description = "The price of the subscription plan", example = "0.00")
         BigDecimal price,
 
-        @Schema(description = "The duration of the subscription plan in months", example = "12", type = "integer")
-        Period duration,
+        @Schema(description = "The duration of the subscription plan in human-readable format", example = "12 months")
+        String formattedDuration,
 
         @Schema(description = "The description of the subscription plan", example = "This is a free plan with limited features.")
         String description,
