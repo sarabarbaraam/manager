@@ -61,7 +61,6 @@ public class SteamClient {
         log.debug("Searching for game: {}", gameName);
         log.debug("Searching...");
 
-        cacheManager.getCacheNames().forEach(name -> Objects.requireNonNull(cacheManager.getCache(name)).clear());
         List<GamesInfo> allGames = loadAllGames();
 
         String normalizeGameName = normalizeQuery(gameName);
