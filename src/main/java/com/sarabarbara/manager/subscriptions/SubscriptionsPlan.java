@@ -51,4 +51,16 @@ public class SubscriptionsPlan {
 
     private Boolean active;
 
+    @Transient
+    public String getDuration() {
+
+        int months = duration.getMonths();
+
+        if (months == 0) {
+
+            return "lifetime";
+        }
+
+        return months + (months == 1 ? " month" : " months");
+    }
 }

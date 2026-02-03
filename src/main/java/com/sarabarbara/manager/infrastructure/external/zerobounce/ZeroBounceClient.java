@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.infrastructure.external.zerobounce;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,12 +23,11 @@ public class ZeroBounceClient {
     private final WebClient zeroBounceWebClient;
     private final ZeroBounceConfig zeroBounceConfig;
 
-
     public EmailValidationResult emailIsReal(String email) {
 
         log.info("Checking if the email {} is real, disposable or spam trap...", email);
 
-        EmailValidationResponse response = zeroBounceWebClient.get()
+        String raw = zeroBounceWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
                         .host("api.zerobounce.net")
@@ -36,10 +36,19 @@ public class ZeroBounceClient {
                         .queryParam("api_key", zeroBounceConfig.getApiKey())
                         .build())
                 .retrieve()
-                .bodyToMono(EmailValidationResponse.class)
+                .bodyToMono(String.class)
                 .block();
 
-        if (response == null) {
+        if (raw == null || !raw.trim().startsWith("{")) {
+            log.error("ZeroBounce returned non‑JSON content: {}", raw);
+            return EmailValidationResult.unverified();
+        }
+
+        EmailValidationResponse response;
+        try {
+            response = new ObjectMapper().readValue(raw, EmailValidationResponse.class);
+        } catch (Exception e) {
+            log.error("Failed to parse ZeroBounce JSON: {}", raw);
             return EmailValidationResult.unverified();
         }
 
@@ -48,6 +57,7 @@ public class ZeroBounceClient {
         }
 
         return EmailValidationResult.invalid(response.subStatus());
-
     }
+
 }
+
