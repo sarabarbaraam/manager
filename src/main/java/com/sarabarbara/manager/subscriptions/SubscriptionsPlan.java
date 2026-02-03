@@ -52,7 +52,7 @@ public class SubscriptionsPlan {
     private Boolean active;
 
     @Transient
-    public String getDuration() {
+    public String getFormattedDuration() {
 
         int months = duration.getMonths();
 
