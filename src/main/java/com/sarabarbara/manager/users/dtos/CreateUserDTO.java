@@ -36,6 +36,6 @@ public record CreateUserDTO(
         @Schema(description = "The profile picture url of the user", examples = "pp.png")
         String profilePictureURL,
 
-        @Schema(description = "Indicates the user's current plan'", examples = "FREE")
+        @Schema(description = "Indicates the user's current plan", examples = "FREE")
         SubscriptionsPlan currentPlan) {
 }
