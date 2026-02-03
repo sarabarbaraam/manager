@@ -30,7 +30,7 @@ public record SubscriptionsPlanDTO(
         BigDecimal price,
 
         @JsonProperty("duration")
-        @Schema(description = "The duration of the subscription plan in human-readable format", example = "12 months")
+        @Schema(description = "The duration of the subscription plan in months", example = "12 months")
         String formattedDuration,
 
         @Schema(description = "The description of the subscription plan", example = "This is a free plan with limited features.")
