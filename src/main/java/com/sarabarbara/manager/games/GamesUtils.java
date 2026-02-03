@@ -75,7 +75,7 @@ public class GamesUtils {
 
     public static void gameType(@NonNull GameListDTO games, List<GameListDTO> gamesList) {
 
-        if (games.type() != null && "game".equalsIgnoreCase(games.type()) || "dlc".equalsIgnoreCase(games.type())) {
+        if (games.type() != null && ("game".equalsIgnoreCase(games.type()) || "dlc".equalsIgnoreCase(games.type()))) {
 
             gamesList.add(games);
         }
