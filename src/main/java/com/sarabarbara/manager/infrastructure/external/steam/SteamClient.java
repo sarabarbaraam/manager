@@ -180,26 +180,34 @@ public class SteamClient {
 
             String base = m.group(1).trim();
             int number;
+          
             try {
+              
                 number = Integer.parseInt(m.group(2));
+              
             } catch (NumberFormatException e) {
+              
                 log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
                 return -1000;
             }
             String roman = toRoman(number);
             String word = numberToWord(number);
 
-            boolean containsBase = name.contains(base);
-            boolean containsArabic = name.contains(String.valueOf(number));
-            boolean containsRoman = name.contains(roman);
-            boolean containsWord = name.contains(word);
+                boolean containsBase = name.contains(base);
+                boolean containsArabic = name.contains(String.valueOf(number));
+                boolean containsRoman = name.contains(roman);
+                boolean containsWord = name.contains(word);
 
-            if (containsBase && (containsArabic || containsRoman || containsWord)) return 2000;
+                if (containsBase && (containsArabic || containsRoman || containsWord)) return 2000;
 
-            if (containsBase) return 800;
+                if (containsBase) return 800;
 
-            if (containsArabic || containsRoman || containsWord)
-                return -500;
+                if (containsArabic || containsRoman || containsWord)
+                    return -500;
+            } catch (NumberFormatException e) {
+                log.debug("Failed to parse number from query '{}': {}", query, e.getMessage());
+                return -1000;
+            }
         }
 
         return -1000;
@@ -232,29 +240,37 @@ public class SteamClient {
 
         String base = m.group(1);
         int number;
+      
         try {
+          
             number = Integer.parseInt(m.group(2));
+          
         } catch (NumberFormatException e) {
+          
             log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
             return List.of();
         }
 
-        String roman = toRoman(number);
-        String word = numberToWord(number);
+            String roman = toRoman(number);
+            String word = numberToWord(number);
 
-        return allGames.stream()
-                .filter(g -> {
+            return allGames.stream()
+                    .filter(g -> {
 
-                    String name = g.name().toLowerCase();
+                        String name = g.name().toLowerCase();
 
-                    if (!name.contains(base)) return false;
+                        if (!name.contains(base)) return false;
 
-                    return name.contains(String.valueOf(number))
-                            || name.contains(roman)
-                            || name.contains(word);
-                })
-                .map(this::toSearchDTO)
-                .toList();
+                        return name.contains(String.valueOf(number))
+                                || name.contains(roman)
+                                || name.contains(word);
+                    })
+                    .map(this::toSearchDTO)
+                    .toList();
+        } catch (NumberFormatException e) {
+            log.debug("Failed to parse number from query '{}': {}", query, e.getMessage());
+            return List.of();
+        }
     }
 
     private @NotNull @Unmodifiable List<GameSearchDTO> fuzzySearch(@NotNull List<GamesInfo> allGames, String query) {
