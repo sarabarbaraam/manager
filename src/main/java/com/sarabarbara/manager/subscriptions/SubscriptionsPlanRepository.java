@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * SubcriptionsPlanRepository class.
+ * SubscriptionsPlanRepository class.
  *
  * @author sarabarbaraam
  * @version 1.0
