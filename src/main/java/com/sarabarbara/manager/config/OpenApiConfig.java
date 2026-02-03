@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * OpenApiCondig class.
+ * OpenApiConfig class.
  *
  * @author sarabarbaraam
  * @version 1.0
