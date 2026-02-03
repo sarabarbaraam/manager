@@ -24,7 +24,7 @@ import static com.sarabarbara.manager.shared.constants.APIConstants.*;
 import static com.sarabarbara.manager.shared.constants.SwaggerGamesExamplesConstants.*;
 
 /**
- * GamesConrtroller class.
+ * GamesController class.
  *
  * @author sarabarbaraam
  * @version 1.0
