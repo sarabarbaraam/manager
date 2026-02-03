@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.subscriptions.dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sarabarbara.manager.subscriptions.SubscriptionsPlanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
@@ -28,6 +29,7 @@ public record SubscriptionsPlanDTO(
         @Schema(description = "The price of the subscription plan", example = "0.00")
         BigDecimal price,
 
+        @JsonProperty("duration")
         @Schema(description = "The duration of the subscription plan in human-readable format", example = "12 months")
         String formattedDuration,
 
