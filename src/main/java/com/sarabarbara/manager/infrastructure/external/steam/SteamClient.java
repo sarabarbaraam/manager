@@ -197,7 +197,6 @@ public class SteamClient {
                     return -500;
             } catch (NumberFormatException e) {
                 log.debug("Failed to parse number from query '{}': {}", query, e.getMessage());
-                // If the number is too large or invalid, treat query as plain text
                 return -1000;
             }
         }
@@ -252,7 +251,6 @@ public class SteamClient {
                     .toList();
         } catch (NumberFormatException e) {
             log.debug("Failed to parse number from query '{}': {}", query, e.getMessage());
-            // If the number is too large or invalid, skip numeric fallback
             return List.of();
         }
     }
