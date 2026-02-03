@@ -179,7 +179,6 @@ public class SteamClient {
         if (m.find()) {
 
             String base = m.group(1).trim();
-            
             try {
                 int number = Integer.parseInt(m.group(2));
                 String roman = toRoman(number);
@@ -232,7 +231,6 @@ public class SteamClient {
         if (!m.find()) return List.of();
 
         String base = m.group(1);
-        
         try {
             int number = Integer.parseInt(m.group(2));
 
