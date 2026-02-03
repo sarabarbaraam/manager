@@ -183,7 +183,7 @@ public class SteamClient {
             try {
                 number = Integer.parseInt(m.group(2));
             } catch (NumberFormatException e) {
-                log.warn("Failed to parse number from query '{}': {}", query, e.getMessage());
+                log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
                 return -1000;
             }
             String roman = toRoman(number);
@@ -235,7 +235,7 @@ public class SteamClient {
         try {
             number = Integer.parseInt(m.group(2));
         } catch (NumberFormatException e) {
-            log.warn("Failed to parse number from query '{}': {}", query, e.getMessage());
+            log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
             return List.of();
         }
 
