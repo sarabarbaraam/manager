@@ -2,7 +2,7 @@ package com.sarabarbara.manager.shared.constants;
 
 
 /**
- * SwaggerSubscriptionsPlanExamplesconstants class.
+ * SwaggerSubscriptionsPlanExamplesConstants class.
  *
  * @author sarabarbaraam
  * @version 1.0
