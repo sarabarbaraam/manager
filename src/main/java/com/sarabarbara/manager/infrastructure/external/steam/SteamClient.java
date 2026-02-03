@@ -27,8 +27,9 @@ import java.util.regex.Pattern;
 
 import static com.sarabarbara.manager.games.GamesUtils.normalizeName;
 import static com.sarabarbara.manager.games.GamesUtils.normalizeQuery;
-import static com.sarabarbara.manager.infrastructure.external.steam.SteamAPIConstants.GET_ALL_GAMES;
-import static com.sarabarbara.manager.shared.utils.Utils.*;
+import static com.sarabarbara.manager.infrastructure.external.steam.SteamAPIConstants.*;
+import static com.sarabarbara.manager.shared.utils.Utils.numberToWord;
+import static com.sarabarbara.manager.shared.utils.Utils.toRoman;
 
 /**
  * SteamClient class.
@@ -180,34 +181,31 @@ public class SteamClient {
 
             String base = m.group(1).trim();
             int number;
-          
+
             try {
-              
+
                 number = Integer.parseInt(m.group(2));
-              
+
             } catch (NumberFormatException e) {
-              
+
                 log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
                 return -1000;
             }
+
             String roman = toRoman(number);
             String word = numberToWord(number);
 
-                boolean containsBase = name.contains(base);
-                boolean containsArabic = name.contains(String.valueOf(number));
-                boolean containsRoman = name.contains(roman);
-                boolean containsWord = name.contains(word);
+            boolean containsBase = name.contains(base);
+            boolean containsArabic = name.contains(String.valueOf(number));
+            boolean containsRoman = name.contains(roman);
+            boolean containsWord = name.contains(word);
 
-                if (containsBase && (containsArabic || containsRoman || containsWord)) return 2000;
+            if (containsBase && (containsArabic || containsRoman || containsWord)) return 2000;
 
-                if (containsBase) return 800;
+            if (containsBase) return 800;
 
-                if (containsArabic || containsRoman || containsWord)
-                    return -500;
-            } catch (NumberFormatException e) {
-                log.debug("Failed to parse number from query '{}': {}", query, e.getMessage());
-                return -1000;
-            }
+            if (containsArabic || containsRoman || containsWord)
+                return -500;
         }
 
         return -1000;
@@ -240,37 +238,33 @@ public class SteamClient {
 
         String base = m.group(1);
         int number;
-      
+
         try {
-          
+
             number = Integer.parseInt(m.group(2));
-          
+
         } catch (NumberFormatException e) {
-          
+
             log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
             return List.of();
         }
 
-            String roman = toRoman(number);
-            String word = numberToWord(number);
+        String roman = toRoman(number);
+        String word = numberToWord(number);
 
-            return allGames.stream()
-                    .filter(g -> {
+        return allGames.stream()
+                .filter(g -> {
 
-                        String name = g.name().toLowerCase();
+                    String name = g.name().toLowerCase();
 
-                        if (!name.contains(base)) return false;
+                    if (!name.contains(base)) return false;
 
-                        return name.contains(String.valueOf(number))
-                                || name.contains(roman)
-                                || name.contains(word);
-                    })
-                    .map(this::toSearchDTO)
-                    .toList();
-        } catch (NumberFormatException e) {
-            log.debug("Failed to parse number from query '{}': {}", query, e.getMessage());
-            return List.of();
-        }
+                    return name.contains(String.valueOf(number))
+                            || name.contains(roman)
+                            || name.contains(word);
+                })
+                .map(this::toSearchDTO)
+                .toList();
     }
 
     private @NotNull @Unmodifiable List<GameSearchDTO> fuzzySearch(@NotNull List<GamesInfo> allGames, String query) {
@@ -293,7 +287,7 @@ public class SteamClient {
 
     public StoreSearchResponseDTO searchGameFromSteamDb(String query) {
 
-        String url = "https://steamdb.info/api/SteamRailgun/?q=" +
+        String url = GET_GAMES_STEAM_DB +
                 URLEncoder.encode(query, StandardCharsets.UTF_8);
 
         int maxRetries = 3;
@@ -369,9 +363,10 @@ public class SteamClient {
     public List<GameSearchDTO> searchSteamStore(String query) {
 
         try {
-            String url = "https://store.steampowered.com/api/storesearch/?term=" +
+            String url = GET_GAMES_STEAM_STORE +
                     URLEncoder.encode(query, StandardCharsets.UTF_8) +
-                    "&l=english&cc=US";
+                    L_ENGLISH +
+                    CC_US;
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -471,9 +466,4 @@ public class SteamClient {
 
         return jaro + prefix * 0.1 * (1 - jaro);
     }
-
-
 }
-
-
-
