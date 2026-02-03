@@ -179,10 +179,19 @@ public class SteamClient {
         if (m.find()) {
 
             String base = m.group(1).trim();
+            int number;
+          
             try {
-                int number = Integer.parseInt(m.group(2));
-                String roman = toRoman(number);
-                String word = numberToWord(number);
+              
+                number = Integer.parseInt(m.group(2));
+              
+            } catch (NumberFormatException e) {
+              
+                log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
+                return -1000;
+            }
+            String roman = toRoman(number);
+            String word = numberToWord(number);
 
                 boolean containsBase = name.contains(base);
                 boolean containsArabic = name.contains(String.valueOf(number));
@@ -230,8 +239,17 @@ public class SteamClient {
         if (!m.find()) return List.of();
 
         String base = m.group(1);
+        int number;
+      
         try {
-            int number = Integer.parseInt(m.group(2));
+          
+            number = Integer.parseInt(m.group(2));
+          
+        } catch (NumberFormatException e) {
+          
+            log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
+            return List.of();
+        }
 
             String roman = toRoman(number);
             String word = numberToWord(number);
