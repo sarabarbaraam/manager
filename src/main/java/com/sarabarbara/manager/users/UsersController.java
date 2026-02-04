@@ -1,0 +1,249 @@
+package com.sarabarbara.manager.users;
+
+
+import com.sarabarbara.manager.shared.BaseResponse;
+import com.sarabarbara.manager.users.dtos.CreateUserDTO;
+import com.sarabarbara.manager.users.dtos.UsersDTO;
+import com.sarabarbara.manager.users.requestes.UpdateUserRequest;
+import com.sarabarbara.manager.users.requestes.UserRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static com.sarabarbara.manager.shared.constants.APIConstants.*;
+import static com.sarabarbara.manager.shared.constants.SwaggerUsersExamplesConstants.*;
+
+/**
+ * UsersController class.
+ *
+ * @author sarabarbaraam
+ * @version 1.0
+ * @since 30/12/2025
+ */
+
+@Slf4j
+@AllArgsConstructor
+@RestController
+@RequestMapping("/api/v1/users")
+public class UsersController {
+
+    private final UsersService usersService;
+
+    @Operation(summary = "Register an user",
+            description = "Register an user for their name, username, password, email and profile picture")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = SUCCESS_SUMMARY,
+                                    summary = SUCCESS,
+                                    value = REGISTER_USER_SUCCESSFUL_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = BAD_REQUEST_SUMMARY,
+                                    summary = BAD_REQUEST,
+                                    value = REGISTER_USER_BAD_REQUEST_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
+                                    summary = INTERNAL_SERVER_ERROR,
+                                    value = REGISTER_USER_INTERNAL_SERVER_ERROR_RESPONSE
+                            )))
+    })
+    @PostMapping("/register")
+    public BaseResponse<CreateUserDTO> registerUser(@Valid @RequestBody UserRequest request) {
+
+        log.info("UsersController - registerUser called");
+        log.info("UsersController - registerUser finished with data: {}", request);
+        return BaseResponse
+                .<CreateUserDTO>builder()
+                .success(true)
+                .data(usersService.createUser(request))
+                .message("User created successfully")
+                .build();
+    }
+
+    @Operation(summary = "Search users",
+            description = "Search all users with pagination support")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = SUCCESS_SUMMARY,
+                                    summary = SUCCESS,
+                                    value = SEARCH_USER_SUCCESSFUL_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = BAD_REQUEST_SUMMARY,
+                                    summary = BAD_REQUEST,
+                                    value = SEARCH_USER_BAD_REQUEST_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
+                                    summary = INTERNAL_SERVER_ERROR,
+                                    value = SEARCH_USER_INTERNAL_SERVER_ERROR_RESPONSE
+                            )))
+    })
+    @GetMapping("/get-all")
+    public BaseResponse<List<UsersDTO>> getUsers(@RequestParam(defaultValue = "1") int page,
+                                                 @RequestParam(defaultValue = "10") int size) {
+
+        log.info("UsersController - getUsers called");
+        log.info("UsersController - getUsers finished");
+        return BaseResponse
+                .<List<UsersDTO>>builder()
+                .success(true)
+                .data(usersService.getUsers(page - 1, size))
+                .message("Users retrieved successfully")
+                .build();
+
+    }
+
+    @Operation(summary = "Searches an user by username",
+            description = "Searches an user for their username. Supports pagination and partial matches.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = SUCCESS_SUMMARY,
+                                    summary = SUCCESS,
+                                    value = SEARCH_USER_SUCCESSFUL_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = BAD_REQUEST_SUMMARY,
+                                    summary = BAD_REQUEST,
+                                    value = SEARCH_USER_BAD_REQUEST_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "404", description = NOT_FOUND,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = NOT_FOUND_SUMMARY,
+                                    summary = NOT_FOUND,
+                                    value = SEARCH_USER_NOT_FOUND_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
+                                    summary = INTERNAL_SERVER_ERROR,
+                                    value = SEARCH_USER_INTERNAL_SERVER_ERROR_RESPONSE
+                            )))
+    })
+    @GetMapping("/search/{username}")
+    public BaseResponse<List<UsersDTO>> searchUser(@PathVariable String username,
+                                                   @RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "10") int size) {
+
+        log.info("UsersController - searchUser called");
+        log.info("UsersController - searchUser finished");
+        return BaseResponse
+                .<List<UsersDTO>>builder()
+                .success(true)
+                .data(usersService.getUserByUsername(username, page - 1, size))
+                .message("Search completed successfully")
+                .build();
+    }
+
+    @Operation(summary = "Update an user",
+            description = "Update an user by the id from the authentication token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = SUCCESS_SUMMARY,
+                                    summary = SUCCESS,
+                                    value = UPDATE_USER_SUCCESSFUL_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = BAD_REQUEST_SUMMARY,
+                                    summary = BAD_REQUEST,
+                                    value = UPDATE_USER_BAD_REQUEST_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "404", description = NOT_FOUND,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = NOT_FOUND_SUMMARY,
+                                    summary = NOT_FOUND,
+                                    value = UPDATE_USER_NOT_FOUND_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
+                                    summary = INTERNAL_SERVER_ERROR,
+                                    value = UPDATE_USER_INTERNAL_SERVER_ERROR_RESPONSE
+                            )))
+    })
+    @PatchMapping("/settings")
+    public BaseResponse<UsersDTO> updateUser(@Valid @RequestBody UpdateUserRequest request) {
+
+        log.info("UsersController - updateUser called");
+        log.info("UsersController - updateUser finished with data: {}", request);
+        return BaseResponse
+                .<UsersDTO>builder()
+                .success(true)
+                .data(usersService.updateUser(request))
+                .message("User updated successfully")
+                .build();
+    }
+
+    @Operation(summary = "Delete an user",
+            description = "Delete an user by the id from the authentication token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = SUCCESS_SUMMARY,
+                                    summary = SUCCESS,
+                                    value = DELETE_USER_SUCCESSFUL_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "404", description = NOT_FOUND,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = NOT_FOUND_SUMMARY,
+                                    summary = NOT_FOUND,
+                                    value = DELETE_USER_NOT_FOUND_RESPONSE
+                            ))),
+            @ApiResponse(responseCode = "500", description = INTERNAL_SERVER_ERROR,
+                    content = @Content(mediaType = APPLICATION_JSON,
+                            examples = @ExampleObject(
+                                    name = INTERNAL_SERVER_ERROR_SUMMARY,
+                                    summary = INTERNAL_SERVER_ERROR,
+                                    value = DELETE_USER_INTERNAL_SERVER_ERROR_RESPONSE
+                            )))
+    })
+    @DeleteMapping("/settings")
+    public BaseResponse<String> deleteUser() {
+
+        log.info("UsersController - deleteUser called");
+        usersService.deleteUser();
+
+        log.info("UsersController - deleteUser finished");
+        return BaseResponse
+                .<String>builder()
+                .success(true)
+                .message("User deleted successfully")
+                .build();
+    }
+
+}
