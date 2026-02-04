@@ -170,10 +170,10 @@ public class UsersServiceImpl implements UsersService {
         }
 
         log.debug("Saving updated user data...");
-        userRepository.save(usersMapper.updateEntityFromRequest(request, existingUser));
+        Users updatedUser = userRepository.save(usersMapper.updateEntityFromRequest(request, existingUser));
 
-        log.info("User updated successfully: {}", existingUser);
-        return usersMapper.toDTO(existingUser);
+        log.info("User updated successfully: {}", updatedUser);
+        return usersMapper.toDTO(updatedUser);
     }
 
     @Override
