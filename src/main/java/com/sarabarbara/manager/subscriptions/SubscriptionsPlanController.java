@@ -119,7 +119,7 @@ public class SubscriptionsPlanController {
                                     value = SEARCH_SUBSCRIPTION_PLAN_INTERNAL_SERVER_ERROR_RESPONSE
                             )))
     })
-    @GetMapping("get-all")
+    @GetMapping
     public BaseResponse<List<SubscriptionsPlanDTO>> getSubscriptionsPlan(@RequestParam(defaultValue = "1") int page,
                                                                          @RequestParam(defaultValue = "10") int size) {
 

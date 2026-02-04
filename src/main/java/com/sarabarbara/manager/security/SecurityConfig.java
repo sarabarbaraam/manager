@@ -43,10 +43,12 @@ public class SecurityConfig {
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/**",
                                 "/api/v1/games/**",
+                                "/api/v1/subscriptions-plans/search/{id}",
+                                "/api/v1/subscriptions-plans",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        .requestMatchers("/api/v1/subscriptions-plans/register").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/subscriptions-plans/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 

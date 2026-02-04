@@ -7,7 +7,6 @@ import com.sarabarbara.manager.subscriptions.requestes.SubscriptionsPlanRequest;
 import com.sarabarbara.manager.subscriptions.requestes.UpdateSubscriptionsPlanRequest;
 import org.mapstruct.*;
 
-import java.time.Period;
 import java.util.List;
 
 /**
@@ -39,9 +38,4 @@ public interface SubscriptionsPlanMapper {
     @Mapping(target = "active", source = "request.active")
     SubscriptionsPlan updateEntityFromRequest(UpdateSubscriptionsPlanRequest request, @MappingTarget SubscriptionsPlan existingPlan);
 
-    // ===================== Custom Mappings =====================
-
-    default Period mapDuration(String duration) {
-        return duration == null ? null : Period.parse(duration);
-    }
 }
