@@ -242,7 +242,7 @@ public class UsersServiceImpl implements UsersService {
         return result;
     }
 
-    public static void passwordValidator(String password) {
+    public void passwordValidator(String password) {
 
         final Pattern pattern = Pattern.compile(PASSWORD_REGEX);
 
