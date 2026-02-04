@@ -154,10 +154,14 @@ public class SubscriptionsPlanServiceImplTest {
     void updateSubscriptionPlan_success_updatesDuration_and_returnsDto() {
         Long id = 1L;
         UpdateSubscriptionsPlanRequest request = mock(UpdateSubscriptionsPlanRequest.class);
-        when(request.duration()).thenReturn("P2M");
+        lenient().when(request.duration()).thenReturn("P2M");
 
         when(subscriptionsPlanRepository.findById(id)).thenReturn(Optional.of(sampleEntity));
-        when(subscriptionsPlanMapper.updateEntityFromRequest(request, sampleEntity)).thenReturn(sampleEntity);
+        when(subscriptionsPlanMapper.updateEntityFromRequest(request, sampleEntity)).thenAnswer(inv -> {
+            // Simulate MapStruct behavior: parse duration and set it on the entity
+            sampleEntity.setDuration(Period.parse("P2M"));
+            return sampleEntity;
+        });
         when(subscriptionsPlanRepository.save(any(SubscriptionsPlan.class))).thenAnswer(inv -> inv.getArgument(0));
 
         SubscriptionsPlanDTO expectedDto = mock(SubscriptionsPlanDTO.class);
@@ -186,8 +190,13 @@ public class SubscriptionsPlanServiceImplTest {
     void updateSubscriptionPlan_invalidDuration_throwsDateTimeParseException() {
         Long id = 1L;
         UpdateSubscriptionsPlanRequest request = mock(UpdateSubscriptionsPlanRequest.class);
-        when(request.duration()).thenReturn("bad");
+        lenient().when(request.duration()).thenReturn("bad");
         when(subscriptionsPlanRepository.findById(id)).thenReturn(Optional.of(sampleEntity));
+        when(subscriptionsPlanMapper.updateEntityFromRequest(request, sampleEntity)).thenAnswer(inv -> {
+            // Simulate MapStruct behavior: attempt to parse invalid duration
+            Period.parse("bad");
+            return sampleEntity;
+        });
 
         assertThrows(DateTimeParseException.class, () -> service.updateSubscriptionPlan(id, request));
         verify(subscriptionsPlanRepository, never()).save(any());
