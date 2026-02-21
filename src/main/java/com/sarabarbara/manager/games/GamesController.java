@@ -1,8 +1,8 @@
 package com.sarabarbara.manager.games;
 
 
+import com.sarabarbara.manager.games.dtos.GameAutocompleteDTO;
 import com.sarabarbara.manager.games.dtos.GameListDTO;
-import com.sarabarbara.manager.games.dtos.GameSearchDTO;
 import com.sarabarbara.manager.games.dtos.GameSheetDTO;
 import com.sarabarbara.manager.shared.BaseResponse;
 import com.sarabarbara.manager.shared.PagedResponse;
@@ -40,8 +40,20 @@ public class GamesController {
 
     private final GamesService gamesService;
 
-    @Operation(summary = "List of games",
-            description = "List of games based on the searched games. Supports pagination")
+    @GetMapping("/search")
+    public ResponseEntity<BaseResponse<List<GameAutocompleteDTO>>> autocomplete(@RequestParam String query) {
+
+        log.info("GamesController - autocomplete called");
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponse
+                .<List<GameAutocompleteDTO>>builder()
+                .success(true)
+                .data(gamesService.autocomplete(query))
+                .message("Autocomplete results retrieved successfully")
+                .build());
+    }
+
+    @Operation(summary = "List of games by filters",
+            description = "List of games based on the provided search criteria as genre, platform... Supports pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = APPLICATION_JSON,
@@ -72,8 +84,8 @@ public class GamesController {
                                     value = LIST_GAME_INTERNAL_ERROR_RESPONSE
                             )))
     })
-    @GetMapping("/search/{searchedGame}")
-    public ResponseEntity<BaseResponse<PagedResponse<GameListDTO>>> listGames(@PathVariable List<GameSearchDTO> searchedGame,
+    @GetMapping("/search/filter/{filteredGames}")
+    public ResponseEntity<BaseResponse<PagedResponse<GameListDTO>>> listGames(@PathVariable List<GameAutocompleteDTO> filteredGames,
                                                                               @RequestParam(defaultValue = "1") int page,
                                                                               @RequestParam(defaultValue = "10") int size) {
 
@@ -81,7 +93,7 @@ public class GamesController {
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse
                 .<PagedResponse<GameListDTO>>builder()
                 .success(true)
-                .data(gamesService.listGames(searchedGame, page - 1, size))
+                .data(gamesService.listGames(filteredGames, page - 1, size))
                 .message("List of games completed successfully")
                 .build());
     }
@@ -118,16 +130,16 @@ public class GamesController {
                                     value = SEARCH_GAME_INTERNAL_ERROR_RESPONSE
                             )))
     })
-    @GetMapping("/{gameName}")
-    public ResponseEntity<BaseResponse<PagedResponse<GameSearchDTO>>> searchGame(@PathVariable String gameName,
-                                                                                 @RequestParam(defaultValue = "1") int page,
-                                                                                 @RequestParam(defaultValue = "10") int size) {
+    @GetMapping("/search/{gameName}")
+    public ResponseEntity<BaseResponse<PagedResponse<GameListDTO>>> getGames(@PathVariable String gameName,
+                                                                             @RequestParam(defaultValue = "1") int page,
+                                                                             @RequestParam(defaultValue = "10") int size) {
 
         log.info("GamesController - searchGame called");
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse
-                .<PagedResponse<GameSearchDTO>>builder()
+                .<PagedResponse<GameListDTO>>builder()
                 .success(true)
-                .data(gamesService.searchGames(gameName, page - 1, size))
+                .data(gamesService.getGames(gameName, page - 1, size))
                 .message("Search completed successfully")
                 .build());
     }

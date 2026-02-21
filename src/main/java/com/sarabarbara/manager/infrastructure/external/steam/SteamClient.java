@@ -3,14 +3,18 @@ package com.sarabarbara.manager.infrastructure.external.steam;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sarabarbara.manager.games.dtos.*;
+import com.sarabarbara.manager.games.GamesMapper;
+import com.sarabarbara.manager.games.GamesUtils;
+import com.sarabarbara.manager.games.SteamBatchParser;
+import com.sarabarbara.manager.games.dtos.GameListDTO;
+import com.sarabarbara.manager.games.dtos.GamesInfo;
+import com.sarabarbara.manager.games.dtos.SteamStoreDTO;
 import com.sarabarbara.manager.shared.exceptions.ExternalApiException;
+import com.sarabarbara.manager.shared.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
-import org.springframework.cache.CacheManager;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +26,12 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.sarabarbara.manager.games.GamesUtils.normalizeName;
 import static com.sarabarbara.manager.games.GamesUtils.normalizeQuery;
@@ -50,73 +58,78 @@ public class SteamClient {
 
     private final ObjectMapper mapper;
     private final SteamConfig steamConfig;
+    private final GamesUtils gamesUtils;
+    private final GamesMapper gamesMapper;
+    private final Executor steamDetailsExecutor;
+    private final Utils utils;
+    private final SteamBatchParser steamBatchParser;
 
-    CacheManager cacheManager;
+    // =========================== SEARCH GAME (CUADRÍCULA) ====================
 
+    public List<GameListDTO> searchGame(List<GamesInfo> allGames, String gameName) {
 
-    @Cacheable(value = "steamSearch", key = "#gameName.toLowerCase()")
-    public List<GameSearchDTO> searchGame(String gameName) {
+        long searchStart = System.currentTimeMillis();
+        String normalized = normalizeQuery(gameName);
 
-        log.info("SteamClient - searchGames called");
-        log.debug("Searching for game: {}", gameName);
-        log.debug("Searching...");
+        // ========== LOCAL SEARCH ==========
+        List<GamesInfo> localCandidates = new ArrayList<>();
+        localCandidates.addAll(gamesUtils.literalSearch(allGames, normalized));
+        localCandidates.addAll(gamesUtils.prefixFallback(allGames, normalized));
+        localCandidates.addAll(gamesUtils.numericFallback(allGames, normalized));
+        localCandidates.addAll(gamesUtils.fuzzySearch(allGames, normalized));
 
-        List<GamesInfo> allGames = loadAllGames();
-
-        String normalizeGameName = normalizeQuery(gameName);
-        List<GamesInfo> normalizedAllGames = allGames.stream()
-                .map(g -> new GamesInfo(g.appid(), normalizeName(g.name())))
+        List<GameListDTO> localMapped = localCandidates.stream()
+                .map(gamesMapper::toGameListDTOFromGamesInfo)
                 .toList();
 
-        // add local search in Steam app list
-        List<GameSearchDTO> candidates = new ArrayList<>();
+        // ========== REMOTE SEARCH ==========
+        List<GameListDTO> remoteCandidates = searchSteamStore(normalized).stream()
+                .map(gamesMapper::toGameListDTOFromSteamStore)
+                .toList();
 
-        candidates.addAll(literalSearch(normalizedAllGames, normalizeGameName));
-        candidates.addAll(prefixFallback(normalizedAllGames, normalizeGameName));
-        candidates.addAll(numericFallback(normalizedAllGames, normalizeGameName));
-        candidates.addAll(fuzzySearch(normalizedAllGames, normalizeGameName));
+        // ========== MERGE ==========
+        List<GameListDTO> all = Stream.concat(
+                localMapped.stream(),
+                remoteCandidates.stream()
+        ).toList();
 
-        // add Steam Store search results
-        candidates.addAll(searchSteamStore(normalizeGameName));
-
-        // add SteamDB search results
-        StoreSearchResponseDTO db = searchGameFromSteamDb(gameName);
-
-        if (db.success()) {
-
-            candidates.addAll(db.data().content());
+        if (all.isEmpty()) {
+            return List.of();
         }
 
-        return getGameRanking(candidates, normalizeGameName);
+        // ========== BATCH DETAILS ==========
+        List<Integer> ids = all.stream()
+                .map(GameListDTO::id)
+                .toList();
+
+        List<GameListDTO> fullDetails = getGameDetailsBatch(ids);
+
+        // ========== RANKING ==========
+        List<GameListDTO> ranked = getGameRanking(fullDetails, normalized);
+
+        long searchEnd = System.currentTimeMillis();
+        log.warn("SEARCH took {} ms", (searchEnd - searchStart));
+
+        return ranked;
     }
 
-    private @NotNull List<GameSearchDTO> getGameRanking(@NotNull List<GameSearchDTO> candidates, String normalizedQuery) {
 
-        Map<Integer, GameSearchDTO> merged = new LinkedHashMap<>();
+    // ============================= GAME DETAILS ===========================
 
-        for (GameSearchDTO dto : candidates) merged.put(dto.id(), dto);
+    /*
+    @Cacheable(value = "steamAppDetails", key = "#appId")
+    public GameListDTO getAppDetails(int appId) {
 
-        List<GameSearchDTO> finalList = new ArrayList<>(merged.values());
-
-        // sort by relevance
-        finalList.sort((a, b) -> {
-
-            int scoreA = relevanceScore(normalizedQuery, normalizeName(a.name()));
-            int scoreB = relevanceScore(normalizedQuery, normalizeName(b.name()));
-
-            log.warn("COMPARE '{}' (score={})  vs  '{}' (score={})",
-                    a.name(), scoreA, b.name(), scoreB);
-
-            return Integer.compare(scoreB, scoreA);
-        });
-        return finalList;
     }
-
+     */
     // ============================= Complementary methods =============================
 
+    // ============================= STEAM API CALLS =============================
     @Cacheable("steamAllGames")
     public List<GamesInfo> loadAllGames() {
+
         try {
+
             String url = GET_ALL_GAMES.formatted(steamConfig.getApiKey());
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -130,6 +143,8 @@ public class SteamClient {
             String body = response.body().trim();
 
             if (body.startsWith("<")) {
+
+                log.error("Steam returned HTML instead of JSON: {}", body);
                 throw new ExternalApiException("Steam returned HTML instead of JSON");
             }
 
@@ -138,16 +153,23 @@ public class SteamClient {
                     .path("apps");
 
             if (!apps.isArray()) {
+
+                log.error("Invalid JSON structure from Steam: {}", body);
                 throw new ExternalApiException("Invalid JSON structure from Steam");
             }
 
             List<GamesInfo> list = new ArrayList<>();
 
             for (JsonNode app : apps) {
+
                 int id = app.path("appid").asInt();
                 String name = app.path("name").asText();
+                String image = "https://cdn.akamai.steamstatic.com/steam/apps/"
+                        + id + "/capsule_184x69.jpg";
+
                 if (!name.isBlank()) {
-                    list.add(new GamesInfo(id, name));
+
+                    list.add(new GamesInfo(id, name, image));
                 }
             }
 
@@ -155,8 +177,213 @@ public class SteamClient {
             return list;
 
         } catch (Exception e) {
+
+            log.error("Error loading Steam app list: {}", e.getMessage());
             throw new ExternalApiException("Error loading Steam app list", e);
         }
+    }
+
+    @Cacheable(value = "steamStoreSearch", key = "#query.toLowerCase()")
+    public List<SteamStoreDTO> searchSteamStore(String query) {
+
+        try {
+
+            String url = GET_GAMES_STEAM_STORE +
+                    URLEncoder.encode(query, StandardCharsets.UTF_8) +
+                    L_ENGLISH +
+                    CC_US;
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Accept", "application/json")
+                    .header("User-Agent", "Mozilla/5.0")
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String body = response.body().trim();
+
+            if (!body.startsWith("{")) {
+
+                log.warn("Steam Store returned non-JSON content: {}", body.substring(0, Math.min(200, body.length())));
+                return List.of();
+            }
+
+            JsonNode root = mapper.readTree(body);
+            JsonNode items = root.path("items");
+
+            if (!items.isArray()) {
+
+                log.warn("Steam Store returned invalid structure: {}", body);
+                return List.of();
+            }
+
+            List<SteamStoreDTO> results = new ArrayList<>();
+
+            for (JsonNode item : items) {
+
+                int id = item.path("id").asInt();
+                String name = item.path("name").asText();
+                String image = item.path("tiny_image").asText();
+                String type = item.path("type").asText();
+
+
+                if (id > 0 && !name.isBlank()) {
+
+                    results.add(new SteamStoreDTO(id, name, image, type));
+                }
+            }
+
+            return results;
+
+        } catch (Exception e) {
+
+            log.error("Error searching Steam Store: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    @Cacheable(
+            value = "steamGameDetailsBatch",
+            key = "#ids.hashCode()",
+            unless = "#result == null || #result.isEmpty()"
+    )
+    public List<GameListDTO> getGameDetailsBatch(@NotNull List<Integer> ids) {
+
+        long start = System.currentTimeMillis();
+
+        // URL base con parámetros correctos
+        final String urlTemplate =
+                "https://store.steampowered.com/api/appdetails?appids=%s";
+
+        // 1. Particionar en batches de 10
+        List<List<Integer>> batches = utils.partition(ids, 10);
+
+        // 2. Ejecutar batches en paralelo
+        List<CompletableFuture<Map<Integer, JsonNode>>> futures =
+                batches.stream()
+                        .map(batch -> CompletableFuture.supplyAsync(
+                                () -> {
+                                    // Convertir IDs → "id1,id2,id3"
+                                    String joined = batch.stream()
+                                            .map(String::valueOf)
+                                            .collect(Collectors.joining(","));
+
+                                    // Construir URL final
+                                    String url = urlTemplate.formatted(joined);
+
+                                    return utils.fetchBatch(batch, url, steamBatchParser);
+                                },
+                                steamDetailsExecutor
+                        ))
+                        .toList();
+
+        // 3. Unir resultados
+        Map<Integer, JsonNode> merged =
+                futures.stream()
+                        .map(CompletableFuture::join)
+                        .flatMap(m -> m.entrySet().stream())
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (a, b) -> a, // evitar colisiones
+                                LinkedHashMap::new
+                        ));
+
+        // 4. Convertir a DTO
+        List<GameListDTO> results = merged.values().stream()
+                .map(node -> mapper.convertValue(node, GameListDTO.class))
+                .toList();
+
+        log.warn("DETAILS BATCH took {} ms", (System.currentTimeMillis() - start));
+
+        return results;
+    }
+
+    /**
+     * Fetches game details from Steam with save retries and error handling.
+     *
+     * @param id Game ID
+     * @return GameListDTO or null if not found/error
+     */
+
+    private @Nullable GameListDTO fetchDetailsSafe(@NotNull Integer id) {
+
+        String url = GET_GAME + id + L_ENGLISH + CC_US;
+
+
+        try {
+
+            // to avoid hitting Steam too hard, especially if we get non-JSON responses
+            Thread.sleep(250);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Accept", "application/json")
+                    .header("User-Agent",
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                                    + "(KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+                    .header("Cookie", "birthtime=0; lastagecheckage=1-0-1900")
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String body = response.body().trim();
+
+            if (!body.startsWith("{")) {
+
+                log.warn("Steam returned non-JSON for appid {}: {}",
+                        id, body.substring(0, Math.min(200, body.length())));
+
+                Thread.sleep(150L + new Random().nextInt(100)); // random backoff to reduce chances of repeated blocks
+            }
+
+            JsonNode root = mapper.readTree(body);
+            JsonNode dataNode = root.path(String.valueOf(id)).path("data");
+
+            if (dataNode.isMissingNode() || dataNode.isNull()) {
+                log.warn("Steam returned empty data for appid {}", id);
+                return null;
+            }
+
+            return mapper.convertValue(dataNode, GameListDTO.class);
+
+        } catch (Exception e) {
+
+            log.error("Error fetching details for game ID {}: {}",
+                    id, e.getMessage());
+        }
+
+        return null;
+    }
+
+    // ============================= RANKING ALGORITHM =============================
+
+    private @NotNull List<GameListDTO> getGameRanking(@NotNull List<GameListDTO> candidates, String normalizedQuery) {
+
+        Map<Integer, GameListDTO> merged = new LinkedHashMap<>();
+
+        for (GameListDTO dto : candidates) merged.put(dto.id(), dto);
+
+        List<GameListDTO> finalList = new ArrayList<>(merged.values());
+
+        // sort by relevance
+        finalList.sort((a, b) -> {
+
+            int scoreA = relevanceScore(normalizedQuery, normalizeName(a.name()));
+            int scoreB = relevanceScore(normalizedQuery, normalizeName(b.name()));
+
+            log.warn("COMPARE '{}' (score={})  vs  '{}' (score={})",
+                    a.name(), scoreA, b.name(), scoreB);
+
+            return Integer.compare(scoreB, scoreA);
+        });
+
+        return finalList;
     }
 
     private int relevanceScore(String query, @NotNull String name) {
@@ -210,259 +437,4 @@ public class SteamClient {
         return -1000;
     }
 
-    private @NotNull @Unmodifiable List<GameSearchDTO> literalSearch(@NotNull List<GamesInfo> allGames, @NotNull String query) {
-
-        return allGames.stream()
-                .filter(g -> g.name().toLowerCase().contains(query.toLowerCase()))
-                .map(this::toSearchDTO)
-                .toList();
-    }
-
-    private @NotNull @Unmodifiable List<GameSearchDTO> prefixFallback(@NotNull List<GamesInfo> allGames, @NotNull String query) {
-
-        String first = query.split("\\s+")[0];
-
-        return allGames.stream()
-                .filter(g -> g.name().toLowerCase().startsWith(first))
-                .map(this::toSearchDTO)
-                .toList();
-    }
-
-    private List<GameSearchDTO> numericFallback(List<GamesInfo> allGames, String query) {
-
-        Pattern p = Pattern.compile("(.*?)(\\d+)$");
-        Matcher m = p.matcher(query);
-
-        if (!m.find()) return List.of();
-
-        String base = m.group(1);
-        int number;
-
-        try {
-
-            number = Integer.parseInt(m.group(2));
-
-        } catch (NumberFormatException e) {
-
-            log.warn("Failed to parse number '{}' from query '{}': {}", m.group(2), query, e.getMessage());
-            return List.of();
-        }
-
-        String roman = toRoman(number);
-        String word = numberToWord(number);
-
-        return allGames.stream()
-                .filter(g -> {
-
-                    String name = g.name().toLowerCase();
-
-                    if (!name.contains(base)) return false;
-
-                    return name.contains(String.valueOf(number))
-                            || name.contains(roman)
-                            || name.contains(word);
-                })
-                .map(this::toSearchDTO)
-                .toList();
-    }
-
-    private @NotNull @Unmodifiable List<GameSearchDTO> fuzzySearch(@NotNull List<GamesInfo> allGames, String query) {
-
-        return allGames.stream()
-                .map(g -> new AbstractMap.SimpleEntry<>(g, jaroWinkler(query, g.name().toLowerCase())))
-                .filter(e -> e.getValue() >= 0.70)
-                .map(e -> toSearchDTO(e.getKey()))
-                .toList();
-    }
-
-    @Contract("_ -> new")
-    private @NotNull GameSearchDTO toSearchDTO(@NotNull GamesInfo game) {
-        return new GameSearchDTO(
-                game.appid(),
-                game.name(),
-                "https://cdn.akamai.steamstatic.com/steam/apps/" + game.appid() + "/capsule_184x69.jpg"
-        );
-    }
-
-    public StoreSearchResponseDTO searchGameFromSteamDb(String query) {
-
-        String url = GET_GAMES_STEAM_DB +
-                URLEncoder.encode(query, StandardCharsets.UTF_8);
-
-        int maxRetries = 3;
-
-        for (int attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .header("Accept", "application/json")
-                        .header("Accept-Encoding", "gzip")
-                        .header("User-Agent",
-                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                                        + "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                        .timeout(Duration.ofSeconds(10))
-                        .build();
-
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                String body = response.body().trim();
-
-                // SteamDB sometimes returns HTML when rate-limited
-                if (!body.startsWith("{")) {
-                    log.warn("SteamDB returned non-JSON content on attempt {}: {}", attempt, body.substring(0, Math.min(200, body.length())));
-                    Thread.sleep(300L * attempt);
-                    continue;
-                }
-
-                // Parse JSON
-                JsonNode root = mapper.readTree(body);
-
-                JsonNode itemsNode = root.path("data").path("results");
-
-                List<SteamDbResultDTO> rawResults = mapper.convertValue(
-                        itemsNode,
-                        mapper.getTypeFactory().constructCollectionType(List.class, SteamDbResultDTO.class)
-                );
-
-                List<GameSearchDTO> results = rawResults.stream()
-                        .map(r -> new GameSearchDTO(
-                                r.id(),
-                                r.name(),
-                                r.tinyImage()
-                        ))
-                        .toList();
-
-                StoreSearchData data = new StoreSearchData(
-                        results,
-                        results.size(),
-                        1,
-                        0,
-                        results.size()
-                );
-
-                return new StoreSearchResponseDTO(
-                        true,
-                        data,
-                        "Search completed successfully"
-                );
-
-            } catch (Exception e) {
-                log.error("Error searching SteamDB (attempt {}): {}", attempt, e.getMessage());
-            }
-        }
-
-        // If all retries fail
-        return new StoreSearchResponseDTO(
-                false,
-                new StoreSearchData(List.of(), 0, 0, 0, 0),
-                "Error searching game in SteamDB"
-        );
-    }
-
-    @Cacheable(value = "steamStoreSearch", key = "#query.toLowerCase()")
-    public List<GameSearchDTO> searchSteamStore(String query) {
-
-        try {
-            String url = GET_GAMES_STEAM_STORE +
-                    URLEncoder.encode(query, StandardCharsets.UTF_8) +
-                    L_ENGLISH +
-                    CC_US;
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .timeout(Duration.ofSeconds(10))
-                    .header("Accept", "application/json")
-                    .header("User-Agent", "Mozilla/5.0")
-                    .build();
-
-            HttpResponse<String> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            String body = response.body().trim();
-
-            if (!body.startsWith("{")) {
-                log.warn("Steam Store returned non-JSON content: {}", body.substring(0, Math.min(200, body.length())));
-                return List.of();
-            }
-
-            JsonNode root = mapper.readTree(body);
-            JsonNode items = root.path("items");
-
-            if (!items.isArray()) {
-                log.warn("Steam Store returned invalid structure: {}", body);
-                return List.of();
-            }
-
-            List<GameSearchDTO> results = new ArrayList<>();
-
-            for (JsonNode item : items) {
-                int id = item.path("id").asInt();
-                String name = item.path("name").asText();
-                String image = item.path("tiny_image").asText();
-
-                if (id > 0 && !name.isBlank()) {
-                    results.add(new GameSearchDTO(id, name, image));
-                }
-            }
-
-            return results;
-
-        } catch (Exception e) {
-            log.error("Error searching Steam Store: {}", e.getMessage());
-            return List.of();
-        }
-    }
-
-    // fuzzy search
-    private double jaroWinkler(@NotNull String text1, String text2) {
-        if (text1.equals(text2)) return 1.0;
-
-        int len1 = text1.length();
-        int len2 = text2.length();
-
-        if (len1 == 0 || len2 == 0) return 0.0;
-
-        int matchRange = Math.max(len1, len2) / 2 - 1;
-
-        boolean[] matches1 = new boolean[len1];
-        boolean[] matches2 = new boolean[len2];
-
-        int matches = 0;
-        int transpositions = 0;
-
-        for (int i = 0; i < len1; i++) {
-            int start = Math.max(0, i - matchRange);
-            int end = Math.min(i + matchRange + 1, len2);
-
-            for (int j = start; j < end; j++) {
-                if (matches2[j]) continue;
-                if (text1.charAt(i) != text2.charAt(j)) continue;
-
-                matches1[i] = true;
-                matches2[j] = true;
-                matches++;
-                break;
-            }
-        }
-
-        if (matches == 0) return 0.0;
-
-        int k = 0;
-        for (int i = 0; i < len1; i++) {
-            if (!matches1[i]) continue;
-            while (!matches2[k]) k++;
-            if (text1.charAt(i) != text2.charAt(k)) transpositions++;
-            k++;
-        }
-
-        double m = matches;
-        double jaro = ((m / len1) + (m / len2) + ((m - transpositions / 2.0) / m)) / 3.0;
-
-        int prefix = 0;
-        for (int i = 0; i < Math.min(4, Math.min(len1, len2)); i++) {
-            if (text1.charAt(i) == text2.charAt(i)) prefix++;
-            else break;
-        }
-
-        return jaro + prefix * 0.1 * (1 - jaro);
-    }
 }

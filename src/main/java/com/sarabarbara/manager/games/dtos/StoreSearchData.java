@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.games.dtos;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.util.List;
@@ -16,10 +17,19 @@ import java.util.List;
 @Builder
 public record StoreSearchData(
 
-        List<GameSearchDTO> content,
+        @Schema(description = "List of game search results", example = "[]")
+        List<GameAutocompleteDTO> content,
+
+        @Schema(description = "Total number of elements found", example = "100")
         int totalElements,
+
+        @Schema(description = "Total number of pages available", example = "10")
         int totalPages,
+
+        @Schema(description = "Current page number", example = "0")
         int page,
+
+        @Schema(description = "Number of elements per page", example = "10")
         int size
 
 ) {

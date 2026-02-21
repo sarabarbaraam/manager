@@ -2,18 +2,25 @@ package com.sarabarbara.manager.games;
 
 
 import com.sarabarbara.manager.games.dtos.GameListDTO;
+import com.sarabarbara.manager.games.dtos.GamesInfo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.stereotype.Component;
 
 import java.net.http.HttpResponse;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.sarabarbara.manager.shared.constants.APIConstants.APPLICATION_JSON;
 import static com.sarabarbara.manager.shared.constants.APIConstants.CONTENT_TYPE;
+import static com.sarabarbara.manager.shared.utils.Utils.numberToWord;
+import static com.sarabarbara.manager.shared.utils.Utils.toRoman;
 
 /**
  * Utils class.
@@ -158,6 +165,115 @@ public class GamesUtils {
                 .replaceAll("(?i)\\bviii\\b", "8")
                 .replaceAll("(?i)\\bix\\b", "9")
                 .replaceAll("(?i)\\bx\\b", "10");
+    }
+
+    // ======================== SEARCH HELPERS ==========================
+
+    public @NotNull @Unmodifiable List<GamesInfo> literalSearch(@NotNull List<GamesInfo> allGames, String query) {
+
+        return allGames.stream()
+                .filter(g -> g.name().toLowerCase().contains(query.toLowerCase()))
+                .toList();
+    }
+
+    public @NotNull @Unmodifiable List<GamesInfo> prefixFallback(@NotNull List<GamesInfo> allGames, @NotNull String query) {
+
+        String first = query.split("\\s+")[0];
+
+        return allGames.stream()
+                .filter(g -> g.name().toLowerCase().startsWith(first))
+                .toList();
+    }
+
+    public List<GamesInfo> numericFallback(List<GamesInfo> allGames, String query) {
+
+        Pattern p = Pattern.compile("(.*?)(\\d+)$");
+        Matcher m = p.matcher(query);
+
+        if (!m.find()) return List.of();
+
+        String base = m.group(1);
+        int number = Integer.parseInt(m.group(2));
+
+        String roman = toRoman(number);
+        String word = numberToWord(number);
+
+        return allGames.stream()
+                .filter(g -> {
+                    String name = g.name().toLowerCase();
+                    return name.contains(base)
+                            && (name.contains(String.valueOf(number))
+                            || name.contains(roman)
+                            || name.contains(word));
+                })
+                .toList();
+    }
+
+    public @NotNull @Unmodifiable List<GamesInfo> fuzzySearch(@NotNull List<GamesInfo> allGames, String query) {
+
+        return allGames.stream()
+                .map(g -> new AbstractMap.SimpleEntry<>(g, jaroWinkler(query, g.name().toLowerCase())))
+                .filter(e -> e.getValue() >= 0.70)
+                .map(AbstractMap.SimpleEntry::getKey)
+                .toList();
+    }
+
+    // fuzzy search
+    private double jaroWinkler(@NotNull String text1, String text2) {
+
+        if (text1.equals(text2)) return 1.0;
+
+        int len1 = text1.length();
+        int len2 = text2.length();
+
+        if (len1 == 0 || len2 == 0) return 0.0;
+
+        int matchRange = Math.max(len1, len2) / 2 - 1;
+
+        boolean[] matches1 = new boolean[len1];
+        boolean[] matches2 = new boolean[len2];
+
+        int matches = 0;
+        int transpositions = 0;
+
+        for (int i = 0; i < len1; i++) {
+
+            int start = Math.max(0, i - matchRange);
+            int end = Math.min(i + matchRange + 1, len2);
+
+            for (int j = start; j < end; j++) {
+                if (matches2[j]) continue;
+                if (text1.charAt(i) != text2.charAt(j)) continue;
+
+                matches1[i] = true;
+                matches2[j] = true;
+                matches++;
+                break;
+            }
+        }
+
+        if (matches == 0) return 0.0;
+
+        int k = 0;
+        for (int i = 0; i < len1; i++) {
+
+            if (!matches1[i]) continue;
+            while (!matches2[k]) k++;
+            if (text1.charAt(i) != text2.charAt(k)) transpositions++;
+            k++;
+        }
+
+        double m = matches;
+        double jaro = ((m / len1) + (m / len2) + ((m - transpositions / 2.0) / m)) / 3.0;
+
+        int prefix = 0;
+        for (int i = 0; i < Math.min(4, Math.min(len1, len2)); i++) {
+
+            if (text1.charAt(i) == text2.charAt(i)) prefix++;
+            else break;
+        }
+
+        return jaro + prefix * 0.1 * (1 - jaro);
     }
 
 }

@@ -16,7 +16,7 @@ import java.util.List;
  */
 
 @Builder
-@Schema(description = "DTO representing a list of games")
+@Schema(description = "DTO representing medium information of a game")
 public record GameListDTO(
 
         @JsonProperty("steam_appid")
@@ -31,7 +31,7 @@ public record GameListDTO(
 
         @Schema(description = "The capsule image of the game",
                 examples = "https://cdn.akamai.steamstatic.com/steam/apps/220/capsule_616x353.jpg?t=1697051907")
-        String capsuleImage,
+        String image,
 
         @Schema(description = "The short description of the game",
                 examples = "Half-Life 2 is a first-person shooter developed by Valve. Set in a dystopian future, " +
@@ -39,7 +39,7 @@ public record GameListDTO(
         String shortDescription,
 
         @JsonProperty("price_overview")
-        @Schema(description = "The price of the game", examples = "{...}")
+        @Schema(description = "The price of the game", examples = "1599")
         PriceOverviewDTO price,
 
         @JsonProperty("is_free")

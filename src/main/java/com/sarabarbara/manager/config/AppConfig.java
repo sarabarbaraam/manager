@@ -31,7 +31,6 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @since 06/01/2026
  */
 
-@RequiredArgsConstructor
 @Configuration
 public class AppConfig {
 

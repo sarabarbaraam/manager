@@ -26,7 +26,6 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
 
@@ -34,6 +33,7 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
     private final SubscriptionsPlanMapper subscriptionsPlanMapper;
 
     @Override
+    @Transactional
     public CreateSubscriptionsPlanDTO createSubscriptionPlan(SubscriptionsPlanRequest request) {
 
         log.info("SubscriptionsPlanServiceImpl - createSubscriptionPlan called");
@@ -50,7 +50,6 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<SubscriptionsPlanDTO> getSubscriptionPlan(int page, int size) {
 
         log.info("SubscriptionsPlanServiceImpl - getSubscriptionPlan called");
@@ -63,7 +62,6 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<SubscriptionsPlanDTO> getSubscriptionPlanById(Long id, int page, int size) {
 
         log.info("SubscriptionsPlanServiceImpl - getSubscriptionPlanById called");
@@ -82,6 +80,7 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
     }
 
     @Override
+    @Transactional
     public SubscriptionsPlanDTO updateSubscriptionPlan(Long id, UpdateSubscriptionsPlanRequest request) {
 
         log.info("SubscriptionsPlanServiceImpl - updateSubscriptionPlan called");
@@ -97,6 +96,7 @@ public class SubscriptionsPlanServiceImpl implements SubscriptionsPlanService {
     }
 
     @Override
+    @Transactional
     public void deleteSubscriptionPlan(Long id) {
 
         log.info("SubscriptionsPlanServiceImpl - deleteSubscriptionPlan called");

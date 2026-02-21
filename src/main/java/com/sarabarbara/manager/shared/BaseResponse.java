@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.shared;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 /**
@@ -20,8 +21,13 @@ import lombok.*;
 @Builder
 public class BaseResponse<T> {
 
+    @Schema(description = "Indicates if the request was successful", example = "true")
     private boolean success;
+
+    @Schema(description = "The data of the response", example = "data")
     private T data;
+
+    @Schema(description = "The message of the response", example = "The request was successful")
     private String message;
 
 }

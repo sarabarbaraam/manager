@@ -15,9 +15,8 @@ import lombok.Builder;
 
 @Builder
 @Schema(description = "DTO representing a game search result")
-public record GameSearchDTO(
+public record GameAutocompleteDTO(
 
-        @JsonProperty("steam_appid")
         @Schema(description = "The id of the game", examples = "413150")
         Integer id,
 
@@ -26,6 +25,6 @@ public record GameSearchDTO(
 
         @Schema(description = "The capsule image of the game",
                 examples = "https://cdn.akamai.steamstatic.com/steam/apps/220/capsule_616x353.jpg?t=1697051907")
-        String capsuleImage
+        String image
 ) {
 }

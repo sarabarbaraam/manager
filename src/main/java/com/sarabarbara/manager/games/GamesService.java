@@ -2,7 +2,7 @@ package com.sarabarbara.manager.games;
 
 
 import com.sarabarbara.manager.games.dtos.GameListDTO;
-import com.sarabarbara.manager.games.dtos.GameSearchDTO;
+import com.sarabarbara.manager.games.dtos.GameAutocompleteDTO;
 import com.sarabarbara.manager.games.dtos.GameSheetDTO;
 import com.sarabarbara.manager.shared.PagedResponse;
 
@@ -18,7 +18,8 @@ import java.util.List;
 
 public interface GamesService {
 
-    PagedResponse<GameSearchDTO> searchGames(String gameName, int page, int size);
-    PagedResponse<GameListDTO> listGames(List<GameSearchDTO> searchedGame, int page, int size);
+    List<GameAutocompleteDTO> autocomplete(String query);
+    PagedResponse<GameListDTO> listGames(List<GameAutocompleteDTO> searchedGame, int page, int size);
+    PagedResponse<GameListDTO> getGames(String gameName, int page, int size);
     GameSheetDTO gameSheet(Integer gameId);
 }

@@ -1,6 +1,7 @@
 package com.sarabarbara.manager.games.dtos;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 /**
@@ -14,8 +15,13 @@ import lombok.Builder;
 @Builder
 public record StoreSearchResponseDTO(
 
+        @Schema(description = "Indicates if the request was successful", example = "true")
         boolean success,
+
+        @Schema(description = "The data of the store search", implementation = StoreSearchData.class)
         StoreSearchData data,
+
+        @Schema(description = "The message of the store search", example = "The request was successful")
         String message
 
 ) {

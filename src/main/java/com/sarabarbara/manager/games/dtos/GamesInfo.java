@@ -17,8 +17,11 @@ import lombok.Builder;
 public record GamesInfo(
 
         @Schema(description = "App ID of the game", example = "570")
-        int appid,
+        int id,
 
         @Schema(description = "Name of the game", example = "Dota 2")
-        String name) {
+        String name,
+
+        @Schema(description = "Image URL of the game", example = "https://cdn.akamai.steamstatic.com/steam/apps/570/capsule_616x353.jpg")
+        String image) {
 }

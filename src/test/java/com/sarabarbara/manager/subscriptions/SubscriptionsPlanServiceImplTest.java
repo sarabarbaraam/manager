@@ -55,7 +55,6 @@ public class SubscriptionsPlanServiceImplTest {
 
     @BeforeEach
     void setUp() {
-
         sampleEntity = new SubscriptionsPlan();
         sampleEntity.setId(1L);
         sampleEntity.setName(SubscriptionsPlanEnum.FREE);
@@ -87,7 +86,7 @@ public class SubscriptionsPlanServiceImplTest {
         verify(subscriptionsPlanRepository).save(captor.capture());
         SubscriptionsPlan captured = captor.getValue();
 
-        assertEquals(Period.parse("P1M"), captured.getDuration());
+        assertEquals("1 month", captured.getDuration());
         verify(subscriptionsPlanMapper).toEntity(request);
         verify(subscriptionsPlanMapper).toCreateSubscriptionsPlanDTO(savedEntity);
     }
@@ -101,6 +100,16 @@ public class SubscriptionsPlanServiceImplTest {
 
         assertThrows(DateTimeParseException.class, () -> service.createSubscriptionPlan(request));
 
+        verify(subscriptionsPlanRepository, never()).save(any());
+    }
+
+    @Test
+    void createSubscriptionPlan_nullDuration_throwsNullPointerException() {
+        SubscriptionsPlanRequest request = mock(SubscriptionsPlanRequest.class);
+        when(request.duration()).thenReturn(null);
+        when(subscriptionsPlanMapper.toEntity(request)).thenReturn(sampleEntity);
+
+        assertThrows(NullPointerException.class, () -> service.createSubscriptionPlan(request));
         verify(subscriptionsPlanRepository, never()).save(any());
     }
 
@@ -119,6 +128,19 @@ public class SubscriptionsPlanServiceImplTest {
         assertEquals(expectedDtos, result);
         verify(subscriptionsPlanRepository).findAll(any(PageRequest.class));
         verify(subscriptionsPlanMapper).toDTOList(content);
+    }
+
+    @Test
+    void getSubscriptionPlan_returnsEmptyList_whenNoContent() {
+        int page = 1, size = 10;
+        PageImpl<SubscriptionsPlan> emptyPage = new PageImpl<>(List.of());
+
+        when(subscriptionsPlanRepository.findAll(any(PageRequest.class))).thenReturn(emptyPage);
+        when(subscriptionsPlanMapper.toDTOList(emptyPage.getContent())).thenReturn(List.of());
+
+        List<SubscriptionsPlanDTO> result = service.getSubscriptionPlan(page, size);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -154,12 +176,11 @@ public class SubscriptionsPlanServiceImplTest {
     void updateSubscriptionPlan_success_updatesDuration_and_returnsDto() {
         Long id = 1L;
         UpdateSubscriptionsPlanRequest request = mock(UpdateSubscriptionsPlanRequest.class);
-        lenient().when(request.duration()).thenReturn("P2M");
+        // Removed unnecessary stubbing of request.duration()
 
         when(subscriptionsPlanRepository.findById(id)).thenReturn(Optional.of(sampleEntity));
         when(subscriptionsPlanMapper.updateEntityFromRequest(request, sampleEntity)).thenAnswer(inv -> {
-            // Simulate MapStruct behavior: parse duration and set it on the entity
-            sampleEntity.setDuration(Period.parse("P2M"));
+            sampleEntity.setDuration(Period.ofMonths(2));
             return sampleEntity;
         });
         when(subscriptionsPlanRepository.save(any(SubscriptionsPlan.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -172,7 +193,7 @@ public class SubscriptionsPlanServiceImplTest {
         assertSame(expectedDto, result);
         ArgumentCaptor<SubscriptionsPlan> captor = ArgumentCaptor.forClass(SubscriptionsPlan.class);
         verify(subscriptionsPlanRepository).save(captor.capture());
-        assertEquals(Period.parse("P2M"), captor.getValue().getDuration());
+        assertEquals("2 months", captor.getValue().getDuration());
     }
 
     @Test
@@ -193,7 +214,7 @@ public class SubscriptionsPlanServiceImplTest {
         lenient().when(request.duration()).thenReturn("bad");
         when(subscriptionsPlanRepository.findById(id)).thenReturn(Optional.of(sampleEntity));
         when(subscriptionsPlanMapper.updateEntityFromRequest(request, sampleEntity)).thenAnswer(inv -> {
-            // Simulate MapStruct behavior: attempt to parse invalid duration
+            // Simulate MapStruct behavior: attempt to parse invalid duration -> will throw
             Period.parse("bad");
             return sampleEntity;
         });
@@ -205,8 +226,10 @@ public class SubscriptionsPlanServiceImplTest {
     @Test
     void deleteSubscriptionPlan_success_setsActiveFalse_and_saves() {
         Long id = 1L;
-        when(subscriptionsPlanRepository.findById(id)).thenReturn(Optional.of(sampleEntity));
-        when(subscriptionsPlanRepository.save(any(SubscriptionsPlan.class))).thenReturn(sampleEntity);
+        SubscriptionsPlan entity = new SubscriptionsPlan();
+        entity.setActive(true);
+        when(subscriptionsPlanRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(subscriptionsPlanRepository.save(any(SubscriptionsPlan.class))).thenReturn(entity);
 
         service.deleteSubscriptionPlan(id);
 

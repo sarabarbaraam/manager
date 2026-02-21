@@ -41,7 +41,6 @@ import static com.sarabarbara.manager.shared.constants.UsersConstants.PASSWORD_R
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class UsersServiceImpl implements UsersService {
 
@@ -54,6 +53,7 @@ public class UsersServiceImpl implements UsersService {
 
     // todo: send verification email after user creation
     @Override
+    @Transactional
     public CreateUserDTO createUser(UserRequest request) {
 
         log.info("UsersServiceImpl - createUser called");
@@ -91,7 +91,6 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UsersDTO> getUsers(int page, int size) {
 
         log.info("UsersServiceImpl - getUsers called");
@@ -110,7 +109,6 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UsersDTO> getUserByUsername(String username, int page, int size) throws UserNotFoundException {
 
         log.info("UsersServiceImpl - getUserByUsername called");
@@ -132,6 +130,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    @Transactional
     public UsersDTO updateUser(@NotNull UpdateUserRequest request) throws UserNotFoundException {
 
         log.info("UsersServiceImpl - updateUser called");
@@ -177,6 +176,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    @Transactional
     public void deleteUser() {
 
         log.info("UsersServiceImpl - deleteUser called");

@@ -15,6 +15,7 @@ import lombok.Builder;
 @Builder
 public record SteamDbPriceDTO(
 
+
         String currency,
         int initial,
         @JsonProperty("final") int finalPrice
